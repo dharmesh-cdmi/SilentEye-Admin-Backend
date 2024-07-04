@@ -1,9 +1,10 @@
 const express = require('express');
+const connectDB = require('./config/dbConnection');
+const dotenv = require('dotenv');
+const cookieParser = require('cookie-parser');
 const cors = require('cors');
-const cookieParser = require("cookie-parser");
-require('dotenv').config();
-const connectDB = require("./configs/db.config");
-const routes = require('./routes/index');
+
+dotenv.config();
 
 //Express Server Setup
 const app = express();
@@ -24,14 +25,15 @@ app.use(cors(corsOptions));
 const DB = process.env.DB_URI;
 connectDB(DB);
 
-//Server status endpoint
-app.get('/', (req, res) => {
-    res.send('Server is Up!');
-});
+// Import and use the auth routes
+app.use('/api/auth', require('./routes/auth'));
+
+const PORT = process.env.PORT || 4000;
 
 // Routes
-app.use("/api", routes);
+app.use('/api/users', require('./routes/testAPI'));
 
-app.listen(port, () => {
-    console.log(`Node/Express Server is Up......\nPort: localhost:${port}`);
+// Start the server
+app.listen(PORT, () => {
+  console.log(`Server is running on http://localhost:${PORT}`);
 });

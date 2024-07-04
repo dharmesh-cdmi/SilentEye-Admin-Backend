@@ -1,5 +1,5 @@
 const express = require('express');
-const connectDB = require('./config/db');
+const connectDB = require('./config/dbConnection');
 const dotenv = require('dotenv');
 
 dotenv.config();
@@ -10,8 +10,15 @@ connectDB();
 
 app.use(express.json({ extended: false }));
 
+// Import and use the auth routes
 app.use('/api/auth', require('./routes/auth'));
 
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 4000;
 
-app.listen(PORT, () => console.log(`Server started on port ${PORT}`));
+// Routes
+app.use('/api/users', require('./routes/testAPI'));
+
+// Start the server
+app.listen(PORT, () => {
+  console.log(`Server is running on http://localhost:${PORT}`);
+});

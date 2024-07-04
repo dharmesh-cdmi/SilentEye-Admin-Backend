@@ -1,17 +1,37 @@
 const express = require('express');
-const connectDB = require('./config/db');
-const dotenv = require('dotenv');
+const cors = require('cors');
+const cookieParser = require("cookie-parser");
+require('dotenv').config();
+const connectDB = require("./configs/db.config");
+const routes = require('./routes/index');
 
-dotenv.config();
-
+//Express Server Setup
 const app = express();
+const port = process.env.PORT || 5111;
+const corsOptions = {
+    origin: 'http://localhost:5173',
+    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+    credentials: true
+};
 
-connectDB();
+//Express Middlewares
+app.use(express.json());
+app.use(cookieParser());
+app.use(cors(corsOptions));
 
-app.use(express.json({ extended: false }));
+// Connection URL
+const DB = process.env.DB_URI;
+connectDB(DB);
 
-app.use('/api/auth', require('./routes/auth'));
+//Server status endpoint
+app.get('/', (req, res) => {
+    res.send('Server is Up!');
+});
 
-const PORT = process.env.PORT || 5000;
+// Routes
+app.use("/api", routes);
 
-app.listen(PORT, () => console.log(`Server started on port ${PORT}`));
+app.listen(port, () => {
+    console.log(`Node/Express Server is Up......\nPort: localhost:${port}`);
+});

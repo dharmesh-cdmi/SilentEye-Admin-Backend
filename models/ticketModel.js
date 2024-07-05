@@ -6,7 +6,7 @@ const TicketSchema = new mongoose.Schema({
     message: { type: String, required: true },
     comments: [{
         text: { type: String, required: true },
-        createdBy: { type: Schema.Types.ObjectId, ref: 'User' },
+        createdBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
         createdAt: { type: Date }
     }],
     closedAt: { type: Date }

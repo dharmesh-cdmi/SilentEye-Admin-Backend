@@ -6,26 +6,26 @@ const validationMiddleware = require('../middleware/validationMiddleware');
 
 router.get(
   "/fetch-settings",
-  authMiddleware.stripToken,
-  authMiddleware.verifyAccessToken,
-  authMiddleware.verifyAdmin,
+  // authMiddleware.stripToken,
+  // authMiddleware.verifyAccessToken,
+  // authMiddleware.verifyAdmin,
   controller.FetchSettings
 );
 
 router.post(
   "/create-settings",
-  authMiddleware.stripToken,
-  authMiddleware.verifyAccessToken,
-  authMiddleware.verifyAdmin,
+  // authMiddleware.stripToken,
+  // authMiddleware.verifyAccessToken,
+  // authMiddleware.verifyAdmin,
   validationMiddleware.validateRequest(settingsSchemas.createSettingsSchema),
   controller.CreateSettings
 );
 
 router.put(
   "/update-settings",
-  authMiddleware.stripToken,
-  authMiddleware.verifyAccessToken,
-  authMiddleware.verifyAdmin,
+  // authMiddleware.stripToken,
+  // authMiddleware.verifyAccessToken,
+  // authMiddleware.verifyAdmin,
   validationMiddleware.validateRequest(settingsSchemas.createSettingsSchema),
   controller.UpdateSettings
 );

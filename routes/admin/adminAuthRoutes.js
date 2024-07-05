@@ -20,16 +20,6 @@ router.post('/', async (req, res) => {
   }
 });
 
-// Route to get all admins
-router.get('/', verifyAdmin, async (req, res) => {
-  try {
-    const admins = await Admin.find();
-    res.status(200).json(admins);
-  } catch (err) {
-    res.status(400).json({ error: err.message });
-  }
-});
-
 // Admin login route
 router.post('/login', async (req, res) => {
   const { email, password } = req.body;

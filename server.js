@@ -21,7 +21,7 @@ app.use(cookieParser());
 app.use(cors(corsOptions));
 
 // Connection URL
-const DB = process.env.DB_URI;
+const DB = process.env.MONGO_URI;
 connectDB(DB);
 
 //Server status endpoint

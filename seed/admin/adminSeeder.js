@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const bcrypt = require('bcrypt');
 const connectDB = require('../../configs/db.config');
 const Admin = require('../../models/admin/adminModel');
 
@@ -8,10 +9,10 @@ const admins = [
     name: 'Admin 1',
     email: 'admin@gmail.com',
     email_verified_at: new Date(),
-    password: '123456',  // Remember to hash passwords in a real application
+    password: '123456',  // Plain text password
     role: 'admin',
     status: 'active',
-    remember_token:null,
+    remember_token: null,
     createdAt: new Date(),
     updatedAt: new Date(),
   },
@@ -19,26 +20,35 @@ const admins = [
     name: 'Admin 2',
     email: 'manager@gmail.com',
     email_verified_at: new Date(),
-    password: '123456',  // Remember to hash passwords in a real application
+    password: '123456',  // Plain text password
     role: 'manager',
     status: 'active',
-    remember_token:null,
+    remember_token: null,
     createdAt: new Date(),
     updatedAt: new Date(),
   },
 ];
 
+// Function to hash passwords
+const hashPasswords = async (admins) => {
+  for (const admin of admins) {
+    const salt = await bcrypt.genSalt(10);
+    admin.password = await bcrypt.hash(admin.password, salt);
+  }
+};
+
 // Function to Seed Admin Data
 const seedAdmins = async () => {
   try {
-    await connectDB();  // Connect to MongoDB
-    await Admin.deleteMany();  // Clear existing data
-    const insertedAdmins = await Admin.insertMany(admins);  // Insert new data
+    await connectDB(); 
+    await hashPasswords(admins); 
+    await Admin.deleteMany(); 
+    const insertedAdmins = await Admin.insertMany(admins);  
     console.log('Admins seeded successfully');
   } catch (err) {
     console.error('Error seeding admins:', err);
   } finally {
-    mongoose.disconnect();  // Disconnect from MongoDB
+    mongoose.disconnect(); 
   }
 };
 

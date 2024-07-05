@@ -1,6 +1,6 @@
 const Settings = require('../models/settingsModel');
 
-const fetchAllSettings = async () => {
+const fetchSettings = async () => {
     const settings = await Settings.findOne({});
     if (!settings) {
         throw new Error('Settings not found!');
@@ -8,6 +8,18 @@ const fetchAllSettings = async () => {
     return settings;
 };
 
+const createSettings = async (settingsData) => {
+    const settings = await Settings.create(settingsData);
+    return settings;
+};
+
+const updateSettings = async (updatedSettingsData) => {
+    const updatedSettings = await Settings.findOneAndUpdate({}, updatedSettingsData);
+    return updatedSettings;
+};
+
 module.exports = {
-    fetchAllSettings,
+    fetchSettings,
+    createSettings,
+    updateSettings
 };

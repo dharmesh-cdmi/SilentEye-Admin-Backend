@@ -1,6 +1,8 @@
+// middleware/authMiddleware.js
 const jwt = require('jsonwebtoken');
 const Admin = require('../models/admin/adminModel');
 const User = require('../models/userModel');
+const { secret } = require('../configs/jwt.config');
 
 // Middleware to verify user
 const verifyUser = async (req, res, next) => {
@@ -11,7 +13,7 @@ const verifyUser = async (req, res, next) => {
   }
 
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const decoded = jwt.verify(token, secret);
     const user = await User.findById(decoded.id);
 
     if (!user) {
@@ -21,6 +23,9 @@ const verifyUser = async (req, res, next) => {
     req.user = user;
     next();
   } catch (error) {
+    if (error.name === 'TokenExpiredError') {
+      return res.status(401).json({ error: 'Token expired.' });
+    }
     res.status(400).json({ error: 'Invalid token.' });
   }
 };
@@ -34,7 +39,7 @@ const verifyAdmin = async (req, res, next) => {
   }
 
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const decoded = jwt.verify(token, secret);
     const admin = await Admin.findById(decoded.id);
 
     if (!admin) {
@@ -44,6 +49,9 @@ const verifyAdmin = async (req, res, next) => {
     req.admin = admin;
     next();
   } catch (error) {
+    if (error.name === 'TokenExpiredError') {
+      return res.status(401).json({ error: 'Token expired.' });
+    }
     res.status(400).json({ error: 'Invalid token.' });
   }
 };

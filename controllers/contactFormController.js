@@ -6,9 +6,9 @@ const FetchAllContactsForm = async (req, res) => {
         res.status(200).json({ contactsForm });
     } catch (error) {
         if (error.message === 'Contacts form not found!') {
-            res.status(404).send(error.message);
+            res.status(404).json({ error: error.message });
         } else {
-            res.status(500).send('Internal Server Error');
+            res.status(500).json({ error: 'Internal Server Error' });
         }
     }
 };
@@ -20,9 +20,9 @@ const SearchContactsForm = async (req, res) => {
         res.status(200).json({ result });
     } catch (error) {
         if (error.message === 'Contacts form not found!') {
-            res.status(404).send(error.message);
+            res.status(404).json({ error: error.message });
         } else {
-            res.status(500).send('Internal Server Error');
+            res.status(500).json({ error: 'Internal Server Error' });
         }
     }
 };
@@ -33,7 +33,7 @@ const CreateContactForm = async (req, res) => {
         await contactFormService.createContactForm(data);
         res.status(200).send('Contact form created successfully!');
     } catch (error) {
-        res.status(500).send('Internal Server Error');
+        res.status(500).json({ error: 'Internal Server Error' });
     }
 };
 

@@ -6,9 +6,9 @@ const FetchSettings = async (req, res) => {
         res.status(200).json({ settings });
     } catch (error) {
         if (error.message === 'Settings not found!') {
-            res.status(404).send(error.message);
+            res.status(404).json({ error: error.message });
         } else {
-            res.status(500).send('Internal Server Error');
+            res.status(500).json({ error: 'Internal Server Error' });
         }
     }
 };
@@ -19,7 +19,7 @@ const CreateSettings = async (req, res) => {
         await settingsService.createSettings(data);
         res.status(200).send('Settings created successfully!');
     } catch (error) {
-        res.status(500).send('Internal Server Error');
+        res.status(500).json({ error: 'Internal Server Error' });
     }
 };
 
@@ -29,7 +29,7 @@ const UpdateSettings = async (req, res) => {
         await settingsService.updateSettings(data);
         res.status(200).send('Settings updated successfully!');
     } catch (error) {
-        res.status(500).send('Internal Server Error');
+        res.status(500).json({ error: 'Internal Server Error' });
     }
 };
 

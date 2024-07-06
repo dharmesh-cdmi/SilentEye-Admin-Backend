@@ -15,6 +15,9 @@ const createExtensions = async (extensionsData) => {
 
 const updateExtensions = async (updatedExtensionsData) => {
     const updatedExtensions = await Extension.findOneAndUpdate({}, updatedExtensionsData);
+    if (!updatedExtensions) {
+        throw new Error('Extensions not found!');
+    }
     return updatedExtensions;
 };
 

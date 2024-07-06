@@ -13,6 +13,20 @@ const FetchAllContactsForm = async (req, res) => {
     }
 };
 
+const SearchContactsForm = async (req, res) => {
+    try {
+        const { pageIndex, limit, searchQuery } = req.body;
+        const result = await contactFormService.searchContactsForm(pageIndex, limit, searchQuery);
+        res.status(200).json({ result });
+    } catch (error) {
+        if (error.message === 'Contacts form not found!') {
+            res.status(404).send(error.message);
+        } else {
+            res.status(500).send('Internal Server Error');
+        }
+    }
+};
+
 const CreateContactForm = async (req, res) => {
     try {
         const data = req.body;
@@ -26,4 +40,5 @@ const CreateContactForm = async (req, res) => {
 module.exports = {
     FetchAllContactsForm,
     CreateContactForm,
+    SearchContactsForm
 };

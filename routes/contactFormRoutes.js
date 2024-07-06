@@ -13,6 +13,12 @@ router.get(
 );
 
 router.post(
+    "/search-contact-form",
+    validationMiddleware.validateRequest(contactFormSchemas.searchContactSchema),
+    controller.SearchContactsForm
+);
+
+router.post(
     "/create-contact-form",
     validationMiddleware.validateRequest(contactFormSchemas.createContactSchema),
     controller.CreateContactForm

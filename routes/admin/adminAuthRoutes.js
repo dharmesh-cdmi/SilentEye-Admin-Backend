@@ -5,7 +5,7 @@ const Admin = require('../../models/admin/adminModel');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const { verifyAdmin } = require('../../middleware/authMiddleware');
-const { secret } = require('../../configs/jwt.config');
+const { accessTokenSecret,accessTokenExpiresIn } = require('../../configs/jwt.config');
 
 // Route to create a new admin
 router.post('/', async (req, res) => {
@@ -34,8 +34,8 @@ router.post('/login', async (req, res) => {
     if (!isMatch) {
       return res.status(401).json({ message: 'Invalid email or password' });
     }
-
-    const access_token = jwt.sign({ id: admin._id, role: 'admin' }, secret, { expiresIn: '1h' });
+ 
+    const access_token = jwt.sign({ id: admin._id, role: 'admin' }, accessTokenSecret, { expiresIn: accessTokenExpiresIn });
     res.json({ access_token });
   } catch (error) {
     res.status(500).json({ message: 'Server error' });

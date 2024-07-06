@@ -5,7 +5,7 @@ const jwt = require('jsonwebtoken');
 const dotenv = require('dotenv');
 const User = require('../models/userModel'); // Ensure you have the correct path to your user model
 const { verifyUser } = require('../middleware/authMiddleware');
-const { secret } = require('../configs/jwt.config');
+const { accessTokenSecret,accessTokenExpiresIn,refreshTokenSecret,refreshTokenExpiresIn } = require('../configs/jwt.config');
 
 dotenv.config();
 
@@ -13,7 +13,7 @@ dotenv.config();
 router.post('/login', async (req, res) => {
   const { email, password, remember_me } = req.body; // Assuming remember_me flag is sent in the request body
 
-  try {
+  try { 
     const user = await User.findOne({ email });
     if (!user) {
       return res.status(401).json({ message: 'Invalid email or password' });
@@ -29,11 +29,11 @@ router.post('/login', async (req, res) => {
     await user.save();
 
     // Generate JWT access token
-    const access_token = jwt.sign({ id: user._id, role: 'user' }, secret, { expiresIn: '1h' });
+    const access_token = jwt.sign({ id: user._id, role: 'user' }, accessTokenSecret, { expiresIn: accessTokenExpiresIn });
 
     // Optionally, handle remember_token logic if remember_me is true
     if (remember_me) {
-      const remember_token = jwt.sign({ id: user._id }, secret, { expiresIn: '7d' }); // Example: Token valid for 7 days
+      const remember_token = jwt.sign({ id: user._id }, refreshTokenSecret, { expiresIn: refreshTokenExpiresIn }); // Example: Token valid for some days
       user.remember_token = remember_token;
       await user.save();
     }

@@ -3,6 +3,7 @@ const express = require('express');
 const settingsRoutes = require('./settingsRoutes');
 const adminRoutes = require('./admin/adminAuthRoutes');
 const userRoutes = require('./authRoutes');
+const visitorRoutes = require('./visitorRoutes');
 
 const router = express.Router();
 
@@ -10,6 +11,8 @@ const router = express.Router();
 // router.use('/auth', authRoutes);
 router.use('/settings', settingsRoutes);
 router.use('/admin', adminRoutes);
+
 router.use('/', userRoutes);
+router.use('/visitors', visitorRoutes);
 
 module.exports = router;

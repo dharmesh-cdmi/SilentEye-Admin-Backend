@@ -12,5 +12,6 @@ router.use('/settings', settingsRoutes);
 router.use('/admin', adminRoutes);
 router.use('/', userRoutes);
 router.use('/tickets', require('./ticketRoutes'));
+router.use('/managers', require('./managerRoutes'));
 
 module.exports = router;

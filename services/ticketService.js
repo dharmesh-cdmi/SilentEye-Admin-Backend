@@ -26,7 +26,7 @@ const fetchAllTickets = async (page = 1, limit = 10, searchQuery = "", status, o
         .sort({ createdAt: order })
         .skip((page - 1) * limit)
         .limit(limit)
-        .populate('comments.text');
+        .populate('comments');
 
     return {
         tickets,

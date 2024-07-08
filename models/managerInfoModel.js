@@ -1,11 +1,12 @@
+const { default: mongoose } = require("mongoose");
 const { Schema } = require("mongoose");
 
 const ManagerInfoSchema = new Schema({
-    // userId: { type: Schema.Types.ObjectId, ref: 'User', required: true }, TODO: Add userId
+    managerId: { type: Schema.Types.ObjectId, ref: 'Admin', required: true },
     userLimit: { type: Number, default: 0 },
     whatsapp: { type: String },
     skype: { type: String },
-    assignedUsers: [{ type: Schema.Types.ObjectId, ref: 'User' }]
+    assignedUsersCount: { type: Number, default: 0 },
 });
 
 const ManagerInfo = mongoose.model('ManagerInfo', ManagerInfoSchema);

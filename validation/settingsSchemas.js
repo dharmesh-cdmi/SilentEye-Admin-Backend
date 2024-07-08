@@ -2,36 +2,47 @@ const yup = require('yup');
 
 const timeUnitEnum = ['s', 'm', 'h', 'd'];
 
+const parseJSON = (value, originalValue) => {
+    if (typeof originalValue === 'string') {
+        try {
+            return JSON.parse(originalValue);
+        } catch (err) {
+            return originalValue;
+        }
+    }
+    return value;
+};
+
 const timeSchema = yup.object().shape({
-    quantity: yup.number().required('Quantity is required').positive('Quantity must be positive'),
-    unit: yup.string().oneOf(timeUnitEnum, 'Invalid time unit').required('Unit is required')
+    quantity: yup.number().positive('Quantity must be positive'),
+    unit: yup.string().oneOf(timeUnitEnum, 'Invalid time unit')
 });
 
 const youTubeVideoPopUpSchema = yup.object().shape({
     status: yup.string().oneOf(['enabled', 'disabled'], 'Invalid status').required('Status is required'),
-    title: yup.string().required('Title is required').trim(),
-    link: yup.string().required('Link is required').trim().url('Invalid URL')
-});
+    title: yup.string().trim(),
+    link: yup.string().trim()
+}).transform(parseJSON);
 
 const salesNotificationSchema = yup.object().shape({
     status: yup.string().oneOf(['enabled', 'disabled'], 'Invalid status').required('Status is required'),
     timeGap: timeSchema.required('Time gap is required'),
     delayed: timeSchema.required('Delayed time is required'),
-    name: yup.string().required('Name is required').trim(),
-    cityState: yup.string().required('City/State is required').trim(),
-    planName: yup.string().required('Plan name is required').trim(),
-    purchaseTime: yup.string().required('Purchase time is required').trim()
-});
+    name: yup.string().trim(),
+    cityState: yup.string().trim(),
+    planName: yup.string().trim(),
+    purchaseTime: yup.string().trim()
+}).transform(parseJSON);
 
 const emailVerificationSchema = yup.object().shape({
     status: yup.string().oneOf(['enabled', 'disabled'], 'Invalid status').required('Status is required')
-});
+}).transform(parseJSON);
 
 const offerPopUpSchema = yup.object().shape({
     status: yup.string().oneOf(['enabled', 'disabled'], 'Invalid status').required('Status is required'),
     delayed: timeSchema.required('Delayed time is required'),
-    image: yup.string().required('Image URL is required').trim().url('Invalid URL')
-});
+    image: yup.string().trim()
+}).transform(parseJSON);
 
 const createSettingsSchema = yup.object().shape({
     youTubeVideoPopUp: youTubeVideoPopUpSchema.required('YouTube Video PopUp settings are required'),

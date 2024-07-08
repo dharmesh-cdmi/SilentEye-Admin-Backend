@@ -12,9 +12,9 @@ router.get(
     controller.FetchAllContactsForm
 );
 
-router.get(
+router.post(
     "/search-contact-form",
-    validationMiddleware.validateQuery(contactFormSchemas.searchContactSchema),
+    validationMiddleware.validateRequest(contactFormSchemas.searchContactSchema),
     controller.SearchContactsForm
 );
 

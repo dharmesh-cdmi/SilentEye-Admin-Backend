@@ -14,7 +14,8 @@ const createSettings = async (settingsData) => {
 };
 
 const updateSettings = async (updatedSettingsData) => {
-    const updatedSettings = await Settings.findOneAndUpdate({}, updatedSettingsData);
+    // const updatedSettings = await Settings.findOneAndUpdate({}, updatedSettingsData), { new: true };
+    const updatedSettings = await Settings.findOneAndUpdate({}, { $set: updatedSettingsData }, { new: true });
     return updatedSettings;
 };
 

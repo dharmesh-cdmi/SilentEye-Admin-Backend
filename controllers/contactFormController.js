@@ -15,10 +15,8 @@ const FetchAllContactsForm = async (req, res) => {
 
 const SearchContactsForm = async (req, res) => {
     try {
-        const { pageIndex, limit, searchQuery } = req.query;
-        const numericPageIndex = parseInt(pageIndex, 10);
-        const numericLimit = parseInt(limit, 10);
-        const result = await contactFormService.searchContactsForm(numericPageIndex, numericLimit, searchQuery);
+        const { pageIndex, limit, searchQuery } = req.body;
+        const result = await contactFormService.searchContactsForm(pageIndex, limit, searchQuery);
         res.status(200).json({ result });
     } catch (error) {
         if (error.message === 'Contacts form not found!') {

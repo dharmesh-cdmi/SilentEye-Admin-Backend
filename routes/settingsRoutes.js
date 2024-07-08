@@ -6,9 +6,9 @@ const validationMiddleware = require('../middleware/validationMiddleware');
 
 router.get(
   "/fetch-all-settings",
-  authMiddleware.stripToken,
-  authMiddleware.verifyAccessToken,
-  authMiddleware.verifyAdmin,
+  // authMiddleware.stripToken,
+  // authMiddleware.verifyAccessToken,
+  // authMiddleware.verifyAdmin,
   controller.FetchAllSettings
 );
 

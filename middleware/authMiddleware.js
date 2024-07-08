@@ -2,7 +2,8 @@
 const jwt = require('jsonwebtoken');
 const Admin = require('../models/admin/adminModel');
 const User = require('../models/userModel');
-const { secret } = require('../configs/jwt.config');
+const { accessTokenSecret} = require('../configs/jwt.config');
+
 
 // Middleware to verify user
 const verifyUser = async (req, res, next) => {
@@ -13,7 +14,7 @@ const verifyUser = async (req, res, next) => {
   }
 
   try {
-    const decoded = jwt.verify(token, secret);
+    const decoded = jwt.verify(token, accessTokenSecret);
     const user = await User.findById(decoded.id);
 
     if (!user) {
@@ -26,7 +27,7 @@ const verifyUser = async (req, res, next) => {
     if (error.name === 'TokenExpiredError') {
       return res.status(401).json({ error: 'Token expired.' });
     }
-    res.status(400).json({ error: 'Invalid token.' });
+    res.status(400).json({ error: 'Please Login To Continue.' });
   }
 };
 
@@ -34,12 +35,15 @@ const verifyUser = async (req, res, next) => {
 const verifyAdmin = async (req, res, next) => {
   const token = req.header('Authorization')?.replace('Bearer ', '');
 
+
   if (!token) {
     return res.status(401).json({ error: 'Access denied. No token provided.' });
   }
 
   try {
-    const decoded = jwt.verify(token, secret);
+
+    const decoded = jwt.verify(token, accessTokenSecret);
+    console.log(decoded);
     const admin = await Admin.findById(decoded.id);
 
     if (!admin) {
@@ -52,7 +56,7 @@ const verifyAdmin = async (req, res, next) => {
     if (error.name === 'TokenExpiredError') {
       return res.status(401).json({ error: 'Token expired.' });
     }
-    res.status(400).json({ error: 'Invalid token.' });
+    res.status(400).json({ error: 'Please Login To Continue.' });
   }
 };
 
@@ -69,4 +73,8 @@ const roleValidator = (roles) => {
   };
 };
 
-module.exports = { verifyUser, verifyAdmin, roleValidator };
+module.exports = { 
+  verifyUser, 
+  verifyAdmin, 
+  roleValidator 
+};

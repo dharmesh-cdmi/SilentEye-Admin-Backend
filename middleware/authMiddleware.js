@@ -42,7 +42,6 @@ const verifyAdmin = async (req, res, next) => {
   try {
 
     const decoded = jwt.verify(token, accessTokenSecret);
-    console.log(decoded);
     const admin = await Admin.findById(decoded.id);
 
     if (!admin) {

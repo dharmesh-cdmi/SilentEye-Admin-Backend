@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
-const connectDB = require('../configs/db.config');
+const connectDB = require('../../configs/db.config');
 const { faker } = require('@faker-js/faker');
-const Visitor = require('../models/visitorModel'); // Adjust the path as per your project structure
+const Visitor = require('../../models/visitorModel'); // Adjust the path as per your project structure
 
 // Function to seed visitors
 async function seedVisitors() {
@@ -17,7 +17,7 @@ async function seedVisitors() {
     for (let i = 0; i < visitorCount; i++) {
       const visitor = new Visitor({
         page: faker.helpers.arrayElement(['home', 'Checkout', 'Plan']),
-        date: faker.date.recent(),
+        visitDate: faker.date.recent(),
         action: faker.helpers.arrayElement(['Visit', 'Checkout', 'Demo View', 'Order Placed', 'Login']),
         isVisit: faker.datatype.boolean(),
         country: faker.location.country(),

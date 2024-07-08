@@ -14,46 +14,59 @@ exports.logVisitor = async (req, res) => {
   }
 };
 
-// Controller to get visitor counts by page
+// Controller to get visitor counts by page and action with date filter
 exports.getVisitorCount = async (req, res) => {
-  const { page } = req.query;
+  const { page, action, startDate, endDate } = req.query;
 
   try {
-    let count;
+    let matchCondition = {};
+    
     if (page) {
-      // If a specific page is provided, count visitors for that page (case-insensitive)
-      const regex = new RegExp(`^${page}$`, 'i');
-      count = await Visitor.countDocuments({ page: regex });
-      res.json({ page, count });
-    } else {
-      // If no specific page is provided, count visitors for all pages
-      count = await Visitor.countDocuments();
-      res.json({ count });
+      matchCondition.page = new RegExp(`^${page}$`, 'i');
     }
+    if (action) {
+      matchCondition.action = new RegExp(`^${action}$`, 'i');
+    }
+    if (startDate && endDate) {
+      matchCondition.visitDate = {
+        $gte: new Date(startDate),
+        $lte: new Date(endDate)
+      };
+    }
+
+    const count = await Visitor.countDocuments(matchCondition);
+    res.json({ count });
   } catch (error) {
     res.status(500).json({ error: 'Failed to retrieve visitor count' });
   }
 };
 
-// Controller to get visitor count and other data
+// Controller to get visitor details with date filter
 exports.getVisitorDetails = async (req, res) => {
-  const { page } = req.query;
+  const { page, action, startDate, endDate } = req.query;
 
   try {
     let matchCondition = {};
+    
     if (page) {
-      // If a specific page is provided, match documents for that page (case-insensitive)
       matchCondition.page = new RegExp(`^${page}$`, 'i');
     }
+    if (action) {
+      matchCondition.action = new RegExp(`^${action}$`, 'i');
+    }
+    if (startDate && endDate) {
+      matchCondition.visitDate = {
+        $gte: new Date(startDate),
+        $lte: new Date(endDate)
+      };
+    }
 
-    // Aggregate data
     const result = await Visitor.aggregate([
       { $match: matchCondition },
       {
         $group: {
-          _id: "$page",
+          _id: { page: "$page", action: "$action" },
           totalCount: { $sum: 1 },
-          actions: { $addToSet: "$action" },
           countries: { $addToSet: "$country" },
           devices: { $addToSet: "$device" },
           ips: { $addToSet: "$IP" }
@@ -61,21 +74,16 @@ exports.getVisitorDetails = async (req, res) => {
       }
     ]);
 
-    // Prepare response
     const response = result.map(item => ({
-      page: item._id,
+      page: item._id.page,
+      action: item._id.action,
       totalCount: item.totalCount,
-      actions: item.actions,
       countries: item.countries,
       devices: item.devices,
       ips: item.ips
     }));
 
-    if (response.length > 0) {
-      res.json(response);
-    } else {
-      res.json([]);
-    }
+    res.json(response);
   } catch (error) {
     res.status(500).json({ error: 'Failed to retrieve visitor data' });
   }

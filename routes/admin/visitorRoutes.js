@@ -2,7 +2,7 @@
 
 const express = require('express');
 const router = express.Router();
-const { logVisitor, getVisitorCount, getVisitorDetails } = require('../controllers/visitorController'); // Ensure you have the correct path to your controller
+const { logVisitor, getVisitorCount, getVisitorDetails } = require('../../controllers/visitorController'); // Ensure you have the correct path to your controller
 
 // Endpoint to log visitor data
 router.post('/log', logVisitor);
@@ -14,3 +14,4 @@ router.get('/count', getVisitorCount);
 router.get('/details', getVisitorDetails);
 
 module.exports = router;
+ 

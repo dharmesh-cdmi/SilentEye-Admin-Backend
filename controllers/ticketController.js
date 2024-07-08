@@ -1,4 +1,4 @@
-const { fetchAllTickets, createTicket, updateTicketStatus, deleteTicket } = require("../services/ticketService");
+const { fetchAllTickets, createTicket, updateTicketStatus, deleteTicket, addComment } = require("../services/ticketService");
 const { apiSuccessResponse, apiErrorResponse, HTTP_STATUS } = require("../utils/responseHelper");
 
 const FetchAllTickets = async (req, res) => {
@@ -44,9 +44,22 @@ const DeleteTicket = async (req, res) => {
         apiErrorResponse(res, 'Internal Server Error', error.message, HTTP_STATUS.INTERNAL_SERVER_ERROR);
     }
 }
+
+const CreateTicketComment = async (req, res) => {
+    try {
+        const { ticketId } = req.params;
+        const { comment } = req.body;
+        const ticket = await addComment(ticketId, comment);
+        apiSuccessResponse(res, 'Comment added successfully', ticket, HTTP_STATUS.OK);
+    } catch (error) {
+        apiErrorResponse(res, 'Internal Server Error', error.message, HTTP_STATUS.INTERNAL_SERVER_ERROR);
+    }
+}
+
 module.exports = {
     FetchAllTickets,
     CreateTicket,
     UpdateTicketStatus,
-    DeleteTicket
+    DeleteTicket,
+    CreateTicketComment
 };

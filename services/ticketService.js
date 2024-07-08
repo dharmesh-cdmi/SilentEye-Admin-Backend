@@ -81,9 +81,7 @@ const updateTicketStatus = async (id, status) => {
  * @returns 
  */
 const addComment = async (ticketId, comment, userId) => {
-    return await Ticket.findOneAndUpdate({
-        ticketId
-    }, {
+    return await Ticket.findByIdAndUpdate(ticketId, {
         $push: {
             comments: {
                 text: comment,
@@ -100,9 +98,7 @@ const addComment = async (ticketId, comment, userId) => {
  * @returns 
  */
 const deleteTicket = async (ticketId) => {
-    return await Ticket.findOneAndDelete({
-        ticketId
-    });
+    return await Ticket.findByIdAndDelete(ticketId);
 }
 
 const getNextTicketId = async () => {

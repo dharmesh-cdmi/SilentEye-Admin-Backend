@@ -5,23 +5,28 @@ const Ticket = require("../models/ticketModel");
  * @param {Number} limit 
  * @param {String} searchQuery
  * @param {('Pending' | 'Active' | 'Answered' | 'Closed')} status
+ * @param {('asc' | 'desc')} order
  * @returns 
  */
 
-const fetchAllTickets = async (page = 1, limit = 10, searchQuery = "", status = "") => {
+const fetchAllTickets = async (page = 1, limit = 10, searchQuery = "", status, order = "desc") => {
     page = parseInt(page) || 1;
     limit = parseInt(limit) || 10;
     const query = {};
     if (searchQuery) {
-        query.someField = { $regex: searchQuery, $options: 'i' };
+        query.message = { $regex: searchQuery, $options: 'i' };
+        query.status = { $regex: searchQuery, $options: 'i' };
     }
     if (status) {
         query.status = status;
     }
     const total = await Ticket.countDocuments(query);
+    // and also include last comment details
     const tickets = await Ticket.find(query)
+        .sort({ createdAt: order })
         .skip((page - 1) * limit)
-        .limit(limit);
+        .limit(limit)
+        .populate('comments.text');
 
     return {
         tickets,
@@ -37,12 +42,12 @@ const fetchAllTickets = async (page = 1, limit = 10, searchQuery = "", status = 
  * @returns 
  */
 const createTicket = async (data) => {
-    const ticketId = `SK${Date.now()}`;
+    const ticketId = await getNextTicketId();
     const ticket = new Ticket({
         ticketId,
         type: data.type,
         message: data.message,
-        status: 'Pending',
+        status: data?.status || 'Pending',
     });
     return await ticket.save();
 }
@@ -53,7 +58,7 @@ const createTicket = async (data) => {
  * @param {('Active' | 'Answered' | 'Closed')} status
  * @returns 
  */
-const updateTicketStatus = async (ticketId, status) => {
+const updateTicketStatus = async (id, status) => {
     let updatedData = {};
     if (status === 'Closed') {
         updatedData = {
@@ -62,13 +67,10 @@ const updateTicketStatus = async (ticketId, status) => {
         }
     } else {
         updatedData = {
-            status
+            status: status
         }
     }
-    return await Ticket.findOneAndUpdate({
-        ticketId
-    }, updatedData);
-
+    return await Ticket.findByIdAndUpdate(id, updatedData);
 }
 
 /**
@@ -101,6 +103,19 @@ const deleteTicket = async (ticketId) => {
     return await Ticket.findOneAndDelete({
         ticketId
     });
+}
+
+const getNextTicketId = async () => {
+    // Ticket format is ST00001
+    // so first we need to get the last ticket id
+
+    let ticketId = await Ticket.findOne({}, { ticketId: 1 }).sort({ createdAt: -1 });
+    if (!ticketId) {
+        return "ST00001";
+    }
+    ticketId = ticketId.ticketId;
+    const num = parseInt(ticketId.substring(2)) + 1;
+    return `ST${num.toString().padStart(5, '0')}`;
 }
 module.exports = {
     fetchAllTickets,

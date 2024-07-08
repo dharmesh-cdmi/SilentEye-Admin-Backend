@@ -2,9 +2,9 @@ const router = require("express").Router();
 const controller = require("../controllers/ticketController.js");
 const authMiddleware = require("../middleware/authMiddleware");
 const { validateRequest, validateQuery } = require("../middleware/validationMiddleware.js");
-const { createTicketSchema, searchTicketSchema } = require("../validation/ticketSchema.js");
+const { createTicketSchema, searchTicketSchema, ticketStatusUpdateSchema } = require("../validation/ticketSchema.js");
 
-router.use(authMiddleware.verifyAdmin);
+// router.use(authMiddleware.verifyAccessToken, authMiddleware.verifyAdmin);
 router.get(
     "/",
     validateQuery(searchTicketSchema),
@@ -17,6 +17,7 @@ router.post(
 );
 router.put(
     "/:ticketId",
+    validateRequest(ticketStatusUpdateSchema),
     controller.UpdateTicketStatus
 );
 router.delete(

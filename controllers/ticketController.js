@@ -3,8 +3,8 @@ const { apiSuccessResponse, apiErrorResponse, HTTP_STATUS } = require("../utils/
 
 const FetchAllTickets = async (req, res) => {
     try {
-        const { page, limit, searchQuery } = req.query;
-        const tickets = await fetchAllTickets(page, limit, searchQuery);
+        const { pageIndex, limit, searchQuery, status, order } = req.query;
+        const tickets = await fetchAllTickets(pageIndex, limit, searchQuery, status, order);
         apiSuccessResponse(res, 'Tickets fetched successfully', tickets, HTTP_STATUS.OK);
     } catch (error) {
         apiErrorResponse(res, 'Internal Server Error', error.message, HTTP_STATUS.INTERNAL_SERVER_ERROR);

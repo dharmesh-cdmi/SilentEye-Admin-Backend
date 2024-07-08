@@ -4,9 +4,10 @@ const TicketSchema = new mongoose.Schema({
     status: { type: String, required: true, enum: ['Pending', 'Active', 'Answered', 'Closed'] },
     type: { type: String, required: true },
     message: { type: String, required: true },
+    user: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
     comments: [{
         text: { type: String, required: true },
-        createdBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+        createdBy: { type: String, enum: ['User', 'Admin'], required: true },
         createdAt: { type: Date }
     }],
     closedAt: { type: Date }

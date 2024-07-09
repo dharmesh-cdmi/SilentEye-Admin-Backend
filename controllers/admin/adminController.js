@@ -5,6 +5,8 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const { accessTokenSecret, accessTokenExpiresIn } = require('../../configs/jwt.config');
 
+const SALT_ROUNDS = parseInt(process.env.SALT_ROUNDS) || 10;
+
 // Controller to create a new admin
 exports.createAdmin = async (req, res) => {
   try {
@@ -52,3 +54,25 @@ exports.getAdminDetails = async (req, res) => {
     res.status(500).json({ message: 'Server error' });
   }
 };
+
+//Reset password for admin
+exports.changePassword = async (req, res) => {
+  try {
+    const { oldPassword, newPassword } = req.body;
+    const adminId = req.admin.id;
+    const admin = await Admin.findById(adminId);
+    if (!admin) {
+      return res.status(404).json({ message: 'Admin not found' });
+    }
+    const isMatch = await bcrypt.compare(oldPassword, admin.password);
+    if (!isMatch) {
+      return res.status(401).json({ message: 'Invalid old password' });
+    }
+    const hashedPassword = await bcrypt.hash(newPassword, SALT_ROUNDS);
+    admin.password = hashedPassword;
+    await admin.save();
+    return res.status(200).json({ message: 'Password updated successfully' });
+  } catch (error) {
+    res.status(500).json({ message: 'Server error' });
+  }
+}

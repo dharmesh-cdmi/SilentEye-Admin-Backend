@@ -1,14 +1,12 @@
-// routes/adminRoutes.js
-const express = require('express');
-const router = express.Router();
+// controllers/adminController.js
+
 const Admin = require('../../models/admin/adminModel');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
-const { verifyAdmin } = require('../../middleware/authMiddleware');
-const { secret } = require('../../configs/jwt.config');
+const { accessTokenSecret, accessTokenExpiresIn } = require('../../configs/jwt.config');
 
-// Route to create a new admin
-router.post('/', async (req, res) => {
+// Controller to create a new admin
+exports.createAdmin = async (req, res) => {
   try {
     const { password } = req.body;
     const hashedPassword = await bcrypt.hash(password, 10);
@@ -18,10 +16,10 @@ router.post('/', async (req, res) => {
   } catch (err) {
     res.status(400).json({ error: err.message });
   }
-});
+};
 
-// Admin login route
-router.post('/login', async (req, res) => {
+// Admin login controller
+exports.loginAdmin = async (req, res) => {
   const { email, password } = req.body;
 
   try {
@@ -35,15 +33,15 @@ router.post('/login', async (req, res) => {
       return res.status(401).json({ message: 'Invalid email or password' });
     }
 
-    const access_token = jwt.sign({ id: admin._id, role: 'admin' }, secret, { expiresIn: '1h' });
+    const access_token = jwt.sign({ id: admin._id, role: 'admin' }, accessTokenSecret, { expiresIn: accessTokenExpiresIn });
     res.json({ access_token });
   } catch (error) {
     res.status(500).json({ message: 'Server error' });
   }
-});
+};
 
-// Route to get admin details
-router.get('/details', verifyAdmin, async (req, res) => {
+// Controller to get admin details
+exports.getAdminDetails = async (req, res) => {
   try {
     const admin = await Admin.findById(req.admin.id).select('-password');
     if (!admin) {
@@ -53,6 +51,4 @@ router.get('/details', verifyAdmin, async (req, res) => {
   } catch (error) {
     res.status(500).json({ message: 'Server error' });
   }
-});
-
-module.exports = router;
+};

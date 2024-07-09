@@ -2,7 +2,7 @@
 
 const express = require('express');
 const router = express.Router();
-const { createAdmin, getAdminDetails, resetPassword } = require('../../controllers/admin/adminController');
+const { createAdmin, getAdminDetails, changePassword } = require('../../controllers/admin/adminController');
 const visitorRoutes = require('./visitorRoutes');
 const orderRoutes = require('./orderRoute');
 const { verifyAdmin } = require('../../middleware/authMiddleware');
@@ -15,10 +15,10 @@ router.get('/details', getAdminDetails);
 router.use('/visitors', visitorRoutes);
 router.use('/orders', orderRoutes);
 router.post(
-    '/reset-password',
+    '/change-password',
     verifyAdmin,
     validationMiddleware.validateRequest(userSchemas.resetPasswordSchema),
-    resetPassword
+    changePassword
 );
 
 module.exports = router;

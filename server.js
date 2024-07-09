@@ -23,7 +23,7 @@ app.use(cors(corsOptions));
 app.use('/static', express.static(path.join(__dirname, 'static')));
 
 // Connection URL
-const DB = process.env.DB_URI;
+const DB = process.env.MONGO_URI;
 connectDB(DB);
 
 //Server status endpoint

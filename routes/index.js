@@ -3,6 +3,10 @@ const express = require('express');
 const settingsRoutes = require('./settingsRoutes');
 const contactFormRoutes = require('./contactFormRoutes');
 const extensionRoutes = require('./extensionRoutes');
+const adminRoutes = require('./admin/adminRoutes');
+const authRoutes = require('./authRoutes');
+const visitorRoutes = require('./admin/visitorRoutes');
+const { verifyAdmin } = require('../middleware/authMiddleware');
 
 const router = express.Router();
 
@@ -11,6 +15,7 @@ const router = express.Router();
 router.use('/setting', settingsRoutes);
 router.use('/contact-form', contactFormRoutes);
 router.use('/extension', extensionRoutes);
+router.use('/', authRoutes);
+router.use('/admin',verifyAdmin, adminRoutes);
 
-
-module.exports = router;
+module.exports = router; 

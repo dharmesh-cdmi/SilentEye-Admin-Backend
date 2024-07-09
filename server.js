@@ -5,6 +5,7 @@ const cookieParser = require("cookie-parser");
 require('dotenv').config();
 const connectDB = require("./configs/db.config");
 const routes = require('./routes/index');
+const errorHandlerMiddleware = require('./middleware/errorHandlerMiddleware');
 
 //Express Server Setup
 const app = express();
@@ -33,6 +34,7 @@ app.get('/', (req, res) => {
 
 // Routes
 app.use("/api", routes);
+app.use(errorHandlerMiddleware);
 
 app.listen(port, () => {
     console.log(`Node/Express Server is Up......\nPort: localhost:${port}`);

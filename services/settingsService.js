@@ -3,7 +3,9 @@ const Settings = require('../models/settingsModel');
 const fetchSettings = async () => {
     const settings = await Settings.findOne({});
     if (!settings) {
-        throw new Error('Settings not found!');
+        const error = new Error('Settings not found!');
+        error.code = 404;
+        throw error;
     }
     return settings;
 };
@@ -16,6 +18,11 @@ const createSettings = async (settingsData) => {
 const updateSettings = async (updatedSettingsData) => {
     // const updatedSettings = await Settings.findOneAndUpdate({}, updatedSettingsData), { new: true };
     const updatedSettings = await Settings.findOneAndUpdate({}, { $set: updatedSettingsData }, { new: true });
+    if (!updatedSettings) {
+        const error = new Error('Settings not found!');
+        error.code = 404;
+        throw error;
+    }
     return updatedSettings;
 };
 

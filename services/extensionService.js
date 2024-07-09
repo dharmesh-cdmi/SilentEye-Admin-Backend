@@ -3,7 +3,9 @@ const Extension = require('../models/extensionModel');
 const fetchExtensions = async () => {
     const extensions = await Extension.findOne({});
     if (!extensions) {
-        throw new Error('Extensions not found!');
+        const error = new Error('Extensions not found!');
+        error.code = 404;
+        throw error;
     }
     return extensions;
 };
@@ -16,7 +18,9 @@ const createExtensions = async (extensionsData) => {
 const updateExtensions = async (updatedExtensionsData) => {
     const updatedExtensions = await Extension.findOneAndUpdate({}, updatedExtensionsData);
     if (!updatedExtensions) {
-        throw new Error('Extensions not found!');
+        const error = new Error('Extensions not found!');
+        error.code = 404;
+        throw error;
     }
     return updatedExtensions;
 };

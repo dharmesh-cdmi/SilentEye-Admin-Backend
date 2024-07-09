@@ -1,39 +1,31 @@
 const extensionService = require('../services/extensionService');
 
-const FetchExtensions = async (req, res) => {
+const FetchExtensions = async (req, res, next) => {
     try {
         const extensions = await extensionService.fetchExtensions();
         res.status(200).json({ extensions });
     } catch (error) {
-        if (error.message === 'Extensions not found!') {
-            res.status(404).json({ error: error.message });
-        } else {
-            res.status(500).json({ error: 'Internal Server Error' });
-        }
+        next(error);
     }
 };
 
-const CreateExtensions = async (req, res) => {
+const CreateExtensions = async (req, res, next) => {
     try {
         const data = req.body;
         await extensionService.createExtensions(data);
         res.status(200).send('Extensions created successfully!');
     } catch (error) {
-        res.status(500).json({ error: 'Internal Server Error' });
+        next(error);
     }
 };
 
-const UpdateExtensions = async (req, res) => {
+const UpdateExtensions = async (req, res, next) => {
     try {
         const data = req.body;
         await extensionService.updateExtensions(data);
         res.status(200).send('Extensions updated successfully!');
     } catch (error) {
-        if (error.message === 'Extensions not found!') {
-            res.status(404).json({ error: error.message });
-        } else {
-            res.status(500).json({ error: 'Internal Server Error' });
-        }
+        next(error);
     }
 };
 

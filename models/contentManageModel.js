@@ -116,6 +116,11 @@ const FaqSchema = new Schema({
 });
 
 const FaqCategorySchema = new Schema({
+    status: {
+        type: String,
+        required: true,
+        enum: ['enabled', 'disabled']
+    },
     title: {
         type: String,
         required: true,

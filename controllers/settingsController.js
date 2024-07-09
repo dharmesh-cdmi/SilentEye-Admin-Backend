@@ -1,20 +1,16 @@
 const settingsService = require('../services/settingsService');
 const path = require("path");
 
-const FetchSettings = async (req, res) => {
+const FetchSettings = async (req, res, next) => {
     try {
         const settings = await settingsService.fetchSettings();
         res.status(200).json({ settings });
     } catch (error) {
-        if (error.message === 'Settings not found!') {
-            res.status(404).json({ error: error.message });
-        } else {
-            res.status(500).json({ error: 'Internal Server Error' });
-        }
+        next(error);
     }
 };
 
-const CreateSettings = async (req, res) => {
+const CreateSettings = async (req, res, next) => {
     try {
         console.log('Body: ', req.body);
         const { youTubeVideoPopUp, salesNotification, emailVerification, offerPopUp } = req.body;
@@ -37,12 +33,11 @@ const CreateSettings = async (req, res) => {
         await settingsService.createSettings(data);
         res.status(200).send('Settings created successfully!');
     } catch (error) {
-        console.log(error);
-        res.status(500).json({ error: 'Internal Server Error' });
+        next(error);
     }
 };
 
-const UpdateSettings = async (req, res) => {
+const UpdateSettings = async (req, res, next) => {
     try {
         const { youTubeVideoPopUp, salesNotification, emailVerification, offerPopUp } = req.body;
         const parsedYouTubeVideoPopUp = JSON.parse(youTubeVideoPopUp);
@@ -63,7 +58,7 @@ const UpdateSettings = async (req, res) => {
         await settingsService.updateSettings(data);
         res.status(200).send('Settings updated successfully!');
     } catch (error) {
-        res.status(500).json({ error: 'Internal Server Error' });
+        next(error);
     }
 };
 

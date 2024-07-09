@@ -12,6 +12,17 @@ const createCheckoutSession = async (req, res) => {
   }
 };
 
+// Create a new stripe product
+const createStripeProduct = async (req, res) => {
+  try {
+    const product = await paymentService.createStripeProduct(req.body);
+    res.status(201).json(product);
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+};
+
 module.exports = {
   createCheckoutSession,
+  createStripeProduct,
 };

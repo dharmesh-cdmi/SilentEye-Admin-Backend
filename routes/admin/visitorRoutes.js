@@ -2,16 +2,16 @@
 
 const express = require('express');
 const router = express.Router();
-const { logVisitor, getVisitorCount, getVisitorDetails } = require('../../controllers/visitorController'); // Ensure you have the correct path to your controller
+const visitorController = require('../../controllers/visitorController'); // Ensure you have the correct path to your controller
 
 // Endpoint to log visitor data
-router.post('/log', logVisitor);
+router.post('/log', visitorController.logVisitor);
 
 // Route to get visitor count
-router.get('/count', getVisitorCount);
+router.get('/count', visitorController.getVisitorCount);
 
 // Route to get visitor count and other data
-router.get('/details', getVisitorDetails);
+router.get('/details', visitorController.getVisitorDetails);
 
 module.exports = router;
  

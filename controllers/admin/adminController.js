@@ -6,7 +6,7 @@ const jwt = require('jsonwebtoken');
 const { accessTokenSecret, accessTokenExpiresIn } = require('../../configs/jwt.config');
 
 // Controller to create a new admin
-exports.createAdmin = async (req, res) => {
+const createAdmin = async (req, res) => {
   try {
     const { password } = req.body;
     const hashedPassword = await bcrypt.hash(password, 10);
@@ -19,7 +19,7 @@ exports.createAdmin = async (req, res) => {
 };
 
 // Admin login controller
-exports.loginAdmin = async (req, res) => {
+const loginAdmin = async (req, res) => {
   const { email, password } = req.body;
 
   try {
@@ -41,7 +41,7 @@ exports.loginAdmin = async (req, res) => {
 };
 
 // Controller to get admin details
-exports.getAdminDetails = async (req, res) => {
+const getAdminDetails = async (req, res) => {
   try {
     const admin = await Admin.findById(req.admin.id).select('-password');
     if (!admin) {
@@ -52,3 +52,9 @@ exports.getAdminDetails = async (req, res) => {
     res.status(500).json({ message: 'Server error' });
   }
 };
+
+module.exports ={
+  createAdmin,
+  loginAdmin,
+  getAdminDetails
+}

@@ -4,9 +4,9 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const User = require('../models/userModel'); // Ensure you have the correct path to your user model
 const { accessTokenSecret, accessTokenExpiresIn, refreshTokenSecret, refreshTokenExpiresIn } = require('../configs/jwt.config');
-
+ 
 // User login controller
-exports.login = async (req, res) => {
+const login = async (req, res) => {
   const { email, password, remember_me } = req.body; // Assuming remember_me flag is sent in the request body
 
   try {
@@ -42,7 +42,7 @@ exports.login = async (req, res) => {
 };
 
 // User profile controller
-exports.getProfile = async (req, res) => {
+const getProfile = async (req, res) => {
   try {
     const user = await User.findById(req.user.id).select('-password');
     if (!user) {
@@ -54,3 +54,7 @@ exports.getProfile = async (req, res) => {
     res.status(500).json({ message: 'Server error' });
   }
 };
+
+module.exports ={
+  login,getProfile
+}

@@ -9,6 +9,8 @@ const { accessTokenSecret, accessTokenExpiresIn, refreshTokenSecret, refreshToke
 const login = async (req, res) => {
   const { email, password, remember_me } = req.body; // Assuming remember_me flag is sent in the request body
 
+  console.log('Request body:', req.body); // Debug: Log request body
+
   try {
     const user = await User.findOne({ email });
     if (!user) {
@@ -25,16 +27,34 @@ const login = async (req, res) => {
     await user.save();
 
     // Generate JWT access token
-    const access_token = jwt.sign({ id: user._id, role: 'user' }, accessTokenSecret, { expiresIn: accessTokenExpiresIn });
+    const access_token = jwt.sign(
+      { id: user._id, role: 'user' },
+      accessTokenSecret,
+      { expiresIn: accessTokenExpiresIn }
+    );
 
-    // Optionally, handle remember_token logic if remember_me is true
+    // Handle remember_token logic if remember_me is true
+    let remember_token;
     if (remember_me) {
-      const remember_token = jwt.sign({ id: user._id }, refreshTokenSecret, { expiresIn: refreshTokenExpiresIn }); // Example: Token valid for some days
+      remember_token = jwt.sign(
+        { id: user._id },
+        refreshTokenSecret,
+        { expiresIn: refreshTokenExpiresIn }
+      );
       user.remember_token = remember_token;
       await user.save();
+      // console.log('Remember token generated:', remember_token); // Debug: Log remember_token
     }
 
-    res.json({ access_token });
+    // Include remember_token only if it was generated
+    const response = { access_token };
+    if (remember_me) {
+      response.refresh_token = remember_token;
+    }
+
+    // console.log('Response:', response); // Debug: Log final response
+    res.json(response);
+
   } catch (error) {
     console.error('Login error:', error);
     res.status(500).json({ message: 'Server error' });

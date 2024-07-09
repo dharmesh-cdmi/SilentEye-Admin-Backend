@@ -16,7 +16,6 @@ router.use('/visitors', visitorRoutes);
 router.use('/orders', orderRoutes);
 router.post(
     '/change-password',
-    verifyAdmin,
     validationMiddleware.validateRequest(userSchemas.resetPasswordSchema),
     changePassword
 );

@@ -12,7 +12,7 @@ router.get(
 );
 router.post(
     "/",
-    verifyUser,
+    verifyAdmin,
     validateRequest(createManagerSchema),
     controller.CreateManager
 );

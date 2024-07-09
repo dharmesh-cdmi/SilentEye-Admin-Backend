@@ -1,6 +1,6 @@
 const router = require("express").Router();
 const controller = require("../controllers/ticketController.js");
-const { verifyAdmin, verifyUser } = require("../middleware/authMiddleware.js");
+const { verifyAdmin, verifyUser, authenticateUser } = require("../middleware/authMiddleware.js");
 const { validateRequest, validateQuery } = require("../middleware/validationMiddleware.js");
 const { createTicketSchema, searchTicketSchema, ticketStatusUpdateSchema, ticketCommentSchema } = require("../validation/ticketSchema.js");
 
@@ -9,6 +9,16 @@ router.get(
     verifyAdmin,
     validateQuery(searchTicketSchema),
     controller.FetchAllTickets
+);
+router.get(
+    "/my-tickets",
+    verifyUser,
+    controller.FetchMyTickets
+);
+router.get(
+    "/:ticketId",
+    verifyAdmin,
+    controller.FetchTicketById
 );
 router.post(
     "/",
@@ -29,6 +39,7 @@ router.delete(
 );
 router.post(
     "/:ticketId/comments",
+    authenticateUser,
     validateRequest(ticketCommentSchema),
     controller.CreateTicketComment
 );

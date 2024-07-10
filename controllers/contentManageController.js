@@ -9,7 +9,17 @@ const FetchContactDetails = async (req, res, next) => {
     }
 };
 
+const UpdateContactDetails = async (req, res, next) => {
+    try {
+        const data = req.body;
+        await contentManageService.updateContactDetails(data);
+        res.status(200).send('Contact details updated successfully!');
+    } catch (error) {
+        next(error);
+    }
+};
 
 module.exports = {
     FetchContactDetails,
+    UpdateContactDetails
 };

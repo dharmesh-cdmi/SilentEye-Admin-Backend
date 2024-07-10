@@ -6,26 +6,20 @@ const validationMiddleware = require('../middleware/validationMiddleware');
 
 router.get(
   "/fetch-extensions",
-  // authMiddleware.stripToken,
-  // authMiddleware.verifyAccessToken,
-  // authMiddleware.verifyAdmin,
+  authMiddleware.verifyAdmin,
   controller.FetchExtensions
 );
 
 router.post(
   "/create-extensions",
-  // authMiddleware.stripToken,
-  // authMiddleware.verifyAccessToken,
-  // authMiddleware.verifyAdmin,
+  authMiddleware.verifyAdmin,
   validationMiddleware.validateRequest(extensionSchemas.createAndUpdateExtenionsSchema),
   controller.CreateExtensions
 );
 
 router.put(
   "/update-extensions",
-  // authMiddleware.stripToken,
-  // authMiddleware.verifyAccessToken,
-  // authMiddleware.verifyAdmin,
+  authMiddleware.verifyAdmin,
   validationMiddleware.validateRequest(extensionSchemas.createAndUpdateExtenionsSchema),
   controller.UpdateExtensions
 );

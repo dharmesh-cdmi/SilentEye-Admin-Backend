@@ -5,42 +5,42 @@ const contactDetailsSchema = new Schema(
     {
         status: {
             type: String,
-            required: true,
+            default: 'disabled',
             enum: ['enabled', 'disabled']
         },
         contact: {
             status: {
                 type: String,
-                required: true,
+                default: 'disabled',
                 enum: ['enabled', 'disabled']
             },
             value: {
                 type: String,
-                required: true,
+                default: '',
                 trim: true
             },
         },
         email: {
             status: {
                 type: String,
-                required: true,
+                default: 'disabled',
                 enum: ['enabled', 'disabled']
             },
             value: {
                 type: String,
-                required: true,
+                default: '',
                 trim: true
             },
         },
         address: {
             status: {
                 type: String,
-                required: true,
+                default: 'disabled',
                 enum: ['enabled', 'disabled']
             },
             value: {
                 type: String,
-                required: true,
+                default: '',
                 trim: true
             },
         },

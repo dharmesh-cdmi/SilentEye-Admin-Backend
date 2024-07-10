@@ -5,7 +5,7 @@ name: SilentEye Backend CI/CD
 
 on:
   push:
-    branches: [ "uday_dev" ]
+    branches: [ "uday-dev" ]
   # pull_request:
   #   branches: [ "main" ]
 
@@ -16,7 +16,7 @@ jobs:
 
     strategy:
       matrix:
-        node-version: [18.x]
+        node-version: [20.x]
         # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
 
     steps:

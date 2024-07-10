@@ -30,30 +30,41 @@ const verifyUser = async (req, res, next) => {
   }
 };
 
-// Middleware to verify admin
+
 const verifyAdmin = async (req, res, next) => {
   const token = req.header('Authorization')?.replace('Bearer ', '');
-
 
   if (!token) {
     return res.status(401).json({ error: 'Access denied. No token provided.' });
   }
 
   try {
+    let decoded;
+    let admin;
 
-    const decoded = jwt.verify(token, accessTokenSecret);
-    const admin = await Admin.findById(decoded.id);
+    try {
+      decoded = jwt.verify(token, accessTokenSecret);
+      admin = await Admin.findById(decoded.id);
+    } catch (err) {
+      if (err.name === 'TokenExpiredError') {
+        // Attempt to verify with remember_token if access token is expired
+        const decodedRemember = jwt.verify(token, refreshTokenSecret);
+        admin = await Admin.findById(decodedRemember.id);
+        if (!admin) {
+          return res.status(401).json({ error: 'Unauthorized.' });
+        }
+      } else {
+        return res.status(401).json({ error: 'Invalid token.' });
+      }
+    }
 
     if (!admin) {
-      return res.status(401).json({ error: 'Admin not found.' });
+      return res.status(401).json({ error: 'Unauthorized.' });
     }
 
     req.admin = admin;
     next();
   } catch (error) {
-    if (error.name === 'TokenExpiredError') {
-      return res.status(401).json({ error: 'Token expired.' });
-    }
     res.status(400).json({ error: 'Please Login To Continue.' });
   }
 };

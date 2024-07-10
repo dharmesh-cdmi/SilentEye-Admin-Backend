@@ -1,8 +1,8 @@
 const express = require('express');
 const router = express.Router();
-const { getOrders } = require('../../controllers/admin/oderController');
+const oderController = require('../../controllers/admin/oderController');
 
 // Route to fetch orders
-router.get('/', getOrders);
+router.get('/', oderController.getOrders);
 
 module.exports = router;

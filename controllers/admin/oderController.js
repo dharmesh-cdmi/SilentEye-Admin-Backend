@@ -1,6 +1,6 @@
 const Orders = require('../../models/ordersModel');
 
-exports.getOrders = async (req, res) => {
+const getOrders = async (req, res) => {
     try {
         // Extract query parameters
         const { page = 1, limit = 10, status, paymentMethod, userId, planName, minAmount, maxAmount, startDate, endDate } = req.query;
@@ -60,3 +60,7 @@ exports.getOrders = async (req, res) => {
         res.status(500).json({ error: error.message });
     }
 };
+
+module.exports={
+    getOrders
+}

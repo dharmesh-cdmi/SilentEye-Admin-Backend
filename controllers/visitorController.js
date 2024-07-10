@@ -3,7 +3,7 @@
 const Visitor = require('../models/visitorModel');
 
 // Controller to log visitor data
-exports.logVisitor = async (req, res) => {
+const logVisitor = async (req, res) => {
   try {
     const { page, action, isVisit, country, device, IP } = req.body;
     const visitor = new Visitor({ page, action, isVisit, country, device, IP });
@@ -15,7 +15,7 @@ exports.logVisitor = async (req, res) => {
 };
 
 // Controller to get visitor counts by page and action with date filter
-exports.getVisitorCount = async (req, res) => {
+const getVisitorCount = async (req, res) => {
   const { page, action, startDate, endDate } = req.query;
 
   try {
@@ -42,7 +42,7 @@ exports.getVisitorCount = async (req, res) => {
 };
 
 // Controller to get visitor details with date filter
-exports.getVisitorDetails = async (req, res) => {
+const getVisitorDetails = async (req, res) => {
   const { page, action, startDate, endDate } = req.query;
 
   try {
@@ -88,3 +88,9 @@ exports.getVisitorDetails = async (req, res) => {
     res.status(500).json({ error: 'Failed to retrieve visitor data' });
   }
 };
+
+module.exports={
+  logVisitor,
+  getVisitorCount,
+  getVisitorDetails
+}

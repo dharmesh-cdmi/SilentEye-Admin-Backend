@@ -31,4 +31,4 @@ jobs:
         echo "${{secrets.ACCESS_TOKEN_EXPIRY_TIME}}" >> .env
         echo "${{secrets.REFRESH_TOKEN_SECRET}}" >> .env
         echo "${{secrets.REFRESH_TOKEN_EXPIRY_TIME}}" >> .env
-    - run: npm start
+    # - run: npm start

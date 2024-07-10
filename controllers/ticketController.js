@@ -49,6 +49,9 @@ const UpdateTicketStatus = async (req, res) => {
         const { ticketId } = req.params;
         const { status } = req.body;
         const ticket = await updateTicketStatus(ticketId, status);
+        if (!ticket) {
+            return apiErrorResponse(res, 'Ticket not found', 'Ticket not found', HTTP_STATUS.NOT_FOUND);
+        }
         apiSuccessResponse(res, 'Ticket status updated successfully', ticket, HTTP_STATUS.OK);
     } catch (error) {
         apiErrorResponse(res, 'Internal Server Error', error.message, HTTP_STATUS.INTERNAL_SERVER_ERROR);
@@ -59,6 +62,9 @@ const DeleteTicket = async (req, res) => {
     try {
         const { ticketId } = req.params;
         const ticket = await deleteTicket(ticketId);
+        if (!ticket) {
+            return apiErrorResponse(res, 'Ticket not found', 'Ticket not found', HTTP_STATUS.NOT_FOUND);
+        }
         apiSuccessResponse(res, 'Ticket deleted successfully', ticket, HTTP_STATUS.OK);
     } catch (error) {
         apiErrorResponse(res, 'Internal Server Error', error.message, HTTP_STATUS.INTERNAL_SERVER_ERROR);

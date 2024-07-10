@@ -81,7 +81,10 @@ const updateTicketStatus = async (id, status) => {
             status: status
         }
     }
-    return await Ticket.findByIdAndUpdate(id, updatedData);
+    let res = await Ticket.findByIdAndUpdate(id, updatedData, {
+        returnOriginal: false
+    });
+    return res;
 }
 
 /**
@@ -99,7 +102,9 @@ const addComment = async (ticketId, comment, role) => {
                 createdBy: role,
                 createdAt: Date.now()
             }
-        }
+        },
+    }, {
+        returnOriginal: false
     });
 }
 
@@ -109,7 +114,7 @@ const addComment = async (ticketId, comment, role) => {
  * @returns 
  */
 const deleteTicket = async (ticketId) => {
-    return await Ticket.findByIdAndDelete(ticketId);
+    return await Ticket.findByIdAndDelete(ticketId, { returnOriginal: false });
 }
 
 const getNextTicketId = async () => {

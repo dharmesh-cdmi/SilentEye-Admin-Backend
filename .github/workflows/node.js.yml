@@ -31,4 +31,5 @@ jobs:
         echo "${{secrets.ACCESS_TOKEN_EXPIRY_TIME}}" >> .env
         echo "${{secrets.REFRESH_TOKEN_SECRET}}" >> .env
         echo "${{secrets.REFRESH_TOKEN_EXPIRY_TIME}}" >> .env
-    # - run: npm start
+    # - run: npm start # if pm2 is setup on server then dont need to run this npm
+    

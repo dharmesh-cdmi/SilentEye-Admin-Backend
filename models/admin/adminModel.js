@@ -47,6 +47,10 @@ const AdminSchema = new Schema({
   updatedAt: {
     type: Date,
     default: Date.now
+  },
+  managerInfo: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'ManagerInfo'
   }
 });
 

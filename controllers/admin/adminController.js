@@ -3,10 +3,10 @@
 const Admin = require('../../models/admin/adminModel');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
-const { accessTokenSecret, accessTokenExpiresIn } = require('../../configs/jwt.config');
+const  { accessTokenSecret, accessTokenExpiresIn, refreshTokenSecret, refreshTokenExpiresIn } = require('../../configs/jwt.config');
 
 // Controller to create a new admin
-exports.createAdmin = async (req, res) => {
+const createAdmin = async (req, res) => {
   try {
     const { password } = req.body;
     const hashedPassword = await bcrypt.hash(password, 10);
@@ -18,9 +18,9 @@ exports.createAdmin = async (req, res) => {
   }
 };
 
-// Admin login controller
-exports.loginAdmin = async (req, res) => {
-  const { email, password } = req.body;
+
+const loginAdmin = async (req, res) => {
+  const { email, password, remember_me } = req.body;
 
   try {
     const admin = await Admin.findOne({ email });
@@ -33,15 +33,45 @@ exports.loginAdmin = async (req, res) => {
       return res.status(401).json({ message: 'Invalid email or password' });
     }
 
-    const access_token = jwt.sign({ id: admin._id, role: 'admin' }, accessTokenSecret, { expiresIn: accessTokenExpiresIn });
-    res.json({ access_token });
+    // Update lastLoggedInAt
+    admin.lastLoggedInAt = new Date();
+    await admin.save();
+
+    // Generate JWT access token
+    const access_token = jwt.sign(
+      { id: admin._id, role: 'admin' },
+      accessTokenSecret,
+      { expiresIn: accessTokenExpiresIn }
+    );
+
+    let remember_token;
+
+    // Handle remember_token logic if remember_me is true
+    if (remember_me) {
+      remember_token = jwt.sign(
+        { id: admin._id },
+        refreshTokenSecret,
+        { expiresIn: refreshTokenExpiresIn }
+      );
+      admin.remember_token = remember_token;
+      await admin.save();
+    }
+
+    // Include remember_token only if it was generated
+    const response = { access_token };
+    if (remember_me) {
+      response.remember_token = remember_token;
+    }
+
+    res.json(response);
   } catch (error) {
+    console.error('Admin Login error:', error);
     res.status(500).json({ message: 'Server error' });
   }
 };
 
 // Controller to get admin details
-exports.getAdminDetails = async (req, res) => {
+const getAdminDetails = async (req, res) => {
   try {
     const admin = await Admin.findById(req.admin.id).select('-password');
     if (!admin) {
@@ -52,3 +82,9 @@ exports.getAdminDetails = async (req, res) => {
     res.status(500).json({ message: 'Server error' });
   }
 };
+
+module.exports ={
+  createAdmin,
+  loginAdmin,
+  getAdminDetails
+}

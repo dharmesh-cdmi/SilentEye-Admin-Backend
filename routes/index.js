@@ -27,5 +27,7 @@ router.use('/product', productRoutes);
 router.use('/addon', addonRoutes);
 router.use('/upsell', upsellRoutes);
 router.use('/subscription', subscriptionRoutes);
+router.use('/tickets', require('./ticketRoutes'));
+router.use('/managers', require('./managerRoutes'));
 
 module.exports = router;

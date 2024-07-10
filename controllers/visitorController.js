@@ -12,7 +12,7 @@ const logVisitor = async (req, res) => {
   }
 };
 
-// Controller to get visitor counts by page and action with date filter
+
 const getVisitorCount = async (req, res) => {
   const { page, action, startDate, endDate } = req.query;
 
@@ -39,7 +39,7 @@ const getVisitorCount = async (req, res) => {
   }
 };
 
-// Controller to get visitor details with date filter
+
 const getVisitorDetails = async (req, res) => {
   const { page, action, startDate, endDate } = req.query;
 

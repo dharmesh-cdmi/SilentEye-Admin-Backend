@@ -12,5 +12,7 @@ const router = express.Router();
 router.use('/', authRoutes);
 router.use('/admin',verifyAdmin, adminRoutes);
 router.use('/settings', settingsRoutes);
+router.use('/tickets', require('./ticketRoutes'));
+router.use('/managers', require('./managerRoutes'));
 
 module.exports = router; 

@@ -71,8 +71,37 @@ const roleValidator = (roles) => {
   };
 };
 
+// Middleware to check if it is user or admin and authenticate
+const authenticateUser = async (req, res, next) => {
+  const token = req.header('Authorization')?.replace('Bearer ', '');
+
+  if (!token) {
+    return res.status(401).json({ error: 'Access denied. No token provided.' });
+  }
+
+  try {
+    const decoded = jwt.verify(token, secret);
+    const user = await User.findById(decoded.id);
+
+    if (!user) {
+      const admin = await Admin.findById(decoded.id);
+      req.admin = admin;
+      return next();
+    }
+
+    req.user = user;
+    next();
+  } catch (error) {
+    if (error.name === 'TokenExpiredError') {
+      return res.status(401).json({ error: 'Token expired.' });
+    }
+    res.status(400).json({ error: 'Invalid token.' });
+  }
+};
+
 module.exports = { 
   verifyUser, 
   verifyAdmin, 
-  roleValidator 
+  roleValidator,
+  authenticateUser 
 };

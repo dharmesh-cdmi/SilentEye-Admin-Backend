@@ -14,8 +14,11 @@ const fetchAllTickets = async (page = 1, limit = 10, searchQuery = "", status, o
     limit = parseInt(limit) || 10;
     const query = {};
     if (searchQuery) {
-        query.message = { $regex: searchQuery, $options: 'i' };
-        query.status = { $regex: searchQuery, $options: 'i' };
+        query.$or = [
+            { message: { $regex: searchQuery, $options: 'i' } },
+            { status: { $regex: searchQuery, $options: 'i' } },
+            { type: { $regex: searchQuery, $options: 'i' } },
+        ];
     }
     if (status) {
         query.status = status;

@@ -1,8 +1,6 @@
-// controllers/authController.js
-
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
-const User = require('../models/userModel'); // Ensure you have the correct path to your user model
+const User = require('../models/userModel');
 const { accessTokenSecret, accessTokenExpiresIn, refreshTokenSecret, refreshTokenExpiresIn } = require('../configs/jwt.config');
  
 // User login controller
@@ -43,7 +41,6 @@ const login = async (req, res) => {
       );
       user.remember_token = remember_token;
       await user.save();
-      // console.log('Remember token generated:', remember_token); // Debug: Log remember_token
     }
 
     // Include remember_token only if it was generated

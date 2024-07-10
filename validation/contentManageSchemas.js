@@ -1,7 +1,7 @@
 const yup = require('yup');
 const mongoose = require('mongoose');
 
-const ObjectId = yup.string().test('is-valid', 'Invalid feature ID', value => mongoose.Types.ObjectId.isValid(value));
+const ObjectId = yup.string().test('is-valid', 'Invalid ID', value => mongoose.Types.ObjectId.isValid(value));
 
 const contactSchema = yup.object().shape({
     status: yup.string().oneOf(['enabled', 'disabled'], 'Invalid status').required('Status is required'),
@@ -44,9 +44,28 @@ const fetchFeaturesSchema = yup.object().shape({
     limit: yup.number().positive('Limit must be positive').required('Limit is required'),
 }).noUnknown(true, 'Unknown field in fetch features data');
 
+const pageSchema = yup.object().shape({
+    status: yup.string().required().oneOf(['enabled', 'disabled']),
+    title: yup.string().trim().required('Title is required'),
+    text: yup.string().trim().required('text is required'),
+}).noUnknown(true, 'Unknown field in page data');
+
+const pageIdSchema = yup.object().shape({
+    pageId: ObjectId.required('Page ID is required'),
+}).noUnknown(true, 'Unknown field in page request params');
+
+const fetchPagesSchema = yup.object().shape({
+    pageIndex: yup.number().positive('Page Index must be positive').required('Page Index is required'),
+    limit: yup.number().positive('Limit must be positive').required('Limit is required'),
+}).noUnknown(true, 'Unknown field in fetch pages data');
+
+
 module.exports = {
     contactDetailsSchema,
     featureSchema,
     featureIdSchema,
-    fetchFeaturesSchema
+    fetchFeaturesSchema,
+    pageSchema,
+    pageIdSchema,
+    fetchPagesSchema
 };

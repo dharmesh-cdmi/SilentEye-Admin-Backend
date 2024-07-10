@@ -58,4 +58,39 @@ router.delete(
     controller.DeleteFeature
 );
 
+router.get(
+    "/fetch-all-pages",
+    // authMiddleware.verifyAdmin,
+    controller.FetchAllPages
+);
+
+router.get(
+    "/fetch-pages",
+    // authMiddleware.verifyAdmin,
+    validationMiddleware.validateQuery(contentManageSchemas.fetchPagesSchema),
+    controller.FetchPages
+);
+
+router.post(
+    "/add-page",
+    // authMiddleware.verifyAdmin,
+    validationMiddleware.validateRequest(contentManageSchemas.pageSchema),
+    controller.AddPage
+);
+
+router.put(
+    "/update-page/:pageId",
+    // authMiddleware.verifyAdmin,
+    validationMiddleware.validateParams(contentManageSchemas.pageIdSchema),
+    validationMiddleware.validateRequest(contentManageSchemas.pageSchema),
+    controller.UpdatePage
+);
+
+router.delete(
+    "/delete-page/:pageId",
+    // authMiddleware.verifyAdmin,
+    validationMiddleware.validateParams(contentManageSchemas.pageIdSchema),
+    controller.DeletePage
+);
+
 module.exports = router;

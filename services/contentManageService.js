@@ -107,7 +107,12 @@ const updateFeature = async (featureId, updatedFeatureData) => {
         error.code = 404;
         throw error;
     }
-    contentManage.features[featureIndex] = { ...contentManage.features[featureIndex], ...updatedFeatureData };
+    const featureToUpdate = contentManage.features[featureIndex];
+    for (const key in updatedFeatureData) {
+        if (updatedFeatureData.hasOwnProperty(key) && featureToUpdate[key] !== undefined) {
+            featureToUpdate[key] = updatedFeatureData[key];
+        }
+    }
     await contentManage.save();
 };
 
@@ -118,9 +123,111 @@ const deleteFeature = async (featureId) => {
         error.code = 404;
         throw error;
     }
-    contentManage.features = contentManage.features.filter(feature => feature._id.toString() !== featureId);
+    const featureIndex = contentManage.features.findIndex(feature => feature._id.toString() === featureId);
+    if (featureIndex === -1) {
+        const error = new Error('Feature not found!');
+        error.code = 404;
+        throw error;
+    }
+    contentManage.features.splice(featureIndex, 1);
     await contentManage.save();
 };
+
+const fetchAllPages = async () => {
+    const contentManage = await ContentManage.findOne({});
+    if (!contentManage) {
+        const error = new Error('Content manage not found!');
+        error.code = 404;
+        throw error;
+    }
+    if (!contentManage.pages || contentManage.pages.length <= 0) {
+        const error = new Error('Pages not found!');
+        error.code = 404;
+        throw error;
+    }
+    return contentManage.pages;
+};
+
+const fetchPages = async (pageIndex, limit) => {
+    const contentManage = await ContentManage.findOne({});
+    if (!contentManage) {
+        const error = new Error('Content manage not found!');
+        error.code = 404;
+        throw error;
+    }
+    if (!contentManage.pages || contentManage.pages.length <= 0) {
+        const error = new Error('Pages not found!');
+        error.code = 404;
+        throw error;
+    }
+    const totalCount = contentManage.pages.length;
+    const totalPages = Math.ceil(totalCount / limit);
+    const startIndex = (pageIndex - 1) * limit;
+    const endIndex = pageIndex * limit;
+    const pages = contentManage.pages.slice(startIndex, endIndex);
+    if (!pages || pages.length <= 0) {
+        const error = new Error('Pages not found!');
+        error.code = 404;
+        throw error;
+    }
+
+    return {
+        pages,
+        totalPages,
+        totalCount
+    };
+};
+
+const addPage = async (pageData) => {
+    const contentManage = await ContentManage.findOne({});
+    if (!contentManage) {
+        const error = new Error('Content manage not found!');
+        error.code = 404;
+        throw error;
+    }
+    contentManage.pages.push(pageData);
+    await contentManage.save();
+};
+
+const updatePage = async (pageId, updatedPageData) => {
+    const contentManage = await ContentManage.findOne({});
+    if (!contentManage) {
+        const error = new Error('Content manage not found!');
+        error.code = 404;
+        throw error;
+    }
+    const pageIndex = contentManage.pages.findIndex(page => page._id.toString() === pageId);
+    if (pageIndex === -1) {
+        const error = new Error('Page not found!');
+        error.code = 404;
+        throw error;
+    }
+    const pageToUpdate = contentManage.pages[pageIndex];
+    for (const key in updatedPageData) {
+        if (updatedPageData.hasOwnProperty(key) && pageToUpdate[key] !== undefined) {
+            pageToUpdate[key] = updatedPageData[key];
+        }
+    }
+    await contentManage.save();
+};
+
+const deletePage = async (pageId) => {
+    const contentManage = await ContentManage.findOne({});
+    if (!contentManage) {
+        const error = new Error('Content manage not found!');
+        error.code = 404;
+        throw error;
+    }
+    const pageIndex = contentManage.pages.findIndex(page => page._id.toString() === pageId);
+    if (pageIndex === -1) {
+        const error = new Error('Page not found!');
+        error.code = 404;
+        throw error;
+    }
+    contentManage.pages.splice(pageIndex, 1);
+    await contentManage.save();
+};
+
 
 module.exports = {
     createContentManage,
@@ -130,5 +237,10 @@ module.exports = {
     fetchFeatures,
     addFeature,
     updateFeature,
-    deleteFeature
+    deleteFeature,
+    fetchAllPages,
+    fetchPages,
+    addPage,
+    updatePage,
+    deletePage
 };

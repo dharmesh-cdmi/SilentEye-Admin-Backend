@@ -80,6 +80,58 @@ const DeleteFeature = async (req, res, next) => {
     }
 };
 
+const FetchAllPages = async (req, res, next) => {
+    try {
+        const pages = await contentManageService.fetchAllPages();
+        res.status(200).json({ pages });
+    } catch (error) {
+        next(error);
+    }
+};
+
+const FetchPages = async (req, res, next) => {
+    try {
+        const { pageIndex, limit } = req.query;
+        const parsedPageIndex = parseInt(pageIndex, 10);
+        const parsedLimit = parseInt(limit, 10);
+        const result = await contentManageService.fetchPages(parsedPageIndex, parsedLimit);
+        res.status(200).json({ result });
+    } catch (error) {
+        next(error);
+    }
+};
+
+const AddPage = async (req, res, next) => {
+    try {
+        const data = req.body;
+        await contentManageService.addPage(data);
+        res.status(200).send('Page added successfully!');
+    } catch (error) {
+        next(error);
+    }
+};
+
+const UpdatePage = async (req, res, next) => {
+    try {
+        const { pageId } = req.params;
+        const data = req.body;
+        await contentManageService.updatePage(pageId, data);
+        res.status(200).send('Page updated successfully!');
+    } catch (error) {
+        next(error);
+    }
+};
+
+const DeletePage = async (req, res, next) => {
+    try {
+        const { pageId } = req.params;
+        await contentManageService.deletePage(pageId);
+        res.status(200).send('Page deleted successfully!');
+    } catch (error) {
+        next(error);
+    }
+};
+
 module.exports = {
     CreateContentManage,
     FetchContactDetails,
@@ -88,5 +140,11 @@ module.exports = {
     FetchFeatures,
     AddFeature,
     UpdateFeature,
-    DeleteFeature
+    DeleteFeature,
+    FetchAllPages,
+    FetchPages,
+    AddPage,
+    UpdatePage,
+    DeletePage
+
 };

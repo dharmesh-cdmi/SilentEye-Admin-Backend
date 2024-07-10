@@ -1,4 +1,7 @@
 const yup = require('yup');
+const mongoose = require('mongoose');
+
+const ObjectId = yup.string().test('is-valid', 'Invalid feature ID', value => mongoose.Types.ObjectId.isValid(value));
 
 const contactSchema = yup.object().shape({
     status: yup.string().oneOf(['enabled', 'disabled'], 'Invalid status').required('Status is required'),
@@ -32,7 +35,18 @@ const featureSchema = yup.object().shape({
     failCount: yup.number().positive('Fail Count must be positive').required('Fail Count is required'),
 }).noUnknown(true, 'Unknown field in feature data');
 
+const featureIdSchema = yup.object().shape({
+    featureId: ObjectId.required('Feature ID is required'),
+}).noUnknown(true, 'Unknown field in feature request params');
+
+const fetchFeaturesSchema = yup.object().shape({
+    pageIndex: yup.number().positive('Page Index must be positive').required('Page Index is required'),
+    limit: yup.number().positive('Limit must be positive').required('Limit is required'),
+}).noUnknown(true, 'Unknown field in fetch features data');
+
 module.exports = {
     contactDetailsSchema,
-    featureSchema
+    featureSchema,
+    featureIdSchema,
+    fetchFeaturesSchema
 };

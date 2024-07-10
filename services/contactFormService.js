@@ -36,7 +36,8 @@ const searchContactsForm = async (pageIndex, limit, searchQuery) => {
 
     return {
         contactsForm,
-        totalPages
+        totalPages,
+        totalCount
     };
 };
 

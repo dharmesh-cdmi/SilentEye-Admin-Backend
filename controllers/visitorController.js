@@ -1,5 +1,3 @@
-// controllers/visitorController.js
-
 const Visitor = require('../models/visitorModel');
 
 // Controller to log visitor data

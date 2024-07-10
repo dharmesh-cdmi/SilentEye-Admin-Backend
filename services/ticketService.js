@@ -120,6 +120,39 @@ const deleteTicket = async (ticketId) => {
     return await Ticket.findByIdAndDelete(ticketId, { returnOriginal: false });
 }
 
+/**
+ * 
+ * @param {Array<String>} ticketIds 
+ * @param {('Active' | 'Answered' | 'Closed')} status
+ * @returns 
+ */
+const bulkUpdateTicketStatus = async (ticketIds, status) => {
+    let updatedData = {};
+    if (status === 'Closed') {
+        updatedData = {
+            status,
+            closedAt: Date.now(),
+        }
+    } else {
+        updatedData = {
+            status: status
+        }
+    }
+    let res = await Ticket.updateMany({ _id: { $in: ticketIds } }, updatedData, {
+        returnOriginal: false
+    });
+    return res;
+}
+
+/**
+ * 
+ * @param {Array<String>} ticketIds 
+ * @returns 
+ */
+const bulkDeleteTickets = async (ticketIds) => {
+    let res = await Ticket.deleteMany({ _id: { $in: ticketIds } });
+    return res;
+}
 const getNextTicketId = async () => {
     let ticketId = await Ticket.findOne({}, { ticketId: 1 }).sort({ createdAt: -1 });
     if (!ticketId) {
@@ -136,5 +169,7 @@ module.exports = {
     addComment,
     deleteTicket,
     fetchMyTickets,
-    fetchTicketById
+    fetchTicketById,
+    bulkUpdateTicketStatus,
+    bulkDeleteTickets
 };

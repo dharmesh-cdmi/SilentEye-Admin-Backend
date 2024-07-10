@@ -1,4 +1,4 @@
-const { fetchAllTickets, createTicket, updateTicketStatus, deleteTicket, addComment, fetchMyTickets, fetchTicketById } = require("../services/ticketService");
+const { fetchAllTickets, createTicket, updateTicketStatus, deleteTicket, addComment, fetchMyTickets, fetchTicketById, bulkUpdateTicketStatus, bulkDeleteTickets } = require("../services/ticketService");
 const { apiSuccessResponse, apiErrorResponse, HTTP_STATUS } = require("../utils/responseHelper");
 
 const FetchAllTickets = async (req, res) => {
@@ -71,6 +71,26 @@ const DeleteTicket = async (req, res) => {
     }
 }
 
+const BulkUpdateTicketStatus = async (req, res) => {
+    try {
+        const { ticketIds, status } = req.body;
+        const result = await bulkUpdateTicketStatus(ticketIds, status);
+        apiSuccessResponse(res, 'Tickets status updated successfully', result, HTTP_STATUS.OK);
+    } catch (error) {
+        apiErrorResponse(res, 'Internal Server Error', error.message, HTTP_STATUS.INTERNAL_SERVER_ERROR);
+    }
+}
+
+const BulkDeleteTickets = async (req, res) => {
+    try {
+        const { ticketIds } = req.body;
+        const result = await bulkDeleteTickets(ticketIds);
+        apiSuccessResponse(res, 'Tickets deleted successfully', result, HTTP_STATUS.OK);
+    } catch (error) {
+        apiErrorResponse(res, 'Internal Server Error', error.message, HTTP_STATUS.INTERNAL_SERVER_ERROR);
+    }
+}
+
 const CreateTicketComment = async (req, res) => {
     let userRole = req.user ? 'user': req.admin ? 'admin': 'guest';
     try {
@@ -90,5 +110,7 @@ module.exports = {
     DeleteTicket,
     CreateTicketComment,
     FetchMyTickets,
-    FetchTicketById
+    FetchTicketById,
+    BulkUpdateTicketStatus,
+    BulkDeleteTickets
 };

@@ -6,8 +6,8 @@ name: SilentEye Backend CI/CD
 on:
   push:
     branches: [ "uday_dev" ]
-  pull_request:
-    branches: [ "main" ]
+  # pull_request:
+  #   branches: [ "main" ]
 
 jobs:
   build:

@@ -11,5 +11,6 @@ router.post(
 );
 router.post('/create-stripe-product', paymentController.createStripeProduct);
 router.post('/create-stripe-addon', paymentController.createStripeProduct);
+router.post('/create-stripe-plan', paymentController.createStripePlan);
 
 module.exports = router;

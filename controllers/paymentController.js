@@ -22,7 +22,18 @@ const createStripeProduct = async (req, res) => {
   }
 };
 
+// Create a new stripe plan
+const createStripePlan = async (req, res) => {
+  try {
+    const plan = await paymentService.createStripePlan(req.body);
+    res.status(201).json(plan);
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+};
+
 module.exports = {
   createCheckoutSession,
   createStripeProduct,
+  createStripePlan,
 };

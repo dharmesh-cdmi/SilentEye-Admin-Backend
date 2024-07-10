@@ -6,6 +6,8 @@ const paymentGatewayRoutes = require('./paymentGatewayRoutes');
 const paymentRoutes = require('./paymentRoutes');
 const productRoutes = require('./productRoutes');
 const addonRoutes = require('./addonRoutes');
+const upsellRoutes = require('./upsellRoutes');
+const subscriptionRoutes = require('./subscriptionRoutes');
 const adminRoutes = require('./admin/adminRoutes');
 const authRoutes = require('./authRoutes');
 const visitorRoutes = require('./admin/visitorRoutes');
@@ -23,5 +25,7 @@ router.use('/payment', paymentRoutes);
 router.use('/payment-gateway', paymentGatewayRoutes);
 router.use('/product', productRoutes);
 router.use('/addon', addonRoutes);
+router.use('/upsell', upsellRoutes);
+router.use('/subscription', subscriptionRoutes);
 
 module.exports = router;

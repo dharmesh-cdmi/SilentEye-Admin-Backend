@@ -6,7 +6,7 @@ name: SilentEye CI/CD
 on:
   push:
     branches:
-      - uday-dev  # Specify the production branch
+      - dev  # Specify the production branch
 
 jobs:
   build:

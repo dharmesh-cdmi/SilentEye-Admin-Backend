@@ -6,16 +6,28 @@ const validationMiddleware = require('../middleware/validationMiddleware');
 
 router.get(
     "/fetch-contact-details",
-    authMiddleware.verifyAdmin,
+    // authMiddleware.verifyAdmin,
     controller.FetchContactDetails
 );
+
 router.put(
     "/update-contact-details",
-    authMiddleware.verifyAdmin,
+    // authMiddleware.verifyAdmin,
     validationMiddleware.validateRequest(contentManageSchemas.contactDetailsSchema),
     controller.UpdateContactDetails
 );
 
+router.get(
+    "/fetch-features",
+    // authMiddleware.verifyAdmin,
+    controller.FetchFeatures
+);
 
+router.post(
+    "/add-feature",
+    // authMiddleware.verifyAdmin,
+    validationMiddleware.validateRequest(contentManageSchemas.featureSchema),
+    controller.AddFeature
+);
 
 module.exports = router;

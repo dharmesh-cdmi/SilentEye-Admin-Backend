@@ -19,7 +19,28 @@ const UpdateContactDetails = async (req, res, next) => {
     }
 };
 
+const FetchFeatures = async (req, res, next) => {
+    try {
+        const features = await contentManageService.fetchFeatures();
+        res.status(200).json({ features });
+    } catch (error) {
+        next(error);
+    }
+};
+
+const AddFeature = async (req, res, next) => {
+    try {
+        const data = req.body;
+        await contentManageService.addFeature(data);
+        res.status(200).send('Feature added successfully!');
+    } catch (error) {
+        next(error);
+    }
+};
+
 module.exports = {
     FetchContactDetails,
-    UpdateContactDetails
+    UpdateContactDetails,
+    FetchFeatures,
+    AddFeature
 };

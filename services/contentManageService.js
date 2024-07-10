@@ -26,7 +26,31 @@ const updateContactDetails = async (updatedContactDetails) => {
     await contentManage.save();
 };
 
+const fetchFeatures = async () => {
+    const contentManage = await ContentManage.findOne({});
+    if (!contentManage) {
+        const error = new Error('Content manage not found!');
+        error.code = 404;
+        throw error;
+    }
+    if (!contentManage.features || contentManage.features.length <= 0) {
+        const error = new Error('Features not found!');
+        error.code = 404;
+        throw error;
+    }
+    return contentManage.features;
+};
 
+const addFeature = async (featureData) => {
+    const contentManage = await ContentManage.findOne({});
+    if (!contentManage) {
+        const error = new Error('Content manage not found!');
+        error.code = 404;
+        throw error;
+    }
+    contentManage.features.push(featureData);
+    await contentManage.save();
+};
 
 
 
@@ -68,5 +92,7 @@ const test = async () => {
 
 module.exports = {
     fetchContactDetails,
-    updateContactDetails
+    updateContactDetails,
+    fetchFeatures,
+    addFeature
 };

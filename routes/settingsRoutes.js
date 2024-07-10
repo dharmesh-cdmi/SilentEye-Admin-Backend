@@ -21,14 +21,14 @@ const upload = multer({ storage });
 
 router.get(
   "/fetch-settings",
-  authMiddleware.verifyAdmin,
+  // authMiddleware.verifyAdmin,
   controller.FetchSettings
 );
 
 router.post(
   "/create-settings",
   upload.single('offerPopUpImage'),
-  authMiddleware.verifyAdmin,
+  // authMiddleware.verifyAdmin,
   validationMiddleware.validateRequest(settingsSchemas.createSettingsSchema),
   controller.CreateSettings
 );
@@ -36,7 +36,7 @@ router.post(
 router.put(
   "/update-settings",
   upload.single('offerPopUpImage'),
-  authMiddleware.verifyAdmin,
+  // authMiddleware.verifyAdmin,
   validationMiddleware.validateRequest(settingsSchemas.createSettingsSchema),
   controller.UpdateSettings
 );

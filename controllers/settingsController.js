@@ -12,7 +12,6 @@ const FetchSettings = async (req, res, next) => {
 
 const CreateSettings = async (req, res, next) => {
     try {
-        console.log('Body: ', req.body);
         const { youTubeVideoPopUp, salesNotification, emailVerification, offerPopUp } = req.body;
         const parsedYouTubeVideoPopUp = JSON.parse(youTubeVideoPopUp);
         const parsedSalesNotification = JSON.parse(salesNotification);
@@ -20,7 +19,6 @@ const CreateSettings = async (req, res, next) => {
         const parsedOfferPopUp = JSON.parse(offerPopUp);
         const offerPopUpImage = req.file;
         let offerPopUpImagePath = (offerPopUpImage && offerPopUpImage.path) || null;
-        console.log('Image Path: ', offerPopUpImagePath);
         const data = {
             youTubeVideoPopUp: parsedYouTubeVideoPopUp,
             salesNotification: parsedSalesNotification,
@@ -52,9 +50,11 @@ const UpdateSettings = async (req, res, next) => {
             emailVerification: parsedEmailVerification,
             offerPopUp: {
                 ...parsedOfferPopUp,
-                image: offerPopUpImagePath
             }
         };
+        if (offerPopUpImagePath) {
+            data.offerPopUp.image = offerPopUpImagePath;
+        }
         await settingsService.updateSettings(data);
         res.status(200).send('Settings updated successfully!');
     } catch (error) {

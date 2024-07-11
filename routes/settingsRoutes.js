@@ -27,8 +27,9 @@ router.get(
 
 router.post(
   "/create-settings",
-  upload.single('offerPopUpImage'),
   // authMiddleware.verifyAdmin,
+  upload.single('offerPopUpImage'),
+  validationMiddleware.validateFile({ required: false }),
   validationMiddleware.validateRequest(settingsSchemas.createSettingsSchema),
   controller.CreateSettings
 );
@@ -37,6 +38,7 @@ router.put(
   "/update-settings",
   // authMiddleware.verifyAdmin,
   upload.single('offerPopUpImage'),
+  validationMiddleware.validateFile({ required: false }),
   validationMiddleware.validateRequest(settingsSchemas.createSettingsSchema),
   controller.UpdateSettings
 );

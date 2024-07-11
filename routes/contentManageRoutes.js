@@ -112,6 +112,42 @@ router.delete(
     controller.DeletePage
 );
 
+//faq api's
+
+router.get(
+    "/fetch-all-faq-categories",
+    // authMiddleware.verifyAdmin,
+    controller.FetchAllFaqCategories
+);
+
+router.post(
+    "/add-faq-category",
+    // authMiddleware.verifyAdmin,
+    upload.single('image'),
+    validationMiddleware.validateFile({ required: true }),
+    validationMiddleware.validateRequest(contentManageSchemas.faqCategorySchema),
+    controller.AddFaqCategory
+);
+
+router.put(
+    "/update-faq-category/:categoryId",
+    // authMiddleware.verifyAdmin,
+    upload.single('image'),
+    validationMiddleware.validateFile({ required: false }),
+    validationMiddleware.validateParams(contentManageSchemas.faqCategoryIdSchema),
+    validationMiddleware.validateRequest(contentManageSchemas.faqCategorySchema),
+    controller.UpdateFaqCategory
+);
+
+router.delete(
+    "/delete-faq-category/:categoryId",
+    // authMiddleware.verifyAdmin,
+    validationMiddleware.validateParams(contentManageSchemas.faqCategoryIdSchema),
+    controller.DeleteFaqCategory
+);
+
+//
+
 router.get(
     "/fetch-all-reviews",
     // authMiddleware.verifyAdmin,

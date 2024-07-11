@@ -61,7 +61,7 @@ const fetchPagesSchema = yup.object().shape({
 const reviewSchema = yup.object().shape({
     status: yup.string().oneOf(['enabled', 'disabled'], 'Invalid status').required('Status is required'),
     name: yup.string().trim().required('Name is required'),
-    rating: yup.number().positive('Rating must be positive').required('Rating is required'),
+    rating: yup.number().positive('Rating must be positive').max(5, 'Rating must be less than or equal to 5').required('Rating is required'),
     review: yup.string().trim().required('Review is required'),
 }).noUnknown(true, 'Unknown field in review data');
 
@@ -74,6 +74,15 @@ const fetchReviewsSchema = yup.object().shape({
     limit: yup.number().positive('Limit must be positive').required('Limit is required'),
 }).noUnknown(true, 'Unknown field in fetch reviews data');
 
+const faqCategorySchema = yup.object().shape({
+    status: yup.string().oneOf(['enabled', 'disabled'], 'Invalid status').required('Status is required'),
+    title: yup.string().trim().required('Title is required'),
+}).noUnknown(true, 'Unknown field in review data');
+
+const faqCategoryIdSchema = yup.object().shape({
+    categoryId: ObjectId.required('Faq Category ID is required'),
+}).noUnknown(true, 'Unknown field in faq category request params');
+
 module.exports = {
     contactDetailsSchema,
     featureSchema,
@@ -82,6 +91,8 @@ module.exports = {
     pageSchema,
     pageIdSchema,
     fetchPagesSchema,
+    faqCategorySchema,
+    faqCategoryIdSchema,
     reviewSchema,
     reviewIdSchema,
     fetchReviewsSchema

@@ -229,6 +229,73 @@ const deletePage = async (pageId) => {
 };
 
 //Faqs api's
+const fetchAllFaqCategories = async () => {
+    const contentManage = await ContentManage.findOne({});
+    if (!contentManage) {
+        const error = new Error('Content manage not found!');
+        error.code = 404;
+        throw error;
+    }
+    if (!contentManage.faqCategories || contentManage.faqCategories.length <= 0) {
+        const error = new Error('Faq Categories not found!');
+        error.code = 404;
+        throw error;
+    }
+    return contentManage.faqCategories;
+};
+
+const addFaqCategory = async (categoryData) => {
+    const contentManage = await ContentManage.findOne({});
+    if (!contentManage) {
+        const error = new Error('Content manage not found!');
+        error.code = 404;
+        throw error;
+    }
+    contentManage.faqCategories.push(categoryData);
+    await contentManage.save();
+};
+
+const updateFaqCategory = async (categoryId, updatedCategoryData) => {
+    const contentManage = await ContentManage.findOne({});
+    if (!contentManage) {
+        const error = new Error('Content manage not found!');
+        error.code = 404;
+        throw error;
+    }
+    const categoryIndex = contentManage.faqCategories.findIndex(category => category._id.toString() === categoryId);
+    if (categoryIndex === -1) {
+        const error = new Error('Faq Category not found!');
+        error.code = 404;
+        throw error;
+    }
+    const categoryToUpdate = contentManage.faqCategories[categoryIndex];
+    for (const key in updatedCategoryData) {
+        if (updatedCategoryData.hasOwnProperty(key) && categoryToUpdate[key] !== undefined) {
+            categoryToUpdate[key] = updatedCategoryData[key];
+        }
+    }
+    await contentManage.save();
+};
+
+const deleteFaqCategory = async (categoryId) => {
+    const contentManage = await ContentManage.findOne({});
+    if (!contentManage) {
+        const error = new Error('Content manage not found!');
+        error.code = 404;
+        throw error;
+    }
+    const categoryIndex = contentManage.faqCategories.findIndex(category => category._id.toString() === categoryId);
+    if (categoryIndex === -1) {
+        const error = new Error('Faq Category not found!');
+        error.code = 404;
+        throw error;
+    }
+    contentManage.faqCategories.splice(categoryIndex, 1);
+    await contentManage.save();
+};
+
+
+//
 
 const fetchAllReviews = async () => {
     const contentManage = await ContentManage.findOne({});
@@ -341,6 +408,10 @@ module.exports = {
     addPage,
     updatePage,
     deletePage,
+    fetchAllFaqCategories,
+    addFaqCategory,
+    updateFaqCategory,
+    deleteFaqCategory,
     fetchAllReviews,
     fetchReviews,
     addReview,

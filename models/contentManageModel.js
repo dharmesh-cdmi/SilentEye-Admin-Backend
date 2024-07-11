@@ -167,7 +167,7 @@ const ContentManageSchema = new Schema({
     },
     features: [FeatureSchema],
     pages: [PageSchema],
-    faqs: [FaqCategorySchema],
+    faqCategories: [FaqCategorySchema],
     reviews: [ReviewSchema]
 }, {
     timestamps: true

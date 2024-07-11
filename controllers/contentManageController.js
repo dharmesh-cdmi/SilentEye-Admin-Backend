@@ -150,6 +150,59 @@ const DeletePage = async (req, res, next) => {
 };
 
 //Faqs api's
+const FetchAllFaqCategories = async (req, res, next) => {
+    try {
+        const categories = await contentManageService.fetchAllFaqCategories();
+        res.status(200).json({ categories });
+    } catch (error) {
+        next(error);
+    }
+};
+
+const AddFaqCategory = async (req, res, next) => {
+    try {
+        const image = req.file;
+        let imagePath = (image && image.path) || null;
+        const data = {
+            ...req.body,
+            faqs: [],
+            image: imagePath
+        };
+        await contentManageService.addFaqCategory(data);
+        res.status(200).send('Faq Category added successfully!');
+    } catch (error) {
+        next(error);
+    }
+};
+
+const UpdateFaqCategory = async (req, res, next) => {
+    try {
+        const { categoryId } = req.params;
+        const data = { ...req.body };
+        if (req.file && req.file.mimetype.startsWith('image/')) {
+            data.image = req.file.path;
+        }
+        else {
+            delete data.image;
+        }
+        await contentManageService.updateFaqCategory(categoryId, data);
+        res.status(200).send('Faq Category updated successfully!');
+    } catch (error) {
+        next(error);
+    }
+};
+
+const DeleteFaqCategory = async (req, res, next) => {
+    try {
+        const { categoryId } = req.params;
+        await contentManageService.deleteFaqCategory(categoryId);
+        res.status(200).send('Faq Category deleted successfully!');
+    } catch (error) {
+        next(error);
+    }
+};
+
+//
 
 const FetchAllReviews = async (req, res, next) => {
     try {
@@ -232,9 +285,13 @@ module.exports = {
     AddPage,
     UpdatePage,
     DeletePage,
+    FetchAllFaqCategories,
+    AddFaqCategory,
+    UpdateFaqCategory,
+    DeleteFaqCategory,
     FetchAllReviews,
     FetchReviews,
     AddReview,
     UpdateReview,
-    DeleteReview,
+    DeleteReview
 };

@@ -202,6 +202,48 @@ const DeleteFaqCategory = async (req, res, next) => {
     }
 };
 
+const FetchAllFaqsByCategory = async (req, res, next) => {
+    try {
+        const { categoryId } = req.params;
+        const faqs = await contentManageService.fetchAllFaqsByCategory(categoryId);
+        res.status(200).json({ faqs });
+    } catch (error) {
+        next(error);
+    }
+};
+
+const AddFaqByCategory = async (req, res, next) => {
+    try {
+        const data = { ...req.body };
+        const { categoryId } = req.params;
+        await contentManageService.addFaqByCategory(categoryId, data);
+        res.status(200).send('Faq added successfully!');
+    } catch (error) {
+        next(error);
+    }
+};
+
+const UpdateFaqByCategory = async (req, res, next) => {
+    try {
+        const { categoryId, faqId } = req.params;
+        const data = { ...req.body };
+        await contentManageService.updateFaqByCategory(categoryId, faqId, data);
+        res.status(200).send('Faq updated successfully!');
+    } catch (error) {
+        next(error);
+    }
+};
+
+const DeleteFaqByCategory = async (req, res, next) => {
+    try {
+        const { categoryId, faqId } = req.params;
+        await contentManageService.deleteFaqByCategory(categoryId, faqId);
+        res.status(200).send('Faq deleted successfully!');
+    } catch (error) {
+        next(error);
+    }
+};
+
 //
 
 const FetchAllReviews = async (req, res, next) => {
@@ -289,6 +331,10 @@ module.exports = {
     AddFaqCategory,
     UpdateFaqCategory,
     DeleteFaqCategory,
+    FetchAllFaqsByCategory,
+    AddFaqByCategory,
+    UpdateFaqByCategory,
+    DeleteFaqByCategory,
     FetchAllReviews,
     FetchReviews,
     AddReview,

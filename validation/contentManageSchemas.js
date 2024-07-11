@@ -83,6 +83,17 @@ const faqCategoryIdSchema = yup.object().shape({
     categoryId: ObjectId.required('Faq Category ID is required'),
 }).noUnknown(true, 'Unknown field in faq category request params');
 
+const faqSchema = yup.object().shape({
+    question: yup.string().trim().required('Question is required'),
+    answer: yup.string().trim().required('Answer is required'),
+}).noUnknown(true, 'Unknown field in faq data');
+
+const faqAndCategoryIdSchema = yup.object().shape({
+    categoryId: ObjectId.required('Faq Category ID is required'),
+    faqId: ObjectId.required('Faq ID is required'),
+}).noUnknown(true, 'Unknown field in faq category request params');
+
+
 module.exports = {
     contactDetailsSchema,
     featureSchema,
@@ -93,6 +104,8 @@ module.exports = {
     fetchPagesSchema,
     faqCategorySchema,
     faqCategoryIdSchema,
+    faqSchema,
+    faqAndCategoryIdSchema,
     reviewSchema,
     reviewIdSchema,
     fetchReviewsSchema

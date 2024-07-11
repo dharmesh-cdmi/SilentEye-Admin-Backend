@@ -146,6 +146,36 @@ router.delete(
     controller.DeleteFaqCategory
 );
 
+router.get(
+    "/fetch-all-faqs-by-category/:categoryId",
+    // authMiddleware.verifyAdmin,
+    validationMiddleware.validateParams(contentManageSchemas.faqCategoryIdSchema),
+    controller.FetchAllFaqsByCategory
+);
+
+router.post(
+    "/add-faq-by-category/:categoryId",
+    // authMiddleware.verifyAdmin,
+    validationMiddleware.validateParams(contentManageSchemas.faqCategoryIdSchema),
+    validationMiddleware.validateRequest(contentManageSchemas.faqSchema),
+    controller.AddFaqByCategory
+);
+
+router.put(
+    "/update-faq-by-category/:categoryId/:faqId",
+    // authMiddleware.verifyAdmin,
+    validationMiddleware.validateParams(contentManageSchemas.faqAndCategoryIdSchema),
+    validationMiddleware.validateRequest(contentManageSchemas.faqSchema),
+    controller.UpdateFaqByCategory
+);
+
+router.delete(
+    "/delete-faq-by-category/:categoryId/:faqId",
+    // authMiddleware.verifyAdmin,
+    validationMiddleware.validateParams(contentManageSchemas.faqAndCategoryIdSchema),
+    controller.DeleteFaqByCategory
+);
+
 //
 
 router.get(

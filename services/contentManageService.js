@@ -241,7 +241,13 @@ const fetchAllFaqCategories = async () => {
         error.code = 404;
         throw error;
     }
-    return contentManage.faqCategories;
+
+    const faqCategoriesWithoutFaqs = contentManage.faqCategories.map(category => {
+        const { faqs, ...categoryWithoutFaqs } = category.toObject();
+        return categoryWithoutFaqs;
+    });
+
+    return faqCategoriesWithoutFaqs;
 };
 
 const addFaqCategory = async (categoryData) => {
@@ -294,6 +300,109 @@ const deleteFaqCategory = async (categoryId) => {
     await contentManage.save();
 };
 
+const fetchAllFaqsByCategory = async (categoryId) => {
+    const contentManage = await ContentManage.findOne({});
+    if (!contentManage) {
+        const error = new Error('Content manage not found!');
+        error.code = 404;
+        throw error;
+    }
+    if (!contentManage.faqCategories || contentManage.faqCategories.length <= 0) {
+        const error = new Error('Faq Categories not found!');
+        error.code = 404;
+        throw error;
+    }
+    const category = contentManage.faqCategories.find(category => category._id.toString() === categoryId);
+    if (!category) {
+        const error = new Error(`Faq Category with ID ${categoryId} not found!`);
+        error.code = 404;
+        throw error;
+    }
+    if (!category.faqs || category.faqs.length <= 0) {
+        const error = new Error('Faqs not found!');
+        error.code = 404;
+        throw error;
+    }
+    return category.faqs;
+};
+
+const addFaqByCategory = async (categoryId, faqData) => {
+    const contentManage = await ContentManage.findOne({});
+    if (!contentManage) {
+        const error = new Error('Content manage not found!');
+        error.code = 404;
+        throw error;
+    }
+    if (!contentManage.faqCategories || contentManage.faqCategories.length <= 0) {
+        const error = new Error('Faq Categories not found!');
+        error.code = 404;
+        throw error;
+    }
+    const category = contentManage.faqCategories.find(category => category._id.toString() === categoryId);
+    if (!category) {
+        const error = new Error(`Faq Category with ID ${categoryId} not found!`);
+        error.code = 404;
+        throw error;
+    }
+    category.faqs.push(faqData);
+    await contentManage.save();
+};
+
+const updateFaqByCategory = async (categoryId, faqId, updatedFaqData) => {
+    const contentManage = await ContentManage.findOne({});
+    if (!contentManage) {
+        const error = new Error('Content manage not found!');
+        error.code = 404;
+        throw error;
+    }
+    if (!contentManage.faqCategories || contentManage.faqCategories.length <= 0) {
+        const error = new Error('Faq Categories not found!');
+        error.code = 404;
+        throw error;
+    }
+    const category = contentManage.faqCategories.find(category => category._id.toString() === categoryId);
+    if (!category) {
+        const error = new Error(`Faq Category with ID ${categoryId} not found!`);
+        error.code = 404;
+        throw error;
+    }
+    const faqToUpdate = category.faqs.find(faq => faq._id.toString() === faqId);
+    if (!faqToUpdate) {
+        const error = new Error(`FAQ with ID ${faqId} not found in Faq Category with ID ${categoryId}!`);
+        error.code = 404;
+        throw error;
+    }
+    Object.assign(faqToUpdate, updatedFaqData);
+    await contentManage.save();
+};
+
+const deleteFaqByCategory = async (categoryId, faqId) => {
+    const contentManage = await ContentManage.findOne({});
+    if (!contentManage) {
+        const error = new Error('Content manage not found!');
+        error.code = 404;
+        throw error;
+    }
+    if (!contentManage.faqCategories || contentManage.faqCategories.length <= 0) {
+        const error = new Error('Faq Categories not found!');
+        error.code = 404;
+        throw error;
+    }
+    const category = contentManage.faqCategories.find(category => category._id.toString() === categoryId);
+    if (!category) {
+        const error = new Error(`Faq Category with ID ${categoryId} not found!`);
+        error.code = 404;
+        throw error;
+    }
+    const faqIndex = category.faqs.findIndex(faq => faq._id.toString() === faqId);
+    if (faqIndex === -1) {
+        const error = new Error(`FAQ with ID ${faqId} not found in Faq Category with ID ${categoryId}!`);
+        error.code = 404;
+        throw error;
+    }
+    category.faqs.splice(faqIndex, 1);
+    await contentManage.save();
+};
 
 //
 
@@ -412,6 +521,10 @@ module.exports = {
     addFaqCategory,
     updateFaqCategory,
     deleteFaqCategory,
+    fetchAllFaqsByCategory,
+    addFaqByCategory,
+    updateFaqByCategory,
+    deleteFaqByCategory,
     fetchAllReviews,
     fetchReviews,
     addReview,

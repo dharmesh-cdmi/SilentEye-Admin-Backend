@@ -23,7 +23,7 @@ const fetchAllManagers = async (queryParams) => {
     const total = await adminModel.countDocuments(query);
 
     const managers = await adminModel.find(query)
-        .select('name email username status')
+        .select('name email username status role')
         .sort({ createdAt: order === 'asc' ? 1 : -1 })
         .skip((page - 1) * limit)
         .limit(limit)
@@ -38,7 +38,12 @@ const fetchAllManagers = async (queryParams) => {
 }
 
 const createManager = async (data) => {
-    let manager = new Admin({
+    const existingManager = await adminModel.findOne({ email: data.email });
+    if (existingManager) {
+        throw new Error('Email already in use');
+    }
+
+    let manager = new adminModel({
         name: data.name,
         email: data.email,
         username: data.username,
@@ -72,8 +77,15 @@ const updateManager = async (id, data) => {
         return null;
     }
 
+    if (data.email && data.email !== manager.email) {
+        const existingManager = await adminModel.findOne({ email: data.email });
+        if (existingManager) {
+            throw new Error('Email already in use');
+        }
+        manager.email = data.email;
+    }
+
     manager.name = data.name || manager.name;
-    manager.email = data.email || manager.email;
     manager.username = data.username || manager.username;
     manager.status = data.status || manager.status;
     managerDetails.userLimit = data.userLimit || managerDetails.userLimit;

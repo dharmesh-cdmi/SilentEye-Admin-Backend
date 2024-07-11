@@ -24,7 +24,8 @@ const searchManagerSchema = yup.object().shape({
     pageIndex: yup.number(),
     limit: yup.number(),
     searchQuery: yup.string().trim(),
-    order: yup.string().oneOf(['asc', 'desc'], 'Invalid order')
+    order: yup.string().oneOf(['asc', 'desc'], 'Invalid order'),
+    status: yup.string().oneOf(['active', 'inactive'], 'Invalid status')
 }).noUnknown(true, 'Unknown field in search manager form data');
 
 module.exports = {

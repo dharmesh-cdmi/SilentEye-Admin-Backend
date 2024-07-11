@@ -44,23 +44,23 @@ const loginAdmin = async (req, res) => {
       { expiresIn: accessTokenExpiresIn }
     );
 
-    let remember_token;
+    let refresh_token;
 
-    // Handle remember_token logic if remember_me is true
+    // Handle refresh_token logic if remember_me is true
     if (remember_me) {
-      remember_token = jwt.sign(
+      refresh_token = jwt.sign(
         { id: admin._id },
         refreshTokenSecret,
         { expiresIn: refreshTokenExpiresIn }
       );
-      admin.remember_token = remember_token;
+      admin.refresh_token = refresh_token;
       await admin.save();
     }
 
-    // Include remember_token only if it was generated
+    // Include refresh_token only if it was generated
     const response = { access_token };
     if (remember_me) {
-      response.remember_token = remember_token;
+      response.refresh_token = refresh_token;
     }
 
     res.json(response);

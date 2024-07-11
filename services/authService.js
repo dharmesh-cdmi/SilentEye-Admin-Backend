@@ -1,6 +1,7 @@
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const User = require('../models/userModel');
+const Admin = require('../models/admin/adminModel'); // Import Admin model
 const { accessTokenSecret, accessTokenExpiresIn, refreshTokenSecret, refreshTokenExpiresIn } = require('../configs/jwt.config');
 
 const authenticateUser = async (email, password) => {
@@ -21,11 +22,29 @@ const authenticateUser = async (email, password) => {
   }
 };
 
-const generateTokens = async (user, remember_me) => {
+const authenticateAdmin = async (email, password) => {
+  try {
+    const admin = await Admin.findOne({ email });
+    if (!admin) {
+      throw new Error('Invalid email or password');
+    }
+
+    const isMatch = await bcrypt.compare(password, admin.password);
+    if (!isMatch) {
+      throw new Error('Invalid email or password');
+    }
+
+    return admin;
+  } catch (error) {
+    throw error;
+  }
+};
+
+const generateTokens = async (userOrAdmin, remember_me) => {
   try {
     // Generate JWT access token
     const accessToken = jwt.sign(
-      { id: user._id, role: 'user' },
+      { id: userOrAdmin._id, role: userOrAdmin instanceof Admin ? 'admin' : 'user' },
       accessTokenSecret,
       { expiresIn: accessTokenExpiresIn }
     );
@@ -34,12 +53,12 @@ const generateTokens = async (user, remember_me) => {
     let refreshToken;
     if (remember_me) {
       refreshToken = jwt.sign(
-        { id: user._id },
+        { id: userOrAdmin._id },
         refreshTokenSecret,
         { expiresIn: refreshTokenExpiresIn }
       );
-      user.remember_token = refreshToken;
-      await user.save();
+      userOrAdmin.remember_token = refreshToken;
+      await userOrAdmin.save();
     }
 
     return { access_token: accessToken, refresh_token: refreshToken };
@@ -50,5 +69,6 @@ const generateTokens = async (user, remember_me) => {
 
 module.exports = {
   authenticateUser,
+  authenticateAdmin,
   generateTokens
 };

@@ -69,7 +69,17 @@ const AddFeature = async (req, res, next) => {
 const UpdateFeature = async (req, res, next) => {
     try {
         const { featureId } = req.params;
-        const data = req.body;
+        const data = {
+            ...req.body,
+            stopHere: req.body.stopHere === "true",
+            failCount: Number(req.body.failCount),
+        };
+        if (req.file && req.file.mimetype.startsWith('image/')) {
+            data.icon = req.file.path;
+        }
+        else {
+            delete data.icon;
+        }
         await contentManageService.updateFeature(featureId, data);
         res.status(200).send('Feature updated successfully!');
     } catch (error) {

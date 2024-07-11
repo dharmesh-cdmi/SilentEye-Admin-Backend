@@ -41,18 +41,21 @@ const validateQuery = (schema) => async (req, res, next) => {
   }
 };
 
-const validateFile = (req, res, next) => {
+const validateFile = (options) => (req, res, next) => {
+  const { required } = options;
   try {
-    if (!req.file) {
-      return res.status(400).json({ error: 'No file uploaded' });
-    }
-    if (req.file.size > 10 * 1024 * 1024) { // Max file size of 10MB
-      return res.status(400).json({ error: 'File size too large' });
-    }
-    if (!req.file.mimetype.startsWith('image/')) { // Only allow image files
-      return res.status(400).json({ error: 'File type not allowed' });
+    if (required && !req.file) {
+      return res.status(400).json({ error: 'File upload is mandatory' });
     }
 
+    if (req.file) {
+      if (req.file.size > 10 * 1024 * 1024) { // Max file size of 10MB
+        return res.status(400).json({ error: 'File size too large' });
+      }
+      if (!req.file.mimetype.startsWith('image/')) { // Only allow image files
+        return res.status(400).json({ error: 'File type not allowed' });
+      }
+    }
     next();
   } catch (error) {
     console.error('File Validation Error:', error);

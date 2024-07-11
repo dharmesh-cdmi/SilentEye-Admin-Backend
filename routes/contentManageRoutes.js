@@ -55,7 +55,7 @@ router.post(
     "/add-feature",
     // authMiddleware.verifyAdmin,
     upload.single('icon'),
-    validationMiddleware.validateFile,
+    validationMiddleware.validateFile({ required: true }),
     validationMiddleware.validateRequest(contentManageSchemas.featureSchema),
     controller.AddFeature
 );
@@ -63,6 +63,8 @@ router.post(
 router.put(
     "/update-feature/:featureId",
     // authMiddleware.verifyAdmin,
+    upload.single('icon'),
+    validationMiddleware.validateFile({ required: false }),
     validationMiddleware.validateParams(contentManageSchemas.featureIdSchema),
     validationMiddleware.validateRequest(contentManageSchemas.featureSchema),
     controller.UpdateFeature

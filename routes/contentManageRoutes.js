@@ -112,4 +112,43 @@ router.delete(
     controller.DeletePage
 );
 
+router.get(
+    "/fetch-all-reviews",
+    // authMiddleware.verifyAdmin,
+    controller.FetchAllReviews
+);
+
+router.get(
+    "/fetch-reviews",
+    // authMiddleware.verifyAdmin,
+    validationMiddleware.validateQuery(contentManageSchemas.fetchReviewsSchema),
+    controller.FetchReviews
+);
+
+router.post(
+    "/add-review",
+    // authMiddleware.verifyAdmin,
+    upload.single('profile'),
+    validationMiddleware.validateFile({ required: true }),
+    validationMiddleware.validateRequest(contentManageSchemas.reviewSchema),
+    controller.AddReview
+);
+
+router.put(
+    "/update-review/:reviewId",
+    // authMiddleware.verifyAdmin,
+    upload.single('profile'),
+    validationMiddleware.validateFile({ required: false }),
+    validationMiddleware.validateParams(contentManageSchemas.reviewIdSchema),
+    validationMiddleware.validateRequest(contentManageSchemas.reviewSchema),
+    controller.UpdateReview
+);
+
+router.delete(
+    "/delete-review/:reviewId",
+    // authMiddleware.verifyAdmin,
+    validationMiddleware.validateParams(contentManageSchemas.reviewIdSchema),
+    controller.DeleteReview
+);
+
 module.exports = router;

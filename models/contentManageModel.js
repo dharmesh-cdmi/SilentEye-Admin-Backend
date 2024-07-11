@@ -135,7 +135,7 @@ const FaqCategorySchema = new Schema({
 });
 
 const ReviewSchema = new Schema({
-    image: {
+    profile: {
         type: String,
         required: true,
         trim: true
@@ -149,7 +149,7 @@ const ReviewSchema = new Schema({
         type: Number,
         required: true
     },
-    description: {
+    review: {
         type: String,
         required: true,
         trim: true

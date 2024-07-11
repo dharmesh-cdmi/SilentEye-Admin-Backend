@@ -149,6 +149,75 @@ const DeletePage = async (req, res, next) => {
     }
 };
 
+//Faqs api's
+
+const FetchAllReviews = async (req, res, next) => {
+    try {
+        const reviews = await contentManageService.fetchAllReviews();
+        res.status(200).json({ reviews });
+    } catch (error) {
+        next(error);
+    }
+};
+
+const FetchReviews = async (req, res, next) => {
+    try {
+        const { pageIndex, limit } = req.query;
+        const parsedPageIndex = parseInt(pageIndex, 10);
+        const parsedLimit = parseInt(limit, 10);
+        const result = await contentManageService.fetchReviews(parsedPageIndex, parsedLimit);
+        res.status(200).json({ result });
+    } catch (error) {
+        next(error);
+    }
+};
+
+const AddReview = async (req, res, next) => {
+    try {
+        const profile = req.file;
+        let profilePath = (profile && profile.path) || null;
+        const data = {
+            ...req.body,
+            rating: Number(req.body.rating),
+            profile: profilePath
+        };
+        await contentManageService.addReview(data);
+        res.status(200).send('Review added successfully!');
+    } catch (error) {
+        next(error);
+    }
+};
+
+const UpdateReview = async (req, res, next) => {
+    try {
+        const { reviewId } = req.params;
+        const data = {
+            ...req.body,
+            rating: Number(req.body.rating),
+        };
+        if (req.file && req.file.mimetype.startsWith('image/')) {
+            data.profile = req.file.path;
+        }
+        else {
+            delete data.profile;
+        }
+        await contentManageService.updateReview(reviewId, data);
+        res.status(200).send('Review updated successfully!');
+    } catch (error) {
+        next(error);
+    }
+};
+
+const DeleteReview = async (req, res, next) => {
+    try {
+        const { reviewId } = req.params;
+        await contentManageService.deleteReview(reviewId);
+        res.status(200).send('Review deleted successfully!');
+    } catch (error) {
+        next(error);
+    }
+};
+
 module.exports = {
     CreateContentManage,
     FetchContactDetails,
@@ -162,6 +231,10 @@ module.exports = {
     FetchPages,
     AddPage,
     UpdatePage,
-    DeletePage
-
+    DeletePage,
+    FetchAllReviews,
+    FetchReviews,
+    AddReview,
+    UpdateReview,
+    DeleteReview,
 };

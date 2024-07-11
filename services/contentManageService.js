@@ -228,6 +228,104 @@ const deletePage = async (pageId) => {
     await contentManage.save();
 };
 
+//Faqs api's
+
+const fetchAllReviews = async () => {
+    const contentManage = await ContentManage.findOne({});
+    if (!contentManage) {
+        const error = new Error('Content manage not found!');
+        error.code = 404;
+        throw error;
+    }
+    if (!contentManage.reviews || contentManage.reviews.length <= 0) {
+        const error = new Error('Reviews not found!');
+        error.code = 404;
+        throw error;
+    }
+    return contentManage.reviews;
+};
+
+const fetchReviews = async (pageIndex, limit) => {
+    const contentManage = await ContentManage.findOne({});
+    if (!contentManage) {
+        const error = new Error('Content manage not found!');
+        error.code = 404;
+        throw error;
+    }
+    if (!contentManage.reviews || contentManage.reviews.length <= 0) {
+        const error = new Error('Reviews not found!');
+        error.code = 404;
+        throw error;
+    }
+    const totalCount = contentManage.reviews.length;
+    const totalPages = Math.ceil(totalCount / limit);
+    const startIndex = (pageIndex - 1) * limit;
+    const endIndex = pageIndex * limit;
+    const reviews = contentManage.reviews.slice(startIndex, endIndex);
+    if (!reviews || reviews.length <= 0) {
+        const error = new Error('Reviews not found!');
+        error.code = 404;
+        throw error;
+    }
+
+    return {
+        reviews,
+        totalPages,
+        totalCount
+    };
+};
+
+const addReview = async (reviewData) => {
+    const contentManage = await ContentManage.findOne({});
+    if (!contentManage) {
+        const error = new Error('Content manage not found!');
+        error.code = 404;
+        throw error;
+    }
+    contentManage.reviews.push(reviewData);
+    await contentManage.save();
+};
+
+const updateReview = async (reviewId, updatedReviewData) => {
+    const contentManage = await ContentManage.findOne({});
+    if (!contentManage) {
+        const error = new Error('Content manage not found!');
+        error.code = 404;
+        throw error;
+    }
+    const reviewIndex = contentManage.reviews.findIndex(review => review._id.toString() === reviewId);
+    if (reviewIndex === -1) {
+        const error = new Error('Review not found!');
+        error.code = 404;
+        throw error;
+    }
+    const reviewToUpdate = contentManage.reviews[reviewIndex];
+    for (const key in updatedReviewData) {
+        if (updatedReviewData.hasOwnProperty(key) && reviewToUpdate[key] !== undefined) {
+            reviewToUpdate[key] = updatedReviewData[key];
+        }
+    }
+    await contentManage.save();
+};
+
+const deleteReview = async (reviewId) => {
+    const contentManage = await ContentManage.findOne({});
+    if (!contentManage) {
+        const error = new Error('Content manage not found!');
+        error.code = 404;
+        throw error;
+    }
+    const reviewIndex = contentManage.reviews.findIndex(review => review._id.toString() === reviewId);
+    if (reviewIndex === -1) {
+        const error = new Error('Review not found!');
+        error.code = 404;
+        throw error;
+    }
+    contentManage.reviews.splice(reviewIndex, 1);
+    await contentManage.save();
+};
+
+
 
 module.exports = {
     createContentManage,
@@ -242,5 +340,10 @@ module.exports = {
     fetchPages,
     addPage,
     updatePage,
-    deletePage
+    deletePage,
+    fetchAllReviews,
+    fetchReviews,
+    addReview,
+    updateReview,
+    deleteReview,
 };

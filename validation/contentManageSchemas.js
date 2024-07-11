@@ -26,7 +26,7 @@ const contactDetailsSchema = yup.object().shape({
 }).noUnknown(true, 'Unknown field in contact details data');
 
 const featureSchema = yup.object().shape({
-    status: yup.string().required().oneOf(['enabled', 'disabled']),
+    status: yup.string().oneOf(['enabled', 'disabled'], 'Invalid status').required('Status is required'),
     title: yup.string().trim().required('Title is required'),
     description: yup.string().trim().required('Description is required'),
     stopHere: yup.boolean().required('Stop Here is required'),
@@ -44,7 +44,7 @@ const fetchFeaturesSchema = yup.object().shape({
 }).noUnknown(true, 'Unknown field in fetch features data');
 
 const pageSchema = yup.object().shape({
-    status: yup.string().required().oneOf(['enabled', 'disabled']),
+    status: yup.string().oneOf(['enabled', 'disabled'], 'Invalid status').required('Status is required'),
     title: yup.string().trim().required('Title is required'),
     text: yup.string().trim().required('text is required'),
 }).noUnknown(true, 'Unknown field in page data');
@@ -58,6 +58,21 @@ const fetchPagesSchema = yup.object().shape({
     limit: yup.number().positive('Limit must be positive').required('Limit is required'),
 }).noUnknown(true, 'Unknown field in fetch pages data');
 
+const reviewSchema = yup.object().shape({
+    status: yup.string().oneOf(['enabled', 'disabled'], 'Invalid status').required('Status is required'),
+    name: yup.string().trim().required('Name is required'),
+    rating: yup.number().positive('Rating must be positive').required('Rating is required'),
+    review: yup.string().trim().required('Review is required'),
+}).noUnknown(true, 'Unknown field in review data');
+
+const reviewIdSchema = yup.object().shape({
+    reviewId: ObjectId.required('Review ID is required'),
+}).noUnknown(true, 'Unknown field in review request params');
+
+const fetchReviewsSchema = yup.object().shape({
+    pageIndex: yup.number().positive('Page Index must be positive').required('Page Index is required'),
+    limit: yup.number().positive('Limit must be positive').required('Limit is required'),
+}).noUnknown(true, 'Unknown field in fetch reviews data');
 
 module.exports = {
     contactDetailsSchema,
@@ -66,5 +81,8 @@ module.exports = {
     fetchFeaturesSchema,
     pageSchema,
     pageIdSchema,
-    fetchPagesSchema
+    fetchPagesSchema,
+    reviewSchema,
+    reviewIdSchema,
+    fetchReviewsSchema
 };

@@ -8,10 +8,10 @@ async function seedVisitors() {
   try {
     await connectDB();
     // Clear existing data
-    await Visitor.deleteMany();
+    // await Visitor.deleteMany();
 
     // Generate and save sample visitors
-    const visitorCount = 20; // Adjust as needed
+    const visitorCount = 5; // Adjust as needed
     const visitors = [];
 
     for (let i = 0; i < visitorCount; i++) {

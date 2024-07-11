@@ -1,11 +1,11 @@
 const authService = require('../services/authService');
 
 const login = async (req, res) => {
-  const { email, password, remember_me } = req.body;
+  const { email, password, remember_me, country, device, IP } = req.body;
 
   try {
     // Example: Authenticate user
-    const user = await authService.authenticateUser(email, password);
+    const user = await authService.authenticateUser(email, password, country, device, IP);
     const tokens = await authService.generateTokens(user, remember_me);
     res.json(tokens);
   } catch (error) {

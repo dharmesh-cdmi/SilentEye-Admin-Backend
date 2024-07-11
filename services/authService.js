@@ -1,10 +1,11 @@
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const User = require('../models/userModel');
-const Admin = require('../models/admin/adminModel'); // Import Admin model
+const Admin = require('../models/admin/adminModel');
 const { accessTokenSecret, accessTokenExpiresIn, refreshTokenSecret, refreshTokenExpiresIn } = require('../configs/jwt.config');
+const { logUserLogin } = require('../services/loginService'); 
 
-const authenticateUser = async (email, password) => {
+const authenticateUser = async (email, password, country, device, IP) => {
   try {
     const user = await User.findOne({ email });
     if (!user) {
@@ -15,6 +16,9 @@ const authenticateUser = async (email, password) => {
     if (!isMatch) {
       throw new Error('Invalid email or password');
     }
+
+    // Log user login details
+    await logUserLogin(email, user._id, country, device, IP);
 
     return user;
   } catch (error) {

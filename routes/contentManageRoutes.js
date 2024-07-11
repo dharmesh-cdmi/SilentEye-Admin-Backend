@@ -3,6 +3,21 @@ const controller = require("../controllers/contentManageController");
 const authMiddleware = require("../middleware/authMiddleware");
 const contentManageSchemas = require('../validation/contentManageSchemas');
 const validationMiddleware = require('../middleware/validationMiddleware');
+const path = require("path")
+const multer = require("multer");
+
+const storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+        cb(null, 'static/images/');
+    },
+    filename: function (req, file, cb) {
+        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+        const fileExtension = path.extname(file.originalname);
+        const fileName = path.basename(file.originalname, fileExtension);
+        cb(null, fileName + '-' + uniqueSuffix + fileExtension);
+    },
+});
+const upload = multer({ storage });
 
 router.post(
     "/create-content-manage",
@@ -39,6 +54,8 @@ router.get(
 router.post(
     "/add-feature",
     // authMiddleware.verifyAdmin,
+    upload.single('icon'),
+    validationMiddleware.validateFile,
     validationMiddleware.validateRequest(contentManageSchemas.featureSchema),
     controller.AddFeature
 );

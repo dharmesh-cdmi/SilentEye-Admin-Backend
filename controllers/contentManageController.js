@@ -51,7 +51,14 @@ const FetchFeatures = async (req, res, next) => {
 
 const AddFeature = async (req, res, next) => {
     try {
-        const data = req.body;
+        const icon = req.file;
+        let iconPath = (icon && icon.path) || null;
+        const data = {
+            ...req.body,
+            stopHere: req.body.stopHere === "true",
+            failCount: Number(req.body.failCount),
+            icon: iconPath
+        };
         await contentManageService.addFeature(data);
         res.status(200).send('Feature added successfully!');
     } catch (error) {

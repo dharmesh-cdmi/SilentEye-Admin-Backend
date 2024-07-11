@@ -29,7 +29,6 @@ const featureSchema = yup.object().shape({
     status: yup.string().required().oneOf(['enabled', 'disabled']),
     title: yup.string().trim().required('Title is required'),
     description: yup.string().trim().required('Description is required'),
-    icon: yup.string().trim().required('Icon is required'),
     stopHere: yup.boolean().required('Stop Here is required'),
     process: yup.string().trim().required('Process is required'),
     failCount: yup.number().positive('Fail Count must be positive').required('Fail Count is required'),

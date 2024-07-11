@@ -35,8 +35,8 @@ router.post(
 
 router.put(
   "/update-settings",
-  upload.single('offerPopUpImage'),
   // authMiddleware.verifyAdmin,
+  upload.single('offerPopUpImage'),
   validationMiddleware.validateRequest(settingsSchemas.createSettingsSchema),
   controller.UpdateSettings
 );

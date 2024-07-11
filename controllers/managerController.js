@@ -1,9 +1,9 @@
-const { fetchAllMangers, createManager, updateManager, deleteManager } = require("../services/managerService");
+const { createManager, updateManager, deleteManager, fetchAllManagers } = require("../services/managerService");
 const { apiSuccessResponse, HTTP_STATUS, HTTP_STATUS_MESSAGE, apiErrorResponse } = require("../utils/responseHelper");
 
 const FetchAllManagers = async (req, res) => {
     try {
-        const managers = await fetchAllMangers(req?.query)
+        const managers = await fetchAllManagers(req?.query)
         return apiSuccessResponse(res, HTTP_STATUS_MESSAGE[200], managers, HTTP_STATUS.OK)
     } catch (error) {
         return apiErrorResponse(res, HTTP_STATUS_MESSAGE[500], error, HTTP_STATUS.INTERNAL_SERVER_ERROR)

@@ -1,23 +1,30 @@
 const adminModel = require("../models/admin/adminModel");
 const ManagerInfo = require("../models/managerInfoModel");
 
-const fetchAllMangers = async (queryParams) => {
+const fetchAllManagers = async (queryParams) => {
     let { page, limit, searchQuery, status, order } = queryParams;
     page = parseInt(page) || 1;
     limit = parseInt(limit) || 10;
-    const query = {};
+    order = order || 'desc';
+
+    const query = { role: 'manager' };
+
     if (searchQuery) {
-        query.name = { $regex: searchQuery, $options: 'i' };
-        query.email = { $regex: searchQuery, $options: 'i' };
+        query.$or = [
+            { name: { $regex: searchQuery, $options: 'i' } },
+            { email: { $regex: searchQuery, $options: 'i' } },
+            { username: { $regex: searchQuery, $options: 'i' } },
+        ];
     }
     if (status) {
         query.status = status;
     }
+
     const total = await adminModel.countDocuments(query);
 
-    let managers = await adminModel.find({ role: 'manager' })
-        .select('name email')
-        .sort({ createdAt: order })
+    const managers = await adminModel.find(query)
+        .select('name email username status')
+        .sort({ createdAt: order === 'asc' ? 1 : -1 })
         .skip((page - 1) * limit)
         .limit(limit)
         .populate('managerInfo', 'userLimit whatsapp skype assignedUsersCount');
@@ -31,9 +38,10 @@ const fetchAllMangers = async (queryParams) => {
 }
 
 const createManager = async (data) => {
-    let manager = new adminModel({
+    let manager = new Admin({
         name: data.name,
         email: data.email,
+        username: data.username,
         email_verified_at: new Date(),
         password: data.password,
         role: 'manager',
@@ -49,10 +57,9 @@ const createManager = async (data) => {
 
     manager.managerInfo = managerDetails._id;
 
-    manager = await manager.save();
+    await manager.save();
     return await managerDetails.save();
 }
-
 
 const updateManager = async (id, data) => {
     const manager = await adminModel.findById(id);
@@ -60,13 +67,18 @@ const updateManager = async (id, data) => {
         return null;
     }
 
-    let managerDetails = await ManagerInfo.findOne({ managerId: id });
-    manager.name = data.name;
-    manager.email = data.email;
-    manager.status = data.status;
-    managerDetails.userLimit = data.userLimit;
-    managerDetails.whatsapp = data.whatsapp;
-    managerDetails.skype = data.skype;
+    const managerDetails = await ManagerInfo.findOne({ managerId: id });
+    if (!managerDetails) {
+        return null;
+    }
+
+    manager.name = data.name || manager.name;
+    manager.email = data.email || manager.email;
+    manager.username = data.username || manager.username;
+    manager.status = data.status || manager.status;
+    managerDetails.userLimit = data.userLimit || managerDetails.userLimit;
+    managerDetails.whatsapp = data.whatsapp || managerDetails.whatsapp;
+    managerDetails.skype = data.skype || managerDetails.skype;
 
     await manager.save();
     return await managerDetails.save();
@@ -83,7 +95,7 @@ const deleteManager = async (id) => {
 }
 
 module.exports = {
-    fetchAllMangers,
+    fetchAllManagers,
     createManager,
     updateManager,
     deleteManager,

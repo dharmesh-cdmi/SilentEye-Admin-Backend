@@ -3,6 +3,7 @@ const yup = require('yup');
 const createManagerSchema = yup.object().shape({
     name: yup.string().trim().required('Name is required'),
     email: yup.string().email('Invalid email').required('Email is required'),
+    username: yup.string().trim().required('Username is required'),
     password: yup.string().trim().required('Password is required'),
     userLimit: yup.number().required('User limit is required'),
     whatsapp: yup.string().trim().required('Whatsapp is required'),

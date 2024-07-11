@@ -149,7 +149,6 @@ const DeletePage = async (req, res, next) => {
     }
 };
 
-//Faqs api's
 const FetchAllFaqCategories = async (req, res, next) => {
     try {
         const categories = await contentManageService.fetchAllFaqCategories();
@@ -243,8 +242,6 @@ const DeleteFaqByCategory = async (req, res, next) => {
         next(error);
     }
 };
-
-//
 
 const FetchAllReviews = async (req, res, next) => {
     try {

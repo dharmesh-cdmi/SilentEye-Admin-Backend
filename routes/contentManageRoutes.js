@@ -112,8 +112,6 @@ router.delete(
     controller.DeletePage
 );
 
-//faq api's
-
 router.get(
     "/fetch-all-faq-categories",
     // authMiddleware.verifyAdmin,
@@ -175,8 +173,6 @@ router.delete(
     validationMiddleware.validateParams(contentManageSchemas.faqAndCategoryIdSchema),
     controller.DeleteFaqByCategory
 );
-
-//
 
 router.get(
     "/fetch-all-reviews",

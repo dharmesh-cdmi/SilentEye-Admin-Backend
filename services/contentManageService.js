@@ -228,7 +228,6 @@ const deletePage = async (pageId) => {
     await contentManage.save();
 };
 
-//Faqs api's
 const fetchAllFaqCategories = async () => {
     const contentManage = await ContentManage.findOne({});
     if (!contentManage) {
@@ -404,8 +403,6 @@ const deleteFaqByCategory = async (categoryId, faqId) => {
     await contentManage.save();
 };
 
-//
-
 const fetchAllReviews = async () => {
     const contentManage = await ContentManage.findOne({});
     if (!contentManage) {
@@ -500,8 +497,6 @@ const deleteReview = async (reviewId) => {
     contentManage.reviews.splice(reviewIndex, 1);
     await contentManage.save();
 };
-
-
 
 module.exports = {
     createContentManage,

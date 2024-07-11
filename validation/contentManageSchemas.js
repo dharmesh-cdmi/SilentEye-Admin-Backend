@@ -93,7 +93,6 @@ const faqAndCategoryIdSchema = yup.object().shape({
     faqId: ObjectId.required('Faq ID is required'),
 }).noUnknown(true, 'Unknown field in faq category request params');
 
-
 module.exports = {
     contactDetailsSchema,
     featureSchema,

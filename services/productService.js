@@ -1,10 +1,18 @@
 // services/productService.js
 const Product = require('../models/productModel');
+const paymentService = require('./paymentService');
 
 // Create a new product
 const createProduct = async (data) => {
   const product = new Product(data);
   await product.save();
+  const stripeData = {
+    paymentGatewayId: data?.paymentGatewayId,
+    name: data?.title,
+    amount: data?.mrp,
+    currency: 'usd',
+  };
+  await paymentService.createStripeProduct(stripeData);
   return product;
 };
 

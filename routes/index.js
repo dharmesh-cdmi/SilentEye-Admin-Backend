@@ -7,7 +7,7 @@ const paymentRoutes = require('./paymentRoutes');
 const productRoutes = require('./productRoutes');
 const addonRoutes = require('./addonRoutes');
 const upsellRoutes = require('./upsellRoutes');
-const subscriptionRoutes = require('./subscriptionRoutes');
+const planRoutes = require('./planRoutes');
 const adminRoutes = require('./admin/adminRoutes');
 const authRoutes = require('./authRoutes');
 const visitorRoutes = require('./admin/visitorRoutes');
@@ -26,7 +26,7 @@ router.use('/payment-gateway', paymentGatewayRoutes);
 router.use('/product', productRoutes);
 router.use('/addon', addonRoutes);
 router.use('/upsell', upsellRoutes);
-router.use('/subscription', subscriptionRoutes);
+router.use('/plan', planRoutes);
 router.use('/tickets', require('./ticketRoutes'));
 router.use('/managers', require('./managerRoutes'));
 

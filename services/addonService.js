@@ -1,10 +1,18 @@
 // services/addonService.js
 const Addon = require('../models/addonModel');
+const paymentService = require('./paymentService');
 
 // Create a new addon
 const createAddon = async (data) => {
   const addon = new Addon(data);
   await addon.save();
+  const stripeData = {
+    paymentGatewayId: data?.paymentGatewayId,
+    name: data?.title,
+    amount: data?.mrp,
+    currency: 'usd',
+  };
+  await paymentService.createStripeProduct(stripeData);
   return addon;
 };
 

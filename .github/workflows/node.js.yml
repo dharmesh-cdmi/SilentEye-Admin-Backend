@@ -24,12 +24,11 @@ jobs:
       with:
         node-version: ${{ matrix.node-version }}
         cache: 'npm'
-
-    - name: Change ownership of Node.js binary directory
-      run: sudo chown -R $(whoami):$(whoami) /usr/local/
       
     - name: Ensure node has execute permissions
-      run: sudo chmod +x /usr/local/bin/node
+      run: |
+        sudo chmod +x $(which node)
+        sudo chmod +x $(which npm)
 
     - run: npm ci
     

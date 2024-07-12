@@ -1,4 +1,4 @@
-const { fetchAllTickets, createTicket, updateTicketStatus, deleteTicket, addComment, fetchMyTickets, fetchTicketById } = require("../services/ticketService");
+const { fetchAllTickets, createTicket, updateTicketStatus, deleteTicket, addComment, fetchMyTickets, fetchTicketById, bulkUpdateTicketStatus, bulkDeleteTickets } = require("../services/ticketService");
 const { apiSuccessResponse, apiErrorResponse, HTTP_STATUS } = require("../utils/responseHelper");
 
 const FetchAllTickets = async (req, res) => {
@@ -49,6 +49,9 @@ const UpdateTicketStatus = async (req, res) => {
         const { ticketId } = req.params;
         const { status } = req.body;
         const ticket = await updateTicketStatus(ticketId, status);
+        if (!ticket) {
+            return apiErrorResponse(res, 'Ticket not found', 'Ticket not found', HTTP_STATUS.NOT_FOUND);
+        }
         apiSuccessResponse(res, 'Ticket status updated successfully', ticket, HTTP_STATUS.OK);
     } catch (error) {
         apiErrorResponse(res, 'Internal Server Error', error.message, HTTP_STATUS.INTERNAL_SERVER_ERROR);
@@ -59,7 +62,30 @@ const DeleteTicket = async (req, res) => {
     try {
         const { ticketId } = req.params;
         const ticket = await deleteTicket(ticketId);
+        if (!ticket) {
+            return apiErrorResponse(res, 'Ticket not found', 'Ticket not found', HTTP_STATUS.NOT_FOUND);
+        }
         apiSuccessResponse(res, 'Ticket deleted successfully', ticket, HTTP_STATUS.OK);
+    } catch (error) {
+        apiErrorResponse(res, 'Internal Server Error', error.message, HTTP_STATUS.INTERNAL_SERVER_ERROR);
+    }
+}
+
+const BulkUpdateTicketStatus = async (req, res) => {
+    try {
+        const { ticketIds, status } = req.body;
+        const result = await bulkUpdateTicketStatus(ticketIds, status);
+        apiSuccessResponse(res, 'Tickets status updated successfully', result, HTTP_STATUS.OK);
+    } catch (error) {
+        apiErrorResponse(res, 'Internal Server Error', error.message, HTTP_STATUS.INTERNAL_SERVER_ERROR);
+    }
+}
+
+const BulkDeleteTickets = async (req, res) => {
+    try {
+        const { ticketIds } = req.body;
+        const result = await bulkDeleteTickets(ticketIds);
+        apiSuccessResponse(res, 'Tickets deleted successfully', result, HTTP_STATUS.OK);
     } catch (error) {
         apiErrorResponse(res, 'Internal Server Error', error.message, HTTP_STATUS.INTERNAL_SERVER_ERROR);
     }
@@ -84,5 +110,7 @@ module.exports = {
     DeleteTicket,
     CreateTicketComment,
     FetchMyTickets,
-    FetchTicketById
+    FetchTicketById,
+    BulkUpdateTicketStatus,
+    BulkDeleteTickets
 };

@@ -14,8 +14,11 @@ const fetchAllTickets = async (page = 1, limit = 10, searchQuery = "", status, o
     limit = parseInt(limit) || 10;
     const query = {};
     if (searchQuery) {
-        query.message = { $regex: searchQuery, $options: 'i' };
-        query.status = { $regex: searchQuery, $options: 'i' };
+        query.$or = [
+            { message: { $regex: searchQuery, $options: 'i' } },
+            { status: { $regex: searchQuery, $options: 'i' } },
+            { type: { $regex: searchQuery, $options: 'i' } },
+        ];
     }
     if (status) {
         query.status = status;
@@ -81,7 +84,10 @@ const updateTicketStatus = async (id, status) => {
             status: status
         }
     }
-    return await Ticket.findByIdAndUpdate(id, updatedData);
+    let res = await Ticket.findByIdAndUpdate(id, updatedData, {
+        returnOriginal: false
+    });
+    return res;
 }
 
 /**
@@ -99,7 +105,9 @@ const addComment = async (ticketId, comment, role) => {
                 createdBy: role,
                 createdAt: Date.now()
             }
-        }
+        },
+    }, {
+        returnOriginal: false
     });
 }
 
@@ -109,9 +117,42 @@ const addComment = async (ticketId, comment, role) => {
  * @returns 
  */
 const deleteTicket = async (ticketId) => {
-    return await Ticket.findByIdAndDelete(ticketId);
+    return await Ticket.findByIdAndDelete(ticketId, { returnOriginal: false });
 }
 
+/**
+ * 
+ * @param {Array<String>} ticketIds 
+ * @param {('Active' | 'Answered' | 'Closed')} status
+ * @returns 
+ */
+const bulkUpdateTicketStatus = async (ticketIds, status) => {
+    let updatedData = {};
+    if (status === 'Closed') {
+        updatedData = {
+            status,
+            closedAt: Date.now(),
+        }
+    } else {
+        updatedData = {
+            status: status
+        }
+    }
+    let res = await Ticket.updateMany({ _id: { $in: ticketIds } }, updatedData, {
+        returnOriginal: false
+    });
+    return res;
+}
+
+/**
+ * 
+ * @param {Array<String>} ticketIds 
+ * @returns 
+ */
+const bulkDeleteTickets = async (ticketIds) => {
+    let res = await Ticket.deleteMany({ _id: { $in: ticketIds } });
+    return res;
+}
 const getNextTicketId = async () => {
     let ticketId = await Ticket.findOne({}, { ticketId: 1 }).sort({ createdAt: -1 });
     if (!ticketId) {
@@ -128,5 +169,7 @@ module.exports = {
     addComment,
     deleteTicket,
     fetchMyTickets,
-    fetchTicketById
+    fetchTicketById,
+    bulkUpdateTicketStatus,
+    bulkDeleteTickets
 };

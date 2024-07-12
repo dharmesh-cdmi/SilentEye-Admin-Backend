@@ -1,0 +1,35 @@
+name: SilentEye CI/CD
+
+on:
+  push:
+    branches:
+      - dev  # Specify the branch from where you want to run when data will be puch to this brach
+
+jobs:
+  build:
+
+    runs-on: self-hosted
+
+    strategy:
+      matrix:
+        node-version: [20.x]
+
+    steps:
+    - uses: actions/checkout@v3
+    - name: Use Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v3
+      with:
+        node-version: ${{ matrix.node-version }}
+        cache: 'npm'
+    - run: npm ci
+    - run: |
+        touch .env
+        echo "${{secrets.PORT}}" >> .env
+        echo "${{secrets.MONGO_URI}}" >> .env
+        echo "${{secrets.SALT_ROUNDS}}" >> .env
+        echo "${{secrets.ACCESS_TOKEN_SECRET}}" >> .env
+        echo "${{secrets.ACCESS_TOKEN_EXPIRY_TIME}}" >> .env
+        echo "${{secrets.REFRESH_TOKEN_SECRET}}" >> .env
+        echo "${{secrets.REFRESH_TOKEN_EXPIRY_TIME}}" >> .env
+    # - run: npm start # if pm2 is setup on server then dont need to run this npm
+    

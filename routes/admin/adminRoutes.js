@@ -1,23 +1,17 @@
-// routes/adminRoutes.js
-
 const express = require('express');
 const router = express.Router();
-const { createAdmin, getAdminDetails, changePassword } = require('../../controllers/admin/adminController');
-const visitorRoutes = require('./visitorRoutes');
-const orderRoutes = require('./orderRoute');
-const { verifyAdmin } = require('../../middleware/authMiddleware');
-const validationMiddleware = require('../../middleware/validationMiddleware');
-const userSchemas = require('../../validation/userSchemas');
+const adminController = require('../../controllers/admin/adminController');
+const oderController = require('../../controllers/admin/oderController');
+const visitorController = require('../../controllers/visitorController'); 
+const analyticsController = require('../../controllers/admin/analyticsController');
+
 
 // Route to create a new admin
-router.post('/', createAdmin);
-router.get('/details', getAdminDetails);
-router.use('/visitors', visitorRoutes);
-router.use('/orders', orderRoutes);
-router.post(
-    '/change-password',
-    validationMiddleware.validateRequest(userSchemas.resetPasswordSchema),
-    changePassword
-);
+router.post('/', adminController.createAdmin);
+router.get('/details', adminController.getAdminDetails);
+router.use('/analytics', analyticsController.analytics);
+router.use('/visitors/count', visitorController.getVisitorCount);
+router.use('/orders',  oderController.getOrders);
+
 
 module.exports = router;

@@ -1,14 +1,15 @@
 
 const express = require('express');
 const router = express.Router();
-const { login, getProfile } = require('../controllers/authController'); // Ensure you have the correct path to your controller
-const { loginAdmin } = require('../controllers/admin/adminController');
+const authController = require('../controllers/authController');
+const userController = require('../controllers/userController');
 const { verifyUser } = require('../middleware/authMiddleware');
 
-// User login route
-router.post('/login', login);
-router.post('/admin/login', loginAdmin);
-// Example protected route
-router.get('/profile', verifyUser, getProfile);
+
+router.post('/login', authController.login);
+router.post('/admin/login', authController.loginAdmin);
+
+//protected route
+router.get('/profile', verifyUser, userController.getProfile);
 
 module.exports = router;

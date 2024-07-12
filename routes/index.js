@@ -10,7 +10,6 @@ const upsellRoutes = require('./upsellRoutes');
 const subscriptionRoutes = require('./subscriptionRoutes');
 const adminRoutes = require('./admin/adminRoutes');
 const authRoutes = require('./authRoutes');
-const visitorRoutes = require('./admin/visitorRoutes');
 const { verifyAdmin } = require('../middleware/authMiddleware');
 
 const router = express.Router();

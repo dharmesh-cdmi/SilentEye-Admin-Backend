@@ -1,6 +1,6 @@
 const Visitor = require('../models/visitorModel');
+const Login = require('../models/loginModel');
 
-// Service function to get visitor count
 const getVisitorCount = async (page = null, action = null, startDate = null, endDate = null) => {
   try {
     // Create the match condition dynamically based on the provided filters
@@ -15,7 +15,7 @@ const getVisitorCount = async (page = null, action = null, startDate = null, end
     if (startDate && endDate) {
       matchCondition.visitDate = {
         $gte: new Date(startDate),
-        $lte: new Date(endDate).setHours(23, 59, 59, 999)
+        $lte: new Date(endDate)
       };
     } else if (startDate) {
       matchCondition.visitDate = {
@@ -23,8 +23,12 @@ const getVisitorCount = async (page = null, action = null, startDate = null, end
       };
     } else if (endDate) {
       matchCondition.visitDate = {
-        $lte: new Date(endDate).setHours(23, 59, 59, 999)
+        $lte: new Date(endDate)
       };
+    }
+
+    if (startDate && endDate) {
+      matchCondition.visitDate.$lte.setHours(23, 59, 59, 999);
     }
 
     const result = await Visitor.aggregate([
@@ -43,12 +47,10 @@ const getVisitorCount = async (page = null, action = null, startDate = null, end
 
     const response = {
       totalVisitorsCount,
-      details: result.map(item => ({
-        // ids: item.ids,
+      visitorDetails: result.map(item => ({
         page: item._id.page,
         action: item._id.action,
         totalCount: item.totalCount,
-        // visitDates: item.visitDates,
       }))
     };
 

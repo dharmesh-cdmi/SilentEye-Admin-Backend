@@ -1,10 +1,11 @@
-const express = require('express');
-const connectDB = require('./config/dbConnection');
-const dotenv = require('dotenv');
-const cookieParser = require('cookie-parser');
-const cors = require('cors');
-
-dotenv.config();
+const express = require("express");
+const path = require("path");
+const cors = require("cors");
+const cookieParser = require("cookie-parser");
+require('dotenv').config();
+const connectDB = require("./configs/db.config");
+const routes = require('./routes/index');
+const errorHandlerMiddleware = require('./middleware/errorHandlerMiddleware');
 
 //Express Server Setup
 const app = express();
@@ -20,20 +21,21 @@ const corsOptions = {
 app.use(express.json());
 app.use(cookieParser());
 app.use(cors(corsOptions));
+app.use('/static', express.static(path.join(__dirname, 'static')));
 
 // Connection URL
-const DB = process.env.DB_URI;
+const DB = process.env.MONGO_URI;
 connectDB(DB);
 
-// Import and use the auth routes
-app.use('/api/auth', require('./routes/auth'));
-
-const PORT = process.env.PORT || 4000;
+//Server status endpoint
+app.get('/', (req, res) => {
+    res.send('Server is Up!');
+});
 
 // Routes
-app.use('/api/users', require('./routes/testAPI'));
+app.use("/api", routes);
+app.use(errorHandlerMiddleware);
 
-// Start the server
-app.listen(PORT, () => {
-  console.log(`Server is running on http://localhost:${PORT}`);
+app.listen(port, () => {
+    console.log(`Node/Express Server is Up......\nPort: localhost:${port}`);
 });

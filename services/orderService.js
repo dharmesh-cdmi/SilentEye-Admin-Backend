@@ -55,13 +55,16 @@ const getOrders = async ({ page = 1, limit = 10, status, paymentMethod, userId, 
 };
 
 
-const getTotalOrderCount = async (plan = null, startDate = null, endDate = null ) => {
+
+const getTotalOrderCount = async (plan = null, startDate = null, endDate = null) => {
     let filter = {};
-    
+
+    // Plan filter
     if (plan) {
         filter['planDetails.planName'] = new RegExp(plan, 'i'); // Case insensitive search
     }
 
+    // Date filters
     if (startDate) {
         filter['orderDetails.purchase'] = { $gte: new Date(startDate) };
     }
@@ -71,19 +74,34 @@ const getTotalOrderCount = async (plan = null, startDate = null, endDate = null 
         filter['orderDetails.purchase'].$lte = new Date(endDate);
     }
 
-
+    // Get total count for orders
     const totalOrders = await Orders.countDocuments(filter);
-    return totalOrders;
-};
 
+    // Get total count for pending orders
+    const pendingOrders = await Orders.countDocuments({
+        ...filter,
+        status: 'Pending'
+    });
 
-const getTotalAddonSales = async (startDate = null, endDate = null) => {
+    // Get total count for completed orders
+    const completedOrders = await Orders.countDocuments({
+        ...filter,
+        status: 'Completed'
+    });
+
+    // Get total count for refunded orders
+    const refundedOrders = await Orders.countDocuments({
+        ...filter,
+        status: 'Refunded'
+    });
+
+    // Get total addon sales count
     let pipeline = [
         { $unwind: "$addOns" }, // Unwind the addOns array
         { $group: { _id: null, totalAddons: { $sum: 1 } } } // Sum the count of addOns
     ];
 
-    // Apply date filters if provided
+    // Apply date filters to the pipeline if provided
     if (startDate && endDate) {
         pipeline.unshift({ $match: {
             'orderDetails.purchase': {
@@ -102,15 +120,20 @@ const getTotalAddonSales = async (startDate = null, endDate = null) => {
     }
 
     const result = await Orders.aggregate(pipeline);
-
     const totalAddonSales = result.length > 0 ? result[0].totalAddons : 0;
-    return totalAddonSales;
+
+    return {
+        totalOrders,
+        paymentInitiated: pendingOrders,
+        totalPurchase: completedOrders,
+        trueRefund: refundedOrders,
+        totalAddonSales
+    };
 };
 
 
 
 module.exports = {
     getOrders,
-    getTotalOrderCount,
-    getTotalAddonSales
+    getTotalOrderCount
 };

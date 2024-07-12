@@ -26,16 +26,23 @@ const authenticateUser = async (email, password, country, device, IP) => {
   }
 };
 
-const authenticateAdmin = async (email, password) => {
+
+const authenticateAdmin = async (emailOrUsername, password) => {
   try {
-    const admin = await Admin.findOne({ email });
+    const admin = await Admin.findOne({
+      $or: [
+        { email: emailOrUsername },
+        { username: emailOrUsername }
+      ]
+    });
+
     if (!admin) {
-      throw new Error('Invalid email or password');
+      throw new Error('Invalid email/username or password');
     }
 
     const isMatch = await bcrypt.compare(password, admin.password);
     if (!isMatch) {
-      throw new Error('Invalid email or password');
+      throw new Error('Invalid email/username or password');
     }
 
     return admin;
@@ -43,6 +50,7 @@ const authenticateAdmin = async (email, password) => {
     throw error;
   }
 };
+
 
 const generateTokens = async (userOrAdmin, remember_me) => {
   try {
@@ -61,8 +69,6 @@ const generateTokens = async (userOrAdmin, remember_me) => {
         refreshTokenSecret,
         { expiresIn: refreshTokenExpiresIn }
       );
-      userOrAdmin.remember_token = refreshToken;
-      await userOrAdmin.save();
     }
 
     return { access_token: accessToken, refresh_token: refreshToken };

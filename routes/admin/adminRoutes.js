@@ -10,14 +10,14 @@ const userSchemas = require('../../validation/userSchemas');
 // Route to create a new admin
 router.post('/', adminController.createAdmin);
 router.get('/details', adminController.getAdminDetails);
+router.use('/analytics', analyticsController.totalCountAnalytics);
+router.use('/users-statistics', analyticsController.usersStatisticsAnalytics);
+router.use('/visitors/count', visitorController.getVisitorCount);
+router.use('/orders', oderController.getOrders);
 router.post(
     '/change-password',
     validationMiddleware.validateRequest(userSchemas.resetPasswordSchema),
     adminController.changePassword
 );
-router.use('/analytics', analyticsController.analytics);
-router.use('/visitors/count', visitorController.getVisitorCount);
-router.use('/orders', oderController.getOrders);
-
 
 module.exports = router;

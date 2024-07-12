@@ -46,8 +46,30 @@ const createContactForm = async (contactFormData) => {
     return contactForm;
 };
 
+const getTotalContactFormsCount = async (startDate, endDate) => {
+    const query = {};
+
+    // Add date filters if provided
+    if (startDate && endDate) {
+        query.createdAt = {
+            $gte: new Date(startDate),
+            $lte: new Date(endDate)
+        };
+    } else if (startDate) {
+        query.createdAt = { $gte: new Date(startDate) };
+    } else if (endDate) {
+        query.createdAt = { $lte: new Date(endDate) };
+    }
+
+    // Get total count of contact forms based on the query
+    const totalCount = await ContactForm.countDocuments(query);
+    return totalCount;
+};
+
+
 module.exports = {
     fetchAllContactsForm,
     createContactForm,
-    searchContactsForm
+    searchContactsForm,
+    getTotalContactFormsCount
 };

@@ -162,6 +162,33 @@ const getNextTicketId = async () => {
     const num = parseInt(ticketId.substring(2)) + 1;
     return `ST${num.toString().padStart(5, '0')}`;
 }
+
+/**
+ * Fetch total count of tickets with optional date filter.
+ * @param {Date} startDate - Optional start date filter
+ * @param {Date} endDate - Optional end date filter
+ * @returns {Promise<Number>} Total count of tickets
+ */
+const getTotalTicketsCount = async (startDate, endDate) => {
+    const query = {};
+
+    if (startDate && endDate) {
+        query.createdAt = {
+            $gte: new Date(startDate),
+            $lte: new Date(endDate)
+        };
+    } else if (startDate) {
+        query.createdAt = { $gte: new Date(startDate) };
+    } else if (endDate) {
+        query.createdAt = { $lte: new Date(endDate) };
+    }
+
+    // Get total count of tickets based on the query
+    const total = await Ticket.countDocuments(query);
+    return total;
+};
+
+
 module.exports = {
     fetchAllTickets,
     createTicket,
@@ -170,6 +197,7 @@ module.exports = {
     deleteTicket,
     fetchMyTickets,
     fetchTicketById,
+    getTotalTicketsCount,
     bulkUpdateTicketStatus,
     bulkDeleteTickets
 };

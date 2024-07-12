@@ -55,16 +55,25 @@ const getOrders = async ({ page = 1, limit = 10, status, paymentMethod, userId, 
 };
 
 
+<<<<<<< HEAD
 
 const getTotalOrderCount = async (plan = null, startDate = null, endDate = null) => {
     let filter = {};
 
     // Plan filter
+=======
+const getTotalOrderCount = async (plan = null, startDate = null, endDate = null ) => {
+    let filter = {};
+    
+>>>>>>> 89c5b8e8dc9eaf4ba0be1a051de9dc1e20ce4689
     if (plan) {
         filter['planDetails.planName'] = new RegExp(plan, 'i'); // Case insensitive search
     }
 
+<<<<<<< HEAD
     // Date filters
+=======
+>>>>>>> 89c5b8e8dc9eaf4ba0be1a051de9dc1e20ce4689
     if (startDate) {
         filter['orderDetails.purchase'] = { $gte: new Date(startDate) };
     }
@@ -74,6 +83,7 @@ const getTotalOrderCount = async (plan = null, startDate = null, endDate = null)
         filter['orderDetails.purchase'].$lte = new Date(endDate);
     }
 
+<<<<<<< HEAD
     // Get total count for orders
     const totalOrders = await Orders.countDocuments(filter);
 
@@ -96,12 +106,25 @@ const getTotalOrderCount = async (plan = null, startDate = null, endDate = null)
     });
 
     // Get total addon sales count
+=======
+
+    const totalOrders = await Orders.countDocuments(filter);
+    return totalOrders;
+};
+
+
+const getTotalAddonSales = async (startDate = null, endDate = null) => {
+>>>>>>> 89c5b8e8dc9eaf4ba0be1a051de9dc1e20ce4689
     let pipeline = [
         { $unwind: "$addOns" }, // Unwind the addOns array
         { $group: { _id: null, totalAddons: { $sum: 1 } } } // Sum the count of addOns
     ];
 
+<<<<<<< HEAD
     // Apply date filters to the pipeline if provided
+=======
+    // Apply date filters if provided
+>>>>>>> 89c5b8e8dc9eaf4ba0be1a051de9dc1e20ce4689
     if (startDate && endDate) {
         pipeline.unshift({ $match: {
             'orderDetails.purchase': {
@@ -120,6 +143,7 @@ const getTotalOrderCount = async (plan = null, startDate = null, endDate = null)
     }
 
     const result = await Orders.aggregate(pipeline);
+<<<<<<< HEAD
     const totalAddonSales = result.length > 0 ? result[0].totalAddons : 0;
 
     return {
@@ -129,6 +153,11 @@ const getTotalOrderCount = async (plan = null, startDate = null, endDate = null)
         trueRefund: refundedOrders,
         totalAddonSales
     };
+=======
+
+    const totalAddonSales = result.length > 0 ? result[0].totalAddons : 0;
+    return totalAddonSales;
+>>>>>>> 89c5b8e8dc9eaf4ba0be1a051de9dc1e20ce4689
 };
 
 
@@ -136,5 +165,9 @@ const getTotalOrderCount = async (plan = null, startDate = null, endDate = null)
 module.exports = {
     getOrders,
     getTotalOrderCount,
+<<<<<<< HEAD
     // getTotalAddonSales
+=======
+    getTotalAddonSales
+>>>>>>> 89c5b8e8dc9eaf4ba0be1a051de9dc1e20ce4689
 };

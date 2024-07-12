@@ -10,12 +10,12 @@ const SettingsSchema = new Schema({
         },
         title: {
             type: String,
-            required: true,
+            default: '',
             trim: true
         },
         link: {
             type: String,
-            required: true,
+            default: '',
             trim: true
         }
     },
@@ -28,43 +28,43 @@ const SettingsSchema = new Schema({
         timeGap: {
             quantity: {
                 type: Number,
-                required: true
+                default: 0,
             },
             unit: {
                 type: String,
-                required: true,
+                default: 's',
                 enum: ['s', 'm', 'h', 'd'] // seconds, minutes, hours, days
             }
         },
         delayed: {
             quantity: {
                 type: Number,
-                required: true
+                default: 0,
             },
             unit: {
                 type: String,
-                required: true,
+                default: 's',
                 enum: ['s', 'm', 'h', 'd']
             }
         },
         name: {
             type: String,
-            required: true,
+            default: '',
             trim: true
         },
         cityState: {
             type: String,
-            required: true,
+            default: '',
             trim: true
         },
         planName: {
             type: String,
-            required: true,
+            default: '',
             trim: true
         },
         purchaseTime: {
             type: String,
-            required: true,
+            default: '',
             trim: true
         }
     },
@@ -84,17 +84,17 @@ const SettingsSchema = new Schema({
         delayed: {
             quantity: {
                 type: Number,
-                required: true
+                default: 0,
             },
             unit: {
                 type: String,
-                required: true,
+                default: 's',
                 enum: ['s', 'm', 'h', 'd']
             }
         },
         image: {
             type: String,
-            required: true,
+            default: null,
             trim: true
         }
     }

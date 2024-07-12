@@ -1,6 +1,8 @@
 const bcrypt = require('bcrypt');
 const Admin = require('../models/admin/adminModel');
 
+const SALT_ROUNDS = parseInt(process.env.SALT_ROUNDS) || 10;
+
 // Service function to create a new admin
 const createAdmin = async (adminData) => {
   try {
@@ -15,10 +17,28 @@ const createAdmin = async (adminData) => {
 };
 
 // Service function to get admin details by ID
-const getAdminById = async (adminId) => {
+const getAdminById = async (adminId, fieldsToExclude = []) => {
   try {
-    const admin = await Admin.findById(adminId).select('-password');
+    let query = Admin.findById(adminId);
+
+    if (fieldsToExclude.length > 0) {
+      fieldsToExclude.forEach(field => {
+        query = query.select(`-${field}`);
+      });
+    }
+
+    const admin = await query.exec();
     return admin;
+  } catch (err) {
+    throw err; // Propagate the error
+  }
+};
+
+const changeAdminPassword = async (newPass, admin) => {
+  try {
+    const hashedPassword = await bcrypt.hash(newPass, SALT_ROUNDS);
+    admin.password = hashedPassword;
+    await admin.save();
   } catch (err) {
     throw err; // Propagate the error
   }
@@ -26,5 +46,6 @@ const getAdminById = async (adminId) => {
 
 module.exports = {
   createAdmin,
-  getAdminById
+  getAdminById,
+  changeAdminPassword
 };

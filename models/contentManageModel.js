@@ -5,24 +5,45 @@ const contactDetailsSchema = new Schema(
     {
         status: {
             type: String,
-            required: true,
+            default: 'disabled',
             enum: ['enabled', 'disabled']
         },
         contact: {
-            type: String,
-            required: true,
-            trim: true
+            status: {
+                type: String,
+                default: 'disabled',
+                enum: ['enabled', 'disabled']
+            },
+            value: {
+                type: String,
+                default: '',
+                trim: true
+            },
         },
         email: {
-            type: String,
-            required: true,
-            trim: true
+            status: {
+                type: String,
+                default: 'disabled',
+                enum: ['enabled', 'disabled']
+            },
+            value: {
+                type: String,
+                default: '',
+                trim: true
+            },
         },
         address: {
-            type: String,
-            required: true,
-            trim: true
-        }
+            status: {
+                type: String,
+                default: 'disabled',
+                enum: ['enabled', 'disabled']
+            },
+            value: {
+                type: String,
+                default: '',
+                trim: true
+            },
+        },
     });
 
 const FeatureSchema = new Schema({
@@ -95,6 +116,11 @@ const FaqSchema = new Schema({
 });
 
 const FaqCategorySchema = new Schema({
+    status: {
+        type: String,
+        required: true,
+        enum: ['enabled', 'disabled']
+    },
     title: {
         type: String,
         required: true,
@@ -109,7 +135,7 @@ const FaqCategorySchema = new Schema({
 });
 
 const ReviewSchema = new Schema({
-    image: {
+    profile: {
         type: String,
         required: true,
         trim: true
@@ -123,7 +149,7 @@ const ReviewSchema = new Schema({
         type: Number,
         required: true
     },
-    description: {
+    review: {
         type: String,
         required: true,
         trim: true
@@ -141,7 +167,7 @@ const ContentManageSchema = new Schema({
     },
     features: [FeatureSchema],
     pages: [PageSchema],
-    faqs: [FaqCategorySchema],
+    faqCategories: [FaqCategorySchema],
     reviews: [ReviewSchema]
 }, {
     timestamps: true

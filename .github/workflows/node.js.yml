@@ -3,37 +3,45 @@ name: SilentEye CI/CD
 on:
   push:
     branches:
-      - dev  # Specify the branch from where you want to run when data will be puch to this brach
+      - dev  # Specify the branch from where you want to run when data will be pushed to this branch
 
 jobs:
   build:
-
     runs-on: self-hosted
 
     strategy:
       matrix:
         node-version: [20.x]
-        
+
     steps:
     - name: Change ownership of the repository directory
       run: sudo chown -R $(whoami):$(whoami) ${{ github.workspace }}
-
+      
     - uses: actions/checkout@v3
-    
+
     - name: Use Node.js ${{ matrix.node-version }}
       uses: actions/setup-node@v3
       with:
         node-version: ${{ matrix.node-version }}
         cache: 'npm'
+
+    - name: Change ownership of Node.js binary directory
+      run: sudo chown -R $(whoami):$(whoami) /usr/local/
+      
+    - name: Ensure node has execute permissions
+      run: sudo chmod +x /usr/local/bin/node
+
     - run: npm ci
+    
     - run: |
         touch .env
-        echo "${{secrets.PORT}}" >> .env
-        echo "${{secrets.MONGO_URI}}" >> .env
-        echo "${{secrets.SALT_ROUNDS}}" >> .env
-        echo "${{secrets.ACCESS_TOKEN_SECRET}}" >> .env
-        echo "${{secrets.ACCESS_TOKEN_EXPIRY_TIME}}" >> .env
-        echo "${{secrets.REFRESH_TOKEN_SECRET}}" >> .env
-        echo "${{secrets.REFRESH_TOKEN_EXPIRY_TIME}}" >> .env
-    # - run: npm start # if pm2 is setup on server then dont need to run this npm
-    
+        echo "PORT=${{secrets.PORT}}" >> .env
+        echo "MONGO_URI=${{secrets.MONGO_URI}}" >> .env
+        echo "SALT_ROUNDS=${{secrets.SALT_ROUNDS}}" >> .env
+        echo "ACCESS_TOKEN_SECRET=${{secrets.ACCESS_TOKEN_SECRET}}" >> .env
+        echo "ACCESS_TOKEN_EXPIRY_TIME=${{secrets.ACCESS_TOKEN_EXPIRY_TIME}}" >> .env
+        echo "REFRESH_TOKEN_SECRET=${{secrets.REFRESH_TOKEN_SECRET}}" >> .env
+        echo "REFRESH_TOKEN_EXPIRY_TIME=${{secrets.REFRESH_TOKEN_EXPIRY_TIME}}" >> .env
+        
+    # Uncomment the following line if you want to start the application
+    # - run: npm start # if pm2 is set up on server then don't need to run this npm start

@@ -12,7 +12,6 @@ const getUserProfile = async (userId) => {
   }
 };
 
-
 const getUserStatistics = async (startDate = null, endDate = null) => {
   try {
     const matchStage = {};

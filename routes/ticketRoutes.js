@@ -2,7 +2,7 @@ const router = require("express").Router();
 const controller = require("../controllers/ticketController.js");
 const { verifyAdmin, verifyUser, authenticateUser } = require("../middleware/authMiddleware.js");
 const { validateRequest, validateQuery } = require("../middleware/validationMiddleware.js");
-const { createTicketSchema, searchTicketSchema, ticketStatusUpdateSchema, ticketCommentSchema } = require("../validation/ticketSchema.js");
+const { createTicketSchema, searchTicketSchema, ticketStatusUpdateSchema, ticketCommentSchema, bulkDeleteSchema, bulkUpdateStatusSchema } = require("../validation/ticketSchema.js");
 
 router.get(
     "/",
@@ -42,6 +42,18 @@ router.post(
     authenticateUser,
     validateRequest(ticketCommentSchema),
     controller.CreateTicketComment
+);
+router.put(
+    "/bulk/status",
+    verifyAdmin,
+    validateRequest(bulkUpdateStatusSchema),
+    controller.BulkUpdateTicketStatus
+);
+router.delete(
+    "/bulk/delete",
+    verifyAdmin,
+    validateRequest(bulkDeleteSchema),
+    controller.BulkDeleteTickets
 );
 
 

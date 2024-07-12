@@ -17,13 +17,13 @@ router.post(
     controller.CreateManager
 );
 router.put(
-    "/:managerId",
+    "/:id",
     verifyAdmin,
     validateRequest(updateManagerSchema),
     controller.UpdateManager
 );
 router.delete(
-    "/:managerId",
+    "/:id",
     verifyAdmin,
     controller.DeleteManager
 );

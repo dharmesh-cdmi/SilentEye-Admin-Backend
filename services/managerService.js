@@ -1,23 +1,30 @@
 const adminModel = require("../models/admin/adminModel");
 const ManagerInfo = require("../models/managerInfoModel");
 
-const fetchAllMangers = async (queryParams) => {
+const fetchAllManagers = async (queryParams) => {
     let { page, limit, searchQuery, status, order } = queryParams;
     page = parseInt(page) || 1;
     limit = parseInt(limit) || 10;
-    const query = {};
+    order = order || 'desc';
+
+    const query = { role: 'manager' };
+
     if (searchQuery) {
-        query.name = { $regex: searchQuery, $options: 'i' };
-        query.email = { $regex: searchQuery, $options: 'i' };
+        query.$or = [
+            { name: { $regex: searchQuery, $options: 'i' } },
+            { email: { $regex: searchQuery, $options: 'i' } },
+            { username: { $regex: searchQuery, $options: 'i' } },
+        ];
     }
     if (status) {
         query.status = status;
     }
+
     const total = await adminModel.countDocuments(query);
 
-    let managers = await adminModel.find({ role: 'manager' })
-        .select('name email')
-        .sort({ createdAt: order })
+    const managers = await adminModel.find(query)
+        .select('name email username status role')
+        .sort({ createdAt: order === 'asc' ? 1 : -1 })
         .skip((page - 1) * limit)
         .limit(limit)
         .populate('managerInfo', 'userLimit whatsapp skype assignedUsersCount');
@@ -31,9 +38,16 @@ const fetchAllMangers = async (queryParams) => {
 }
 
 const createManager = async (data) => {
+    const existingEmail = await adminModel.findOne({ email: data.email });
+    const existingUsername = await adminModel.findOne({ username: data.username });
+
+    if (existingEmail) throw new Error('Email already in use');
+    if (existingUsername) throw new Error('Username already in use');
+
     let manager = new adminModel({
         name: data.name,
         email: data.email,
+        username: data.username,
         email_verified_at: new Date(),
         password: data.password,
         role: 'manager',
@@ -45,6 +59,7 @@ const createManager = async (data) => {
         userLimit: data.userLimit,
         whatsapp: data.whatsapp,
         skype: data.skype,
+        order: data.order,
     });
 
     manager.managerInfo = managerDetails._id;
@@ -60,13 +75,26 @@ const updateManager = async (id, data) => {
         return null;
     }
 
+    if (data.email && data.email !== manager.email) {
+        const existingEmail = await adminModel.findOne({ email: data.email });
+        if (existingEmail) throw new Error('Email already in use');
+    }
+
+    if (data.username && data.username !== manager.username) {
+        const existingUsername = await adminModel.findOne({ username: data.username });
+        if (existingUsername) throw new Error('Username already in use');
+    }
+
     let managerDetails = await ManagerInfo.findOne({ managerId: id });
-    manager.name = data.name;
-    manager.email = data.email;
-    manager.status = data.status;
-    managerDetails.userLimit = data.userLimit;
-    managerDetails.whatsapp = data.whatsapp;
-    managerDetails.skype = data.skype;
+
+    if (data.name) manager.name = data.name;
+    if (data.email) manager.email = data.email;
+    if (data.username) manager.username = data.username;
+    if (data.status) manager.status = data.status;
+    if (data.userLimit) managerDetails.userLimit = data.userLimit;
+    if (data.whatsapp) managerDetails.whatsapp = data.whatsapp;
+    if (data.skype) managerDetails.skype = data.skype;
+    if (data.order !== undefined) managerDetails.order = data.order;
 
     await manager.save();
     return await managerDetails.save();
@@ -83,7 +111,7 @@ const deleteManager = async (id) => {
 }
 
 module.exports = {
-    fetchAllMangers,
+    fetchAllManagers,
     createManager,
     updateManager,
     deleteManager,

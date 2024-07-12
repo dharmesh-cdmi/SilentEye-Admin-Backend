@@ -1,9 +1,11 @@
-const express = require('express');
-const cors = require('cors');
+const express = require("express");
+const path = require("path");
+const cors = require("cors");
 const cookieParser = require("cookie-parser");
 require('dotenv').config();
 const connectDB = require("./configs/db.config");
 const routes = require('./routes/index');
+const errorHandlerMiddleware = require('./middleware/errorHandlerMiddleware');
 
 //Express Server Setup
 const app = express();
@@ -19,6 +21,7 @@ const corsOptions = {
 app.use(express.json());
 app.use(cookieParser());
 app.use(cors(corsOptions));
+app.use('/static', express.static(path.join(__dirname, 'static')));
 
 // Connection URL
 const DB = process.env.MONGO_URI;
@@ -31,6 +34,7 @@ app.get('/', (req, res) => {
 
 // Routes
 app.use("/api", routes);
+app.use(errorHandlerMiddleware);
 
 app.listen(port, () => {
     console.log(`Node/Express Server is Up......\nPort: localhost:${port}`);

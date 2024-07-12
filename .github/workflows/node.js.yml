@@ -37,7 +37,7 @@ jobs:
           echo "REFRESH_TOKEN_SECRET=${{ secrets.REFRESH_TOKEN_SECRET }}" >> .env
           echo "REFRESH_TOKEN_EXPIRY_TIME=${{ secrets.REFRESH_TOKEN_EXPIRY_TIME }}" >> .env
 
-      - name: Start Node.js Application
-        run: npm start
+      # - name: Start Node.js Application
+      #   run: npm start
 
 

@@ -30,13 +30,16 @@ const UpdateManager = async (req, res) => {
     try {
         const manager = await updateManager(req?.params?.id, req?.body);
         if (!manager) {
-            return apiErrorResponse(res, 'Manager not found', null, HTTP_STATUS.NOT_FOUND);
+            return apiErrorResponse(res, HTTP_STATUS_MESSAGE[404], 'Manager not found', HTTP_STATUS.NOT_FOUND);
         }
         return apiSuccessResponse(res, HTTP_STATUS_MESSAGE[200], manager, HTTP_STATUS.OK);
     } catch (error) {
+        if (error.message === 'Email already in use' || error.message === 'Username already in use') {
+            return apiErrorResponse(res, error.message, error.message, HTTP_STATUS.BAD_REQUEST);
+        }
         return apiErrorResponse(res, HTTP_STATUS_MESSAGE[500], error, HTTP_STATUS.INTERNAL_SERVER_ERROR);
     }
-};
+}
 
 // Delete a manager
 const DeleteManager = async (req, res) => {

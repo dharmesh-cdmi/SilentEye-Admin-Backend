@@ -38,10 +38,11 @@ const fetchAllManagers = async (queryParams) => {
 }
 
 const createManager = async (data) => {
-    const existingManager = await adminModel.findOne({ email: data.email });
-    if (existingManager) {
-        throw new Error('Email already in use');
-    }
+    const existingEmail = await adminModel.findOne({ email: data.email });
+    const existingUsername = await adminModel.findOne({ username: data.username });
+
+    if (existingEmail) throw new Error('Email already in use');
+    if (existingUsername) throw new Error('Username already in use');
 
     let manager = new adminModel({
         name: data.name,
@@ -58,13 +59,15 @@ const createManager = async (data) => {
         userLimit: data.userLimit,
         whatsapp: data.whatsapp,
         skype: data.skype,
+        order: data.order,
     });
 
     manager.managerInfo = managerDetails._id;
 
-    await manager.save();
+    manager = await manager.save();
     return await managerDetails.save();
 }
+
 
 const updateManager = async (id, data) => {
     const manager = await adminModel.findById(id);
@@ -72,25 +75,26 @@ const updateManager = async (id, data) => {
         return null;
     }
 
-    const managerDetails = await ManagerInfo.findOne({ managerId: id });
-    if (!managerDetails) {
-        return null;
-    }
-
     if (data.email && data.email !== manager.email) {
-        const existingManager = await adminModel.findOne({ email: data.email });
-        if (existingManager) {
-            throw new Error('Email already in use');
-        }
-        manager.email = data.email;
+        const existingEmail = await adminModel.findOne({ email: data.email });
+        if (existingEmail) throw new Error('Email already in use');
     }
 
-    manager.name = data.name || manager.name;
-    manager.username = data.username || manager.username;
-    manager.status = data.status || manager.status;
-    managerDetails.userLimit = data.userLimit || managerDetails.userLimit;
-    managerDetails.whatsapp = data.whatsapp || managerDetails.whatsapp;
-    managerDetails.skype = data.skype || managerDetails.skype;
+    if (data.username && data.username !== manager.username) {
+        const existingUsername = await adminModel.findOne({ username: data.username });
+        if (existingUsername) throw new Error('Username already in use');
+    }
+
+    let managerDetails = await ManagerInfo.findOne({ managerId: id });
+
+    if (data.name) manager.name = data.name;
+    if (data.email) manager.email = data.email;
+    if (data.username) manager.username = data.username;
+    if (data.status) manager.status = data.status;
+    if (data.userLimit) managerDetails.userLimit = data.userLimit;
+    if (data.whatsapp) managerDetails.whatsapp = data.whatsapp;
+    if (data.skype) managerDetails.skype = data.skype;
+    if (data.order !== undefined) managerDetails.order = data.order;
 
     await manager.save();
     return await managerDetails.save();

@@ -13,9 +13,13 @@ jobs:
     strategy:
       matrix:
         node-version: [20.x]
-
+        
     steps:
+    - name: Change ownership of the repository directory
+      run: sudo chown -R $(whoami):$(whoami) ${{ github.workspace }}
+
     - uses: actions/checkout@v3
+    
     - name: Use Node.js ${{ matrix.node-version }}
       uses: actions/setup-node@v3
       with:

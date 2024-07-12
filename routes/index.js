@@ -8,6 +8,7 @@ const productRoutes = require('./productRoutes');
 const addonRoutes = require('./addonRoutes');
 const upsellRoutes = require('./upsellRoutes');
 const planRoutes = require('./planRoutes');
+const shippingRoutes = require('./shippingRoutes');
 const adminRoutes = require('./admin/adminRoutes');
 const authRoutes = require('./authRoutes');
 const visitorRoutes = require('./admin/visitorRoutes');
@@ -29,5 +30,6 @@ router.use('/upsell', upsellRoutes);
 router.use('/plan', planRoutes);
 router.use('/tickets', require('./ticketRoutes'));
 router.use('/managers', require('./managerRoutes'));
+router.use('/shipping', shippingRoutes);
 
 module.exports = router;

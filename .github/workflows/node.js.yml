@@ -39,10 +39,8 @@ jobs:
 
       - name: Start Node.js Application with pm2
         run: |
-          pm2 start server.js --name "silenteye-backend"
-          pm2 save
-          pm2 list  # Optional: Check if the application is running correctly
-
-      - name: Show pm2 Process List
-        run: pm2 list
+          pm2 start silenteye-backend --watch
+  
+      # - name: Show pm2 Process List
+      #   run: pm2 list
 

@@ -28,8 +28,7 @@ const getAdminDetails = async (req, res) => {
 const changePassword = async (req, res) => {
   try {
     const { oldPassword, newPassword } = req.body;
-    // const adminId = req.admin?.id;
-    const adminId = '6691201d636c335d3593481b';
+    const adminId = req.admin?.id;
     if (!adminId) {
       return res.status(400).json({ message: 'Inavlid Admin Id' });
     }

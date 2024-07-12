@@ -1,6 +1,5 @@
 const adminService = require('../../services/adminService');
-
-const SALT_ROUNDS = parseInt(process.env.SALT_ROUNDS) || 10;
+const bcrypt = require('bcrypt');
 
 // Controller to create a new admin
 const createAdmin = async (req, res) => {
@@ -15,7 +14,7 @@ const createAdmin = async (req, res) => {
 // Controller to get admin details by ID
 const getAdminDetails = async (req, res) => {
   try {
-    const admin = await adminService.getAdminById(req.admin.id);
+    const admin = await adminService.getAdminById(req.admin.id, ['password']);
     if (!admin) {
       return res.status(404).json({ message: 'Admin not found' });
     }
@@ -25,7 +24,32 @@ const getAdminDetails = async (req, res) => {
   }
 };
 
+//Reset password for admin
+const changePassword = async (req, res) => {
+  try {
+    const { oldPassword, newPassword } = req.body;
+    // const adminId = req.admin?.id;
+    const adminId = '6691201d636c335d3593481b';
+    if (!adminId) {
+      return res.status(400).json({ message: 'Inavlid Admin Id' });
+    }
+    const admin = await adminService.getAdminById(adminId);
+    if (!admin) {
+      return res.status(404).json({ message: 'Admin not found' });
+    }
+    const isMatch = await bcrypt.compare(oldPassword, admin.password);
+    if (!isMatch) {
+      return res.status(401).json({ message: 'Invalid old password' });
+    }
+    await adminService.changeAdminPassword(newPassword, admin);
+    return res.status(200).json({ message: 'Password updated successfully' });
+  } catch (error) {
+    res.status(500).json({ message: 'Server error' });
+  }
+};
+
 module.exports = {
   createAdmin,
-  getAdminDetails
+  getAdminDetails,
+  changePassword
 };

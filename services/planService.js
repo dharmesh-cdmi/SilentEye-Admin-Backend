@@ -1,13 +1,41 @@
 const Plan = require('../models/planModel');
+const paymentService = require('./paymentService');
 
 // Create a new plan
 const createPlan = async (data) => {
   try {
+    const pgData = {
+      paymentGatewayId: data?.paymentGatewayId,
+      name: data?.name,
+      amount: data?.mrp,
+      currency: 'usd',
+      description: `${data?.discountPercent}% OFF`,
+      images: [data?.icon],
+    };
+
+    const pgPlan = await paymentService.createStripeItem(pgData);
+
+    data = {
+      ...data,
+      paymentGatewayId: data?.paymentGatewayId,
+      pgPlanId: pgPlan?.data?.product,
+      pgPriceId: pgPlan?.data?.id,
+    };
+
     const plan = new Plan(data);
     await plan.save();
-    return plan;
+
+    return {
+      status: true,
+      data: plan,
+      message: 'Plan created successfully',
+    };
   } catch (error) {
-    throw new Error(`Error creating plan: ${error.message}`);
+    return {
+      status: true,
+      error: true,
+      message: 'Error in creating plan: ' + error,
+    };
   }
 };
 
@@ -32,7 +60,26 @@ const getPlanById = async (id) => {
 // Update plan by ID
 const updatePlan = async (id, data) => {
   try {
-    const plan = await Plan.findByIdAndUpdate(id, data, {
+    let plan = await getPlanById(id);
+
+    const pgData = {
+      paymentGatewayId: plan?.paymentGatewayId,
+      itemId: plan?.pgPlanId,
+      name: data?.name,
+      description: data?.description ? data?.description : plan.description,
+      itemMetadata: data?.planMetadata ? data.planMetadata : undefined,
+      priceId: plan?.pgPriceId,
+      amount: data?.mrp ? data.mrp : undefined,
+      priceMetadata: data?.priceMetadata ? data.priceMetadata : undefined,
+    };
+
+    const pgPlan = await paymentService.updateStripeItem(pgData);
+
+    if (!pgPlan) {
+      throw new Error('Plan not updated on stripe!');
+    }
+
+    plan = await Plan.findByIdAndUpdate(id, data, {
       new: true,
     });
     return plan;
@@ -44,9 +91,35 @@ const updatePlan = async (id, data) => {
 // Delete plan by ID
 const deletePlan = async (id) => {
   try {
-    await Plan.findByIdAndDelete(id);
+    let plan = await getPlanById(id);
+    if (!plan) {
+      throw new Error('Plan not found!');
+    }
+
+    const pgData = {
+      paymentGatewayId: plan?.paymentGatewayId,
+      itemId: plan?.pgPlanId,
+    };
+
+    const pgPlan = await paymentService.deleteStripeItem(pgData);
+
+    if (!pgPlan) {
+      throw new Error('Plan not deleted on stripe!');
+    }
+
+    plan = await Plan.findByIdAndDelete(id);
+
+    return {
+      status: true,
+      data: plan,
+      message: 'Plan deleted successfully',
+    };
   } catch (error) {
-    throw new Error(`Error deleting plan: ${error.message}`);
+    return {
+      status: true,
+      error: true,
+      message: 'Error in deleting plan: ' + error,
+    };
   }
 };
 

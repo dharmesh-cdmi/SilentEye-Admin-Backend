@@ -40,13 +40,28 @@ const PlanSchema = new Schema(
       required: true,
       enum: ['live', 'test'],
     },
+    paymentGatewayId: {
+      type: String,
+      required: false,
+      trim: true,
+    },
+    pgPlanId: {
+      type: String,
+      required: false,
+      trim: true,
+    },
+    pgPriceId: {
+      type: String,
+      required: false,
+      trim: true,
+    },
   },
   {
     timestamps: true,
   }
 );
 
-PlanSchema.pre('save', function (next) {
+PlanSchema.pre('validate', function (next) {
   if (this.discountPercent && this.mrp) {
     this.discountValue = (this.mrp * this.discountPercent) / 100;
     this.tag = this.discountPercent + '% OFF';

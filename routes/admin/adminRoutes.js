@@ -9,7 +9,8 @@ const analyticsController = require('../../controllers/admin/analyticsController
 // Route to create a new admin
 router.post('/', adminController.createAdmin);
 router.get('/details', adminController.getAdminDetails);
-router.use('/analytics', analyticsController.analytics);
+router.use('/analytics', analyticsController.totalCountAnalytics);
+router.use('/users-statistics', analyticsController.usersStatisticsAnalytics);
 router.use('/visitors/count', visitorController.getVisitorCount);
 router.use('/orders',  oderController.getOrders);
 

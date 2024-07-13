@@ -25,6 +25,7 @@ app.use('/static', express.static(path.join(__dirname, 'static')));
 
 // Connection URL
 const DB = process.env.MONGO_URI;
+console.log(DB);
 connectDB(DB);
 
 //Server status endpoint

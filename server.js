@@ -24,9 +24,8 @@ app.use(cors(corsOptions));
 app.use('/static', express.static(path.join(__dirname, 'static')));
 
 // Connection URL
-const DB = process.env.MONGO_URI;
-console.log(DB);
-connectDB(DB);
+//Please dont pass anythign from here its auto config from .env file in db config file
+connectDB();
 
 //Server status endpoint
 app.get('/', (req, res) => {

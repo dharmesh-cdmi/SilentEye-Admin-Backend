@@ -31,7 +31,7 @@ async function seedUsers() {
         await hashPasswords(users); // Hash passwords before inserting
         await User.deleteMany(); // Delete existing users
         const insertedUsers = await User.insertMany(users); // Insert new users
-        console.log('Users seeded successfully:', insertedUsers);
+        console.log('Users seeded successfully:');
     } catch (err) {
         console.error('Error seeding users:', err);
     } finally {

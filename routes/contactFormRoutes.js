@@ -6,13 +6,13 @@ const validationMiddleware = require('../middleware/validationMiddleware');
 
 router.get(
     "/fetch-all-contacts-form",
-    // authMiddleware.verifyAdmin,
+    authMiddleware.verifyAdmin,
     controller.FetchAllContactsForm
 );
 
 router.post(
     "/search-contact-form",
-    // authMiddleware.verifyAdmin,
+    authMiddleware.verifyAdmin,
     validationMiddleware.validateRequest(contactFormSchemas.searchContactSchema),
     controller.SearchContactsForm
 );

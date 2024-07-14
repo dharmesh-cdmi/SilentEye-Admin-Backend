@@ -21,39 +21,39 @@ const upload = multer({ storage });
 
 router.post(
     "/create-content-manage",
-    // authMiddleware.verifyAdmin,
+    authMiddleware.verifyAdmin,
     controller.CreateContentManage
 );
 
 router.get(
     "/fetch-contact-details",
-    // authMiddleware.verifyAdmin,
+    authMiddleware.verifyAdmin,
     controller.FetchContactDetails
 );
 
 router.put(
     "/update-contact-details",
-    // authMiddleware.verifyAdmin,
+    authMiddleware.verifyAdmin,
     validationMiddleware.validateRequest(contentManageSchemas.contactDetailsSchema),
     controller.UpdateContactDetails
 );
 
 router.get(
     "/fetch-all-features",
-    // authMiddleware.verifyAdmin,
+    authMiddleware.verifyAdmin,
     controller.FetchAllFeatures
 );
 
 router.get(
     "/fetch-features",
-    // authMiddleware.verifyAdmin,
+    authMiddleware.verifyAdmin,
     validationMiddleware.validateQuery(contentManageSchemas.fetchFeaturesSchema),
     controller.FetchFeatures
 );
 
 router.post(
     "/add-feature",
-    // authMiddleware.verifyAdmin,
+    authMiddleware.verifyAdmin,
     upload.single('icon'),
     validationMiddleware.validateFile({ required: true }),
     validationMiddleware.validateRequest(contentManageSchemas.featureSchema),
@@ -62,7 +62,7 @@ router.post(
 
 router.put(
     "/update-feature/:featureId",
-    // authMiddleware.verifyAdmin,
+    authMiddleware.verifyAdmin,
     upload.single('icon'),
     validationMiddleware.validateFile({ required: false }),
     validationMiddleware.validateParams(contentManageSchemas.featureIdSchema),
@@ -72,34 +72,34 @@ router.put(
 
 router.delete(
     "/delete-feature/:featureId",
-    // authMiddleware.verifyAdmin,
+    authMiddleware.verifyAdmin,
     validationMiddleware.validateParams(contentManageSchemas.featureIdSchema),
     controller.DeleteFeature
 );
 
 router.get(
     "/fetch-all-pages",
-    // authMiddleware.verifyAdmin,
+    authMiddleware.verifyAdmin,
     controller.FetchAllPages
 );
 
 router.get(
     "/fetch-pages",
-    // authMiddleware.verifyAdmin,
+    authMiddleware.verifyAdmin,
     validationMiddleware.validateQuery(contentManageSchemas.fetchPagesSchema),
     controller.FetchPages
 );
 
 router.post(
     "/add-page",
-    // authMiddleware.verifyAdmin,
+    authMiddleware.verifyAdmin,
     validationMiddleware.validateRequest(contentManageSchemas.pageSchema),
     controller.AddPage
 );
 
 router.put(
     "/update-page/:pageId",
-    // authMiddleware.verifyAdmin,
+    authMiddleware.verifyAdmin,
     validationMiddleware.validateParams(contentManageSchemas.pageIdSchema),
     validationMiddleware.validateRequest(contentManageSchemas.pageSchema),
     controller.UpdatePage
@@ -107,20 +107,20 @@ router.put(
 
 router.delete(
     "/delete-page/:pageId",
-    // authMiddleware.verifyAdmin,
+    authMiddleware.verifyAdmin,
     validationMiddleware.validateParams(contentManageSchemas.pageIdSchema),
     controller.DeletePage
 );
 
 router.get(
     "/fetch-all-faq-categories",
-    // authMiddleware.verifyAdmin,
+    authMiddleware.verifyAdmin,
     controller.FetchAllFaqCategories
 );
 
 router.post(
     "/add-faq-category",
-    // authMiddleware.verifyAdmin,
+    authMiddleware.verifyAdmin,
     upload.single('image'),
     validationMiddleware.validateFile({ required: true }),
     validationMiddleware.validateRequest(contentManageSchemas.faqCategorySchema),
@@ -129,7 +129,7 @@ router.post(
 
 router.put(
     "/update-faq-category/:categoryId",
-    // authMiddleware.verifyAdmin,
+    authMiddleware.verifyAdmin,
     upload.single('image'),
     validationMiddleware.validateFile({ required: false }),
     validationMiddleware.validateParams(contentManageSchemas.faqCategoryIdSchema),
@@ -139,21 +139,21 @@ router.put(
 
 router.delete(
     "/delete-faq-category/:categoryId",
-    // authMiddleware.verifyAdmin,
+    authMiddleware.verifyAdmin,
     validationMiddleware.validateParams(contentManageSchemas.faqCategoryIdSchema),
     controller.DeleteFaqCategory
 );
 
 router.get(
     "/fetch-all-faqs-by-category/:categoryId",
-    // authMiddleware.verifyAdmin,
+    authMiddleware.verifyAdmin,
     validationMiddleware.validateParams(contentManageSchemas.faqCategoryIdSchema),
     controller.FetchAllFaqsByCategory
 );
 
 router.post(
     "/add-faq-by-category/:categoryId",
-    // authMiddleware.verifyAdmin,
+    authMiddleware.verifyAdmin,
     validationMiddleware.validateParams(contentManageSchemas.faqCategoryIdSchema),
     validationMiddleware.validateRequest(contentManageSchemas.faqSchema),
     controller.AddFaqByCategory
@@ -161,7 +161,7 @@ router.post(
 
 router.put(
     "/update-faq-by-category/:categoryId/:faqId",
-    // authMiddleware.verifyAdmin,
+    authMiddleware.verifyAdmin,
     validationMiddleware.validateParams(contentManageSchemas.faqAndCategoryIdSchema),
     validationMiddleware.validateRequest(contentManageSchemas.faqSchema),
     controller.UpdateFaqByCategory
@@ -169,27 +169,27 @@ router.put(
 
 router.delete(
     "/delete-faq-by-category/:categoryId/:faqId",
-    // authMiddleware.verifyAdmin,
+    authMiddleware.verifyAdmin,
     validationMiddleware.validateParams(contentManageSchemas.faqAndCategoryIdSchema),
     controller.DeleteFaqByCategory
 );
 
 router.get(
     "/fetch-all-reviews",
-    // authMiddleware.verifyAdmin,
+    authMiddleware.verifyAdmin,
     controller.FetchAllReviews
 );
 
 router.get(
     "/fetch-reviews",
-    // authMiddleware.verifyAdmin,
+    authMiddleware.verifyAdmin,
     validationMiddleware.validateQuery(contentManageSchemas.fetchReviewsSchema),
     controller.FetchReviews
 );
 
 router.post(
     "/add-review",
-    // authMiddleware.verifyAdmin,
+    authMiddleware.verifyAdmin,
     upload.single('profile'),
     validationMiddleware.validateFile({ required: true }),
     validationMiddleware.validateRequest(contentManageSchemas.reviewSchema),
@@ -198,7 +198,7 @@ router.post(
 
 router.put(
     "/update-review/:reviewId",
-    // authMiddleware.verifyAdmin,
+    authMiddleware.verifyAdmin,
     upload.single('profile'),
     validationMiddleware.validateFile({ required: false }),
     validationMiddleware.validateParams(contentManageSchemas.reviewIdSchema),
@@ -208,7 +208,7 @@ router.put(
 
 router.delete(
     "/delete-review/:reviewId",
-    // authMiddleware.verifyAdmin,
+    authMiddleware.verifyAdmin,
     validationMiddleware.validateParams(contentManageSchemas.reviewIdSchema),
     controller.DeleteReview
 );

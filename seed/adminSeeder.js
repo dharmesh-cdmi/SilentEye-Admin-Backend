@@ -13,7 +13,6 @@ const admins = [
     password: '123456',  // Plain text password
     role: 'admin',
     status: 'active',
-    remember_token: null,
     createdAt: new Date(),
     updatedAt: new Date(),
   },
@@ -25,7 +24,6 @@ const admins = [
     password: '123456',  // Plain text password
     role: 'manager',
     status: 'active',
-    remember_token: null,
     createdAt: new Date(),
     updatedAt: new Date(),
   },

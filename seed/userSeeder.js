@@ -54,7 +54,6 @@ const userSeeder = async () => {
         address: faker.address.streetAddress()
       },
       status: faker.helpers.arrayElement(['active', 'inactive']),
-      remember_token: faker.string.alphanumeric(20),
       lastLoggedInAt: faker.date.recent(),
       createdAt: faker.date.past(),
       updatedAt: faker.date.recent(),

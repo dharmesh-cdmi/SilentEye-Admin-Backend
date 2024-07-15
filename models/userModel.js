@@ -19,7 +19,10 @@ const userSchema = new Schema({
   activePlanId: { type: Schema.Types.ObjectId, ref: 'Plan' },
   userDetails: userDetailsSchema,
   status: { type: String, enum: ['active', 'inactive'], default: 'active' },
-  remember_token: { type: String },
+  refreshToken: {
+    type: String,
+    required: false,
+  },
   lastLoggedInAt: { type: Date },
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now },

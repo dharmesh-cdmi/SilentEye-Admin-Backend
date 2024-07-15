@@ -36,9 +36,9 @@ const RefundRequestSchema = new Schema(
       required: true,
     },
     planId: {
-      type: String,
+      type: Schema.Types.ObjectId,
+      ref: 'Plan',
       required: false,
-      trim: true,
     },
   },
   {

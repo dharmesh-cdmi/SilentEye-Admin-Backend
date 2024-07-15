@@ -31,9 +31,9 @@ const AddonSchema = new Schema(
       required: true,
     },
     paymentGatewayId: {
-      type: String,
+      type: Schema.Types.ObjectId,
+      ref: 'PaymentGateway',
       required: false,
-      trim: true,
     },
     pgAddonId: {
       type: String,

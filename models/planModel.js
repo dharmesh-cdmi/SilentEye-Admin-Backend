@@ -41,9 +41,9 @@ const PlanSchema = new Schema(
       enum: ['live', 'test'],
     },
     paymentGatewayId: {
-      type: String,
+      type: Schema.Types.ObjectId,
+      ref: 'PaymentGateway',
       required: false,
-      trim: true,
     },
     pgPlanId: {
       type: String,

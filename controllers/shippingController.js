@@ -13,7 +13,8 @@ const createShipping = async (req, res) => {
 // Get all shippings
 const getAllShippings = async (req, res) => {
   try {
-    const shippings = await shippingService.getAllShippings();
+    const { page = 1, limit = 10 } = req.query;
+    const shippings = await shippingService.getAllShippings(page, limit);
     res.status(200).json(shippings);
   } catch (error) {
     res.status(400).json({ status: true, error: true, message: error.message });

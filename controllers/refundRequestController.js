@@ -15,7 +15,11 @@ const createRefundRequest = async (req, res) => {
 // Get all refund requests
 const getAllRefundRequests = async (req, res) => {
   try {
-    const refundRequests = await refundRequestService.getAllRefundRequests();
+    const { page = 1, limit = 10 } = req.query;
+    const refundRequests = await refundRequestService.getAllRefundRequests(
+      page,
+      limit
+    );
     res.status(200).json(refundRequests);
   } catch (error) {
     res.status(400).json({ status: true, error: true, message: error.message });

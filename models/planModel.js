@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const mongoosePaginate = require('mongoose-paginate-v2');
 const Schema = mongoose.Schema;
 
 const PlanSchema = new Schema(
@@ -69,6 +70,8 @@ PlanSchema.pre('validate', function (next) {
   }
   next();
 });
+
+PlanSchema.plugin(mongoosePaginate);
 
 const Plan = mongoose.model('Plan', PlanSchema);
 

@@ -41,8 +41,17 @@ const createProduct = async (data) => {
 };
 
 // Get all products
-const getAllProducts = async () => {
-  return await Product.find({});
+const getAllProducts = async (page, limit) => {
+  try {
+    const options = {
+      page: parseInt(page, 10),
+      limit: parseInt(limit, 10),
+      sort: { createdAt: -1 },
+    };
+    return await Product.paginate({}, options);
+  } catch (error) {
+    throw new Error('Error in fetching products: ' + error.message);
+  }
 };
 
 // Get a single product by ID

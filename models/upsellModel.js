@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const mongoosePaginate = require('mongoose-paginate-v2');
 const Schema = mongoose.Schema;
 
 const UpsellSchema = new Schema(
@@ -64,6 +65,8 @@ UpsellSchema.pre('save', function (next) {
   }
   next();
 });
+
+UpsellSchema.plugin(mongoosePaginate);
 
 const Upsell = mongoose.model('Upsell', UpsellSchema);
 

@@ -17,7 +17,11 @@ const createPaymentGateway = async (req, res) => {
 // Get all payment gateways
 const getAllPaymentGateways = async (req, res) => {
   try {
-    const paymentGateways = await paymentGatewayService.getAllPaymentGateways();
+    const { page = 1, limit = 10 } = req.query;
+    const paymentGateways = await paymentGatewayService.getAllPaymentGateways(
+      page,
+      limit
+    );
     res.status(200).json(paymentGateways);
   } catch (error) {
     res.status(400).json({ error: error.message });

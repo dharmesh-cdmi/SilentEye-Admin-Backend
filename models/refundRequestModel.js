@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const mongoosePaginate = require('mongoose-paginate-v2');
 const Schema = mongoose.Schema;
 
 const RefundRequestSchema = new Schema(
@@ -61,6 +62,8 @@ RefundRequestSchema.pre('validate', async function (next) {
   }
   next();
 });
+
+RefundRequestSchema.plugin(mongoosePaginate);
 
 const RefundRequest = mongoose.model('RefundRequest', RefundRequestSchema);
 

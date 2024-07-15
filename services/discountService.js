@@ -19,9 +19,14 @@ const createDiscount = async (data) => {
 };
 
 // Get all discounts
-const getAllDiscounts = async () => {
+const getAllDiscounts = async (page, limit) => {
   try {
-    return await Discount.find();
+    const options = {
+      page: parseInt(page, 10),
+      limit: parseInt(limit, 10),
+      sort: { createdAt: -1 },
+    };
+    return await Discount.paginate({}, options);
   } catch (error) {
     throw new Error('Error in fetching discounts: ' + error.message);
   }

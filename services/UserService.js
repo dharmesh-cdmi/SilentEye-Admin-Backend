@@ -62,6 +62,7 @@ const fetchAllUsers = async (queryParams) => {
     toDate,
     dateFilter,
     status,
+    userStatus,
     blocked,
     country,
     process,
@@ -123,6 +124,10 @@ const fetchAllUsers = async (queryParams) => {
     filters.status = { $in: status.split(',') };
   }
 
+  // User status filtering
+  if (userStatus) {
+    filters.userStatus = { $in: userStatus.split(',') };
+  }
   // Blocked status filtering
   if (blocked) {
     filters.blocked = blocked === 'true';
@@ -177,12 +182,10 @@ const registerUser = async (userData) => {
     email,
     password,
     assignedBy,
-    profile_avatar,
-    country,
-    phone,
-    address,
+    userDetails,
     status,
     process,
+    userStatus,
     amountRefund = 0,
     amountSpend = 0
   } = userData;
@@ -204,13 +207,10 @@ const registerUser = async (userData) => {
     email,
     password: hashedPassword,
     assignedBy,
-    userDetails: {
-      profile_avatar,
-      country,
-      phone,
-      address,
-    },
-    status,
+    userDetails: userDetails || {},
+    status: status || 'active',
+    userStatus: userStatus || 'Demo',
+    email_verified_at: new Date(),
     process,
     joined: new Date(),
     amountSpend,
@@ -251,7 +251,7 @@ const updateUser = async (id, data) => {
     if (data.userDetails.phone) user.userDetails.phone = data.userDetails.phone;
     if (data.userDetails.address) user.userDetails.address = data.userDetails.address;
   }
-  if (data.status) user.status = data.status;
+  if (data.userStatus) user.status = data.userStatus;
   if (data.remember_token) user.remember_token = data.remember_token;
   if (data.lastLoggedInAt) user.lastLoggedInAt = data.lastLoggedInAt;
   if (data.amountSpend) user.amountSpend = data.amountSpend;

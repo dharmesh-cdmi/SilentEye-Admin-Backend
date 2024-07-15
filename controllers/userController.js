@@ -1,4 +1,5 @@
-const userService = require('../services/UserService');
+const userService = require('../services/userService');
+const { apiErrorResponse, apiSuccessResponse, HTTP_STATUS_MESSAGE, HTTP_STATUS } = require('../utils');
 
 const getProfile = async (req, res) => {
   try {

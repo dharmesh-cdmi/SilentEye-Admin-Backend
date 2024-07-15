@@ -28,7 +28,7 @@ const userSchema = new Schema({
   device: { type: String },
   ipAddress: { type: String },
   blocked: { type: Boolean, default: false },
-  status: {
+  userStatus: {
     type: String,
     enum: ['Demo', 'Checkout', 'Paid'],
     default: 'Demo'

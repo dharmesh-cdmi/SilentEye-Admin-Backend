@@ -23,7 +23,7 @@ const createUserSchema = yup.object().shape({
     device: yup.string().trim(),
     ipAddress: yup.string().trim(),
     blocked: yup.boolean(),
-    status: yup.string().oneOf(['Demo', 'Checkout', 'Paid'], 'Invalid status').default('Demo'),
+    userStatus: yup.string().oneOf(['Demo', 'Checkout', 'Paid'], 'Invalid status').default('Demo'),
     process: yup.string().oneOf(['Running', 'Pending', 'Completed'], 'Invalid process').default('Pending'),
     joined: yup.date().default(() => new Date()),
     history: yup.array().of(

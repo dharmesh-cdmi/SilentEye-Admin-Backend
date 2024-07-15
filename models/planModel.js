@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
-const SubscriptionSchema = new Schema(
+const PlanSchema = new Schema(
   {
     name: {
       type: String,
@@ -40,13 +40,28 @@ const SubscriptionSchema = new Schema(
       required: true,
       enum: ['live', 'test'],
     },
+    paymentGatewayId: {
+      type: String,
+      required: false,
+      trim: true,
+    },
+    pgPlanId: {
+      type: String,
+      required: false,
+      trim: true,
+    },
+    pgPriceId: {
+      type: String,
+      required: false,
+      trim: true,
+    },
   },
   {
     timestamps: true,
   }
 );
 
-SubscriptionSchema.pre('save', function (next) {
+PlanSchema.pre('validate', function (next) {
   if (this.discountPercent && this.mrp) {
     this.discountValue = (this.mrp * this.discountPercent) / 100;
     this.tag = this.discountPercent + '% OFF';
@@ -55,6 +70,6 @@ SubscriptionSchema.pre('save', function (next) {
   next();
 });
 
-const Subscription = mongoose.model('Subscription', SubscriptionSchema);
+const Plan = mongoose.model('Plan', PlanSchema);
 
-module.exports = Subscription;
+module.exports = Plan;

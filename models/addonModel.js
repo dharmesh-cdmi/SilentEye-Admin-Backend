@@ -30,6 +30,21 @@ const AddonSchema = new Schema(
       type: Boolean,
       required: true,
     },
+    paymentGatewayId: {
+      type: String,
+      required: false,
+      trim: true,
+    },
+    pgAddonId: {
+      type: String,
+      required: false,
+      trim: true,
+    },
+    pgPriceId: {
+      type: String,
+      required: false,
+      trim: true,
+    },
   },
   {
     timestamps: true,

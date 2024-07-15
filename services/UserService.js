@@ -161,6 +161,15 @@ const fetchAllUsers = async (queryParams) => {
   };
 };
 
+const fetchUserById = async (userId) => {
+  const user = await User.findById(userId)
+    .populate('assignedBy', 'name email')
+    .populate('orders', 'orderId planDetails.total orderDetails.purchase status')
+    .populate('userDetails', 'profile_avatar country phone address')
+    .exec();
+
+  return user;
+};
 
 const registerUser = async (userData) => {
   const {
@@ -287,5 +296,6 @@ module.exports = {
   registerUser,
   updateUser,
   deleteUser,
-  addUserHistory
+  addUserHistory,
+  fetchUserById
 };

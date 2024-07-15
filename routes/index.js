@@ -12,6 +12,7 @@ const upsellRoutes = require('./upsellRoutes');
 const subscriptionRoutes = require('./subscriptionRoutes');
 const adminRoutes = require('./admin/adminRoutes');
 const authRoutes = require('./authRoutes');
+const userRoutes = require('./userRoutes');
 const { verifyAdmin } = require('../middleware/authMiddleware');
 
 const router = express.Router();
@@ -32,5 +33,6 @@ router.use('/upsell', upsellRoutes);
 router.use('/subscription', subscriptionRoutes);
 router.use('/tickets', require('./ticketRoutes'));
 router.use('/managers', require('./managerRoutes'));
+router.use('/users', userRoutes);
 
 module.exports = router;

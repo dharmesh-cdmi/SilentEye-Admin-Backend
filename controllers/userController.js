@@ -20,6 +20,18 @@ const FetchAllUsers = async (req, res) => {
   }
 }
 
+const FetchUserById = async (req, res) => {
+  try {
+    const user = await userService.fetchUserById(req.params.userId);
+    if (!user) {
+      return apiErrorResponse(res, HTTP_STATUS_MESSAGE[404], 'User not found', HTTP_STATUS.NOT_FOUND);
+    }
+    return apiSuccessResponse(res, HTTP_STATUS_MESSAGE[200], user, HTTP_STATUS.OK);
+  } catch (error) {
+    return apiErrorResponse(res, HTTP_STATUS_MESSAGE[500], error, HTTP_STATUS.INTERNAL_SERVER_ERROR);
+  }
+}
+
 // Register User
 const RegisterUser = async (req, res) => {
   try {
@@ -75,5 +87,6 @@ module.exports = {
   RegisterUser,
   UpdateUser,
   DeleteUser,
-  AddUserHistory
+  AddUserHistory,
+  FetchUserById
 };

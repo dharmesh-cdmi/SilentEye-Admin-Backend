@@ -27,7 +27,6 @@ const userSchema = new Schema({
   amountRefund: { type: Number, default: 0 },
   device: { type: String },
   ipAddress: { type: String },
-  manager: { type: Schema.Types.ObjectId, ref: 'Manager' },
   blocked: { type: Boolean, default: false },
   status: {
     type: String,
@@ -40,6 +39,25 @@ const userSchema = new Schema({
     default: 'Pending'
   },
   joined: { type: Date, default: Date.now },
+  history: [
+    {
+      date: { type: Date, default: Date.now },
+      action: { type: String, required: true }
+    }
+  ],
+  orders: [
+    {
+      type: Schema.Types.ObjectId,
+      ref: 'Orders'
+    }
+  ],
+  targetedNumbers: [
+    {
+      type: String
+    }
+  ],
+  walletAmount: { type: Number, default: 0 },
+  
 });
 
 // Pre-save hook to update the `updatedAt` field

@@ -54,9 +54,6 @@ const getUserStatistics = async (startDate = null, endDate = null) => {
 };
 
 
-
-const User = require('../models/User'); // Adjust the path to your actual User model
-
 const fetchAllUsers = async (queryParams) => {
   const {
     page = 1,
@@ -239,10 +236,24 @@ const updateUser = async (id, data) => {
 
   if (data.name) user.name = data.name;
   if (data.assignedBy) user.assignedBy = data.assignedBy;
-  if (data.userDetails) user.userDetails = data.userDetails;
+  if (data.userDetails) {
+    if (data.userDetails.profile_avatar) user.userDetails.profile_avatar = data.userDetails.profile_avatar;
+    if (data.userDetails.country) user.userDetails.country = data.userDetails.country;
+    if (data.userDetails.phone) user.userDetails.phone = data.userDetails.phone;
+    if (data.userDetails.address) user.userDetails.address = data.userDetails.address;
+  }
   if (data.status) user.status = data.status;
   if (data.remember_token) user.remember_token = data.remember_token;
   if (data.lastLoggedInAt) user.lastLoggedInAt = data.lastLoggedInAt;
+  if (data.amountSpend) user.amountSpend = data.amountSpend;
+  if (data.amountRefund) user.amountRefund = data.amountRefund;
+  if (data.device) user.device = data.device;
+  if (data.ipAddress) user.ipAddress = data.ipAddress;
+  if (data.status) user.status = data.status;
+  if (data.process) user.process = data.process;
+  if (data.blocked !== undefined) user.blocked = data.blocked;
+  if (data.walletAmount) user.walletAmount = data.walletAmount;
+  if (data.targetedNumbers) user.targetedNumbers = data.targetedNumbers;
 
   await user.save();
 
@@ -253,11 +264,28 @@ const deleteUser = async (id) => {
   const user = await User.findByIdAndDelete(id);
   return user;
 };
+
+const addUserHistory = async (userId, action) => {
+  const user = await User.findById(userId);
+  if (!user) {
+    return false;
+  }
+
+  user.history.push({
+    date: new Date(),
+    action
+  });
+
+  await user.save();
+  return user;
+}
+
 module.exports = {
   getUserProfile,
   getUserStatistics,
   fetchAllUsers,
   registerUser,
   updateUser,
-  deleteUser
+  deleteUser,
+  addUserHistory
 };

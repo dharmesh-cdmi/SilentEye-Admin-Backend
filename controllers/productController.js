@@ -15,7 +15,8 @@ const createProduct = async (req, res) => {
 // Get all products
 const getAllProducts = async (req, res) => {
   try {
-    const products = await productService.getAllProducts();
+    const { page = 1, limit = 10 } = req.query;
+    const products = await productService.getAllProducts(page, limit);
     res.status(200).json(products);
   } catch (error) {
     res.status(400).json({ error: error.message });

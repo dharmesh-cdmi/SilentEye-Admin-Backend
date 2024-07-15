@@ -15,7 +15,8 @@ const createUpsell = async (req, res) => {
 // Get all upsells
 const getAllUpsells = async (req, res) => {
   try {
-    const upsells = await upsellService.getAllUpsells();
+    const { page = 1, limit = 10 } = req.query;
+    const upsells = await upsellService.getAllUpsells(page, limit);
     res.status(200).json(upsells);
   } catch (error) {
     res.status(400).json({ error: error.message });

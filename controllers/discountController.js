@@ -13,7 +13,8 @@ const createDiscount = async (req, res) => {
 // Get all discounts
 const getAllDiscounts = async (req, res) => {
   try {
-    const discounts = await discountService.getAllDiscounts();
+    const { page = 1, limit = 10 } = req.query;
+    const discounts = await discountService.getAllDiscounts(page, limit);
     res.status(200).json(discounts);
   } catch (error) {
     res.status(500).json({ error: error.message });

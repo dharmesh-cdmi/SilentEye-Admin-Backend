@@ -12,9 +12,14 @@ const createRefundRequest = async (data) => {
 };
 
 // Get all refund requests
-const getAllRefundRequests = async () => {
+const getAllRefundRequests = async (page, limit) => {
   try {
-    return await RefundRequest.find();
+    const options = {
+      page: parseInt(page, 10),
+      limit: parseInt(limit, 10),
+      sort: { createdAt: -1 },
+    };
+    return await RefundRequest.paginate({}, options);
   } catch (error) {
     throw new Error(`Error in getting refund requests: ${error.message}`);
   }

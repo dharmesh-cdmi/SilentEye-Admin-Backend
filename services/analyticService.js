@@ -22,8 +22,8 @@ const analytics = async (addon = null, plan = null, page = null, action = null, 
     }
     return response;
 }
-const usersStatisticsAnalytics = async (startDate = null, endDate = null) =>{
-    const userStatistics = await userService.getUserStatistics(startDate, endDate);
+const usersStatisticsAnalytics = async (startDate = null, endDate = null,groupBy = null) =>{
+    const userStatistics = await userService.getUserStatistics(startDate, endDate,groupBy);
     const response = {
         userStatistics,
     }

@@ -1,43 +1,80 @@
 const mongoose = require('mongoose');
+const Plan = require('../models/planModel'); // Adjust the path as necessary
+const User = require('../models/userModel'); // Adjust the path as necessary
 const connectDB = require('../configs/db.config');
-const User = require('../models/userModel');
-const { hashPasswords } = require('../utils'); // Adjust the path accordingly
+const { ObjectId } = mongoose.Types;
+const { faker } = require('@faker-js/faker');
 
-// Define user data
-const users = [
-    {
-        name: 'user',
-        email: 'user@gmail.com',
-        email_verified_at: new Date(),
-        password: '123456', // Plain password (will be hashed before insertion)
-        assignedBy: '60d3b41abdacab0026a733c6', // Assigned managerId
-        userDetails: {
-            profile_avatar: 'path/to/avatar.jpg',
-            country: 'USA',
-            phone: 1234567890,
-            address: '1234 Elm Street',
-        },
-        status: 'active',
-        remember_token: 'random_token',
-        lastLoggedInAt: new Date(),
-        createdAt: new Date(),
-        updatedAt: new Date(),
+const userSeeder = async () => {
+  await connectDB();
+
+  // Find all necessary plans
+  const premiumPlan = await Plan.findOne({ name: 'Premium' });
+  const standardPlan = await Plan.findOne({ name: 'Standard' });
+  const demoPlan = await Plan.findOne({ name: 'Demo' });
+
+  if (!premiumPlan || !standardPlan || !demoPlan) {
+    console.error('Plans not found. Ensure plans are seeded before running user seeder.');
+    return;
+  }
+
+  // Array to hold users
+  const users = [];
+
+  // Generate additional users
+  for (let i = 1; i <= 300; i++) { // Change '30' to the desired number of users
+    let selectedPlan;
+    const randomPlanIndex = Math.floor(Math.random() * 3); // Randomly select from 0 to 2
+
+    switch (randomPlanIndex) {
+      case 0:
+        selectedPlan = premiumPlan._id;
+        break;
+      case 1:
+        selectedPlan = standardPlan._id;
+        break;
+      case 2:
+        selectedPlan = demoPlan._id;
+        break;
+      default:
+        selectedPlan = premiumPlan._id; // Default to premium plan if random index is out of range
+        break;
     }
-];
 
-async function seedUsers() {
-    try {
-        await connectDB(); // Connect to MongoDB
-        await hashPasswords(users); // Hash passwords before inserting
-        await User.deleteMany(); // Delete existing users
-        const insertedUsers = await User.insertMany(users); // Insert new users
-        console.log('Users seeded successfully:');
-    } catch (err) {
-        console.error('Error seeding users:', err);
-    } finally {
-        mongoose.connection.close(); // Close MongoDB connection
-    }
-}
+    users.push({
+      name: faker.name.fullName(),
+      email: faker.internet.email(),
+      email_verified_at: faker.date.past(),
+      password: faker.internet.password(),
+      assignedBy: new ObjectId(), // Example assignedBy ID
+      userDetails: {
+        profile_avatar: faker.image.avatar(),
+        country: faker.address.country(),
+        phone: faker.phone.number(),
+        address: faker.address.streetAddress()
+      },
+      status: faker.helpers.arrayElement(['active', 'inactive']),
+      remember_token: faker.string.alphanumeric(20),
+      lastLoggedInAt: faker.date.recent(),
+      createdAt: faker.date.past(),
+      updatedAt: faker.date.recent(),
+      _id: new ObjectId(), // MongoDB will generate a unique ID
+      __v: 0,
+      activePlanId: selectedPlan
+    });
+  }
 
-// Run the seeder
-seedUsers();
+  await User.deleteMany({});
+  await User.insertMany(users);
+  console.log('Users have been seeded');
+};
+
+userSeeder()
+  .then(() => {
+    console.log('User seeder completed');
+    mongoose.connection.close();
+  })
+  .catch((error) => {
+    console.error('User seeder error:', error);
+    mongoose.connection.close();
+  });

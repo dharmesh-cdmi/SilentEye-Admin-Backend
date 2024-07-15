@@ -43,7 +43,22 @@ const getVisitorCount = async (page = null, action = null, startDate = null, end
       }
     ]);
 
-    const totalVisitorsCount = await Visitor.countDocuments(matchCondition);
+
+    // Aggregate to find unique visitors by IP and visit date
+    const uniqueVisitor = await Visitor.aggregate([
+      { $match: matchCondition },
+      {
+        $group: {
+          _id: { 
+            visitorIP: "$visitorIP", 
+            date: { $dateToString: { format: "%Y-%m-%d", date: "$visitDate" } }
+          },
+          totalCount: { $sum: 1 },
+        }
+      }
+    ]);
+
+    const totalVisitorsCount = uniqueVisitor.length;
 
     const response = {
       totalVisitorsCount,

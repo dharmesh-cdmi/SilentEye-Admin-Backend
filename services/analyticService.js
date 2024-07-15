@@ -8,13 +8,15 @@ const userService = require("./UserService");
 const analytics = async (addon = null, plan = null, page = null, action = null, startDate = null, endDate = null)=> {
     const visitorDetails = await visitorService.getVisitorCount(page, action, startDate, endDate);
     const totalLoggedInUser = await loginService.getLoginCount(startDate, endDate);
-    const totalOrder = await orderService.getTotalOrderCount(plan,startDate, endDate);
+    const orders = await orderService.getTotalOrderCount(plan,startDate, endDate);
+    // const conversion = await orderService.getTotalConversion(startDate, endDate);
     const totalSupportTicket = await ticketService.getTotalTicketsCount(startDate, endDate)
     const totalContactFormSubmited = await contactFormService.getTotalContactFormsCount(startDate, endDate)
     const response = {
         visitorDetails,
         totalLoggedInUser,
-        totalOrder,
+        orders,
+        // conversion,
         totalSupportTicket,
         totalContactFormSubmited
     }

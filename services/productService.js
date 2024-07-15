@@ -58,6 +58,9 @@ const getProductById = async (id) => {
 const updateProduct = async (id, data) => {
   try {
     let product = await getProductById(id);
+    if (!product) {
+      throw new Error('Product not found!');
+    }
 
     const pgData = {
       paymentGatewayId: product?.paymentGatewayId,
@@ -79,10 +82,6 @@ const updateProduct = async (id, data) => {
       new: true,
       runValidators: true,
     });
-
-    if (!product) {
-      throw new Error('Product not found!');
-    }
 
     return {
       status: true,

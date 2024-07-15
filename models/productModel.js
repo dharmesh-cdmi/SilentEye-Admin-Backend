@@ -23,9 +23,9 @@ const ProductSchema = new Schema(
       trim: true,
     },
     paymentGatewayId: {
-      type: String,
+      type: Schema.Types.ObjectId,
+      ref: 'PaymentGateway',
       required: false,
-      trim: true,
     },
     pgProductId: {
       type: String,

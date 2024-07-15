@@ -1,0 +1,43 @@
+name: SilentEye CI/CD
+
+on:
+  push:
+    branches:
+      - dev  # Specify the branch from where you want to run when data will be pushed to this branch
+
+jobs:
+  build:
+
+    runs-on: self-hosted
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '16.x'  # Adjust the Node.js version as per your requirement
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Set Node.js Permissions
+        run: |
+          sudo chown root:root /root/.nvm/versions/node/v16.20.2/bin/node
+          sudo chmod +x /root/.nvm/versions/node/v16.20.2/bin/node
+
+      - name: Set Environment Variables
+        run: |
+          echo "${{ secrets.PORT }}" >> .env
+          echo "${{ secrets.MONGO_URI }}" >> .env
+          echo "${{ secrets.SALT_ROUNDS }}" >> .env
+          echo "${{ secrets.ACCESS_TOKEN_SECRET }}" >> .env
+          echo "${{ secrets.ACCESS_TOKEN_EXPIRY_TIME }}" >> .env
+          echo "${{ secrets.REFRESH_TOKEN_SECRET }}" >> .env
+          echo "${{ secrets.REFRESH_TOKEN_EXPIRY_TIME }}" >> .env
+
+      # - name: Start Node.js Application
+      #   run: npm start
+
+

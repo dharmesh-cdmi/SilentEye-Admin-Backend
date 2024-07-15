@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
 const ExtensionSchema = new Schema({
-    Captcha: {
+    captcha: {
         status: {
             type: String,
             enum: ['enabled', 'disabled'],
@@ -11,16 +11,16 @@ const ExtensionSchema = new Schema({
         },
         key: {
             type: String,
-            required: true,
+            default: '',
             trim: true
         },
         secretKey: {
             type: String,
-            required: true,
+            default: '',
             trim: true
         }
     },
-    TwoFA: {
+    twoFA: {
         status: {
             type: String,
             enum: ['enabled', 'disabled'],
@@ -29,16 +29,16 @@ const ExtensionSchema = new Schema({
         },
         key: {
             type: String,
-            required: true,
+            default: '',
             trim: true
         },
         secretKey: {
             type: String,
-            required: true,
+            default: '',
             trim: true
         }
     },
-    TagManager: {
+    tagManager: {
         status: {
             type: String,
             enum: ['enabled', 'disabled'],
@@ -47,11 +47,11 @@ const ExtensionSchema = new Schema({
         },
         id: {
             type: String,
-            required: true,
+            default: '',
             trim: true
         }
     },
-    ChatBot: {
+    chatBot: {
         status: {
             type: String,
             enum: ['enabled', 'disabled'],
@@ -60,12 +60,12 @@ const ExtensionSchema = new Schema({
         },
         key: {
             type: String,
-            required: true,
+            default: '',
             trim: true
         },
         secretKey: {
             type: String,
-            required: true,
+            default: '',
             trim: true
         }
     }

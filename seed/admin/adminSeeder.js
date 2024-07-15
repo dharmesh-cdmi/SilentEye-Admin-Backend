@@ -8,6 +8,7 @@ const admins = [
   {
     name: 'Admin 1',
     email: 'admin@gmail.com',
+    username: 'admin1',
     email_verified_at: new Date(),
     password: '123456',  // Plain text password
     role: 'admin',
@@ -18,6 +19,7 @@ const admins = [
   },
   {
     name: 'Admin 2',
+    username: 'manager2',
     email: 'manager@gmail.com',
     email_verified_at: new Date(),
     password: '123456',  // Plain text password

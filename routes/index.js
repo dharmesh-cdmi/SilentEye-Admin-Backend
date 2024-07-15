@@ -1,7 +1,9 @@
 const express = require('express');
 // const authRoutes = require('./authRoutes');
 const settingsRoutes = require('./settingsRoutes');
-const userRoutes = require('./authRoutes');
+const contactFormRoutes = require('./contactFormRoutes');
+const extensionRoutes = require('./extensionRoutes');
+const contentManageRoutes = require('./contentManageRoutes');
 const paymentGatewayRoutes = require('./paymentGatewayRoutes');
 const paymentRoutes = require('./paymentRoutes');
 const productRoutes = require('./productRoutes');
@@ -11,17 +13,18 @@ const planRoutes = require('./planRoutes');
 const shippingRoutes = require('./shippingRoutes');
 const adminRoutes = require('./admin/adminRoutes');
 const authRoutes = require('./authRoutes');
-const visitorRoutes = require('./admin/visitorRoutes');
 const { verifyAdmin } = require('../middleware/authMiddleware');
 
 const router = express.Router();
 
 // Set up routes
+// router.use('/auth', authRoutes);
+router.use('/setting', settingsRoutes);
+router.use('/contact-form', contactFormRoutes);
+router.use('/extension', extensionRoutes);
+router.use('/content-manage', contentManageRoutes);
 router.use('/', authRoutes);
 router.use('/admin', verifyAdmin, adminRoutes);
-router.use('/settings', settingsRoutes);
-router.use('/admin', adminRoutes);
-router.use('/', userRoutes);
 router.use('/payment', paymentRoutes);
 router.use('/payment-gateway', paymentGatewayRoutes);
 router.use('/product', productRoutes);

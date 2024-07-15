@@ -7,6 +7,7 @@ const ManagerInfoSchema = new Schema({
     whatsapp: { type: String },
     skype: { type: String },
     assignedUsersCount: { type: Number, default: 0 },
+    order: { type: Number, default: 0 },
 });
 
 const ManagerInfo = mongoose.model('ManagerInfo', ManagerInfoSchema);

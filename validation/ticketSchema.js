@@ -22,9 +22,21 @@ const ticketStatusUpdateSchema = yup.object().shape({
     status: yup.string().oneOf(['Active', 'Answered', 'Closed'], 'Invalid status').required('Status is required')
 }).noUnknown(true, 'Unknown field in ticket status update data');
 
+
+const bulkUpdateStatusSchema = yup.object({
+    ticketIds: yup.array().of(yup.string().required()).required(),
+    status: yup.string().oneOf(['Active', 'Answered', 'Closed']).required(),
+});
+
+const bulkDeleteSchema = yup.object({
+    ticketIds: yup.array().of(yup.string().required()).required(),
+});
+
 module.exports = {
     createTicketSchema,
     ticketCommentSchema,
     searchTicketSchema,
-    ticketStatusUpdateSchema
+    ticketStatusUpdateSchema,
+    bulkUpdateStatusSchema,
+    bulkDeleteSchema
 };

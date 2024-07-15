@@ -251,7 +251,7 @@ const updateUser = async (id, data) => {
     if (data.userDetails.phone) user.userDetails.phone = data.userDetails.phone;
     if (data.userDetails.address) user.userDetails.address = data.userDetails.address;
   }
-  if (data.userStatus) user.status = data.userStatus;
+  if (data.userStatus) user.userStatus = data.userStatus;
   if (data.remember_token) user.remember_token = data.remember_token;
   if (data.lastLoggedInAt) user.lastLoggedInAt = data.lastLoggedInAt;
   if (data.amountSpend) user.amountSpend = data.amountSpend;

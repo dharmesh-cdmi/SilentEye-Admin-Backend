@@ -47,7 +47,7 @@ const RegisterUser = async (req, res) => {
 // Update User
 const UpdateUser = async (req, res) => {
   try {
-    const user = await userService.updateUser(req.params.id, req.body);
+    const user = await userService.updateUser(req.params.userId, req.body);
     if (!user) {
       return apiErrorResponse(res, HTTP_STATUS_MESSAGE[404], 'User not found', HTTP_STATUS.NOT_FOUND);
     }
@@ -60,7 +60,7 @@ const UpdateUser = async (req, res) => {
 // Delete User
 const DeleteUser = async (req, res) => {
   try {
-    const user = await userService.deleteUser(req.params.id);
+    const user = await userService.deleteUser(req.params.userId);
     if (!user) {
       return apiErrorResponse(res, HTTP_STATUS_MESSAGE[404], 'User not found', HTTP_STATUS.NOT_FOUND);
     }

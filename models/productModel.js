@@ -22,6 +22,21 @@ const ProductSchema = new Schema(
       required: true,
       trim: true,
     },
+    paymentGatewayId: {
+      type: String,
+      required: false,
+      trim: true,
+    },
+    pgProductId: {
+      type: String,
+      required: false,
+      trim: true,
+    },
+    pgPriceId: {
+      type: String,
+      required: false,
+      trim: true,
+    },
   },
   {
     timestamps: true,

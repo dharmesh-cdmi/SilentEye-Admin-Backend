@@ -1,11 +1,42 @@
 // services/addonService.js
 const Addon = require('../models/addonModel');
+const paymentService = require('./paymentService');
 
 // Create a new addon
 const createAddon = async (data) => {
-  const addon = new Addon(data);
-  await addon.save();
-  return addon;
+  try {
+    const pgData = {
+      paymentGatewayId: data?.paymentGatewayId,
+      name: data?.title,
+      amount: data?.mrp,
+      currency: 'usd',
+      description: data?.description,
+    };
+
+    const pgProduct = await paymentService.createStripeItem(pgData);
+
+    data = {
+      ...data,
+      paymentGatewayId: data?.paymentGatewayId,
+      pgProductId: pgProduct?.data?.product,
+      pgPriceId: pgProduct?.data?.id,
+    };
+
+    const addon = new Addon(data);
+    await addon.save();
+
+    return {
+      status: true,
+      data: addon,
+      message: 'Addon created successfully',
+    };
+  } catch (error) {
+    return {
+      status: true,
+      error: true,
+      message: 'Error in creating addon: ' + error,
+    };
+  }
 };
 
 // Get all addons
@@ -24,23 +55,79 @@ const getAddonById = async (id) => {
 
 // Update a addon by ID
 const updateAddon = async (id, data) => {
-  const addon = await Addon.findByIdAndUpdate(id, data, {
-    new: true,
-    runValidators: true,
-  });
-  if (!addon) {
-    throw new Error('Addon not found!');
+  try {
+    let addon = await getAddonById(id);
+
+    const pgData = {
+      paymentGatewayId: addon?.paymentGatewayId,
+      productId: addon?.pgProductId,
+      name: data?.title,
+      productMetadata: data?.productMetadata ? data.productMetadata : undefined,
+      priceId: addon?.pgPriceId,
+      amount: data?.mrp ? data.mrp : undefined,
+      priceMetadata: data?.priceMetadata ? data.priceMetadata : undefined,
+    };
+
+    const pgProduct = await paymentService.updateStripeProduct(pgData);
+    if (!pgProduct) {
+      throw new Error('Addon not updated on stripe!');
+    }
+
+    addon = await Addon.findByIdAndUpdate(id, data, {
+      new: true,
+      runValidators: true,
+    });
+    if (!addon) {
+      throw new Error('Addon not found!');
+    }
+
+    return {
+      status: true,
+      data: addon,
+      message: 'Addon updated successfully',
+    };
+  } catch (error) {
+    return {
+      status: true,
+      error: true,
+      message: 'Error in updating addon: ' + error,
+    };
   }
-  return addon;
 };
 
 // Delete a addon by ID
 const deleteAddon = async (id) => {
-  const addon = await Addon.findByIdAndDelete(id);
-  if (!addon) {
-    throw new Error('Addon not found!');
+  try {
+    let addon = await getAddonById(id);
+    if (!addon) {
+      throw new Error('Addon not found!');
+    }
+
+    const pgData = {
+      paymentGatewayId: addon?.paymentGatewayId,
+      itemId: addon?.pgAddonId,
+    };
+
+    const pgAddon = await paymentService.deleteStripeItem(pgData);
+
+    if (!pgAddon) {
+      throw new Error('Addon not deleted on stripe!');
+    }
+
+    addon = await Addon.findByIdAndDelete(id);
+
+    return {
+      status: true,
+      data: addon,
+      message: 'Addon deleted successfully',
+    };
+  } catch (error) {
+    return {
+      status: true,
+      error: true,
+      message: 'Error in deleting addon: ' + error,
+    };
   }
-  return addon;
 };
 
 module.exports = {

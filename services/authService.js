@@ -60,7 +60,13 @@ const generateTokens = async (userOrAdmin) => {
     userOrAdmin.refreshToken = refreshToken;
     await userOrAdmin.save();
 
-    return { access_token: accessToken, refresh_token: refreshToken };
+    // return { access_token: accessToken, refresh_token: refreshToken };
+
+    return {
+      statusCode: 200,
+      message: 'Loggedin successfully',
+      data: { access_token: accessToken, refresh_token: refreshToken }
+    };
   } catch (error) {
     throw error;
   }

@@ -1,8 +1,7 @@
 const jwt = require('jsonwebtoken');
 const Admin = require('../models/admin/adminModel');
 const User = require('../models/userModel');
-const { accessTokenSecret} = require('../configs/jwt.config');
-
+const { accessTokenSecret, refreshTokenSecret } = require('../configs/jwt.config');
 
 // Middleware to verify user
 const verifyUser = async (req, res, next) => {
@@ -30,7 +29,7 @@ const verifyUser = async (req, res, next) => {
   }
 };
 
-
+// Middleware to verify admin
 const verifyAdmin = async (req, res, next) => {
   const token = req.header('Authorization')?.replace('Bearer ', '');
 
@@ -39,24 +38,8 @@ const verifyAdmin = async (req, res, next) => {
   }
 
   try {
-    let decoded;
-    let admin;
-
-    try {
-      decoded = jwt.verify(token, accessTokenSecret);
-      admin = await Admin.findById(decoded.id);
-    } catch (err) {
-      if (err.name === 'TokenExpiredError') {
-        // Attempt to verify with remember_token if access token is expired
-        const decodedRemember = jwt.verify(token, refreshTokenSecret);
-        admin = await Admin.findById(decodedRemember.id);
-        if (!admin) {
-          return res.status(401).json({ error: 'Unauthorized.' });
-        }
-      } else {
-        return res.status(401).json({ error: 'Invalid token.' });
-      }
-    }
+    const decoded = jwt.verify(token, accessTokenSecret);
+    const admin = await Admin.findById(decoded.id);
 
     if (!admin) {
       return res.status(401).json({ error: 'Unauthorized.' });
@@ -65,6 +48,9 @@ const verifyAdmin = async (req, res, next) => {
     req.admin = admin;
     next();
   } catch (error) {
+    if (error.name === 'TokenExpiredError') {
+      return res.status(401).json({ error: 'Token expired.' });
+    }
     res.status(400).json({ error: 'Please Login To Continue.' });
   }
 };
@@ -96,6 +82,9 @@ const authenticateUser = async (req, res, next) => {
 
     if (!user) {
       const admin = await Admin.findById(decoded.id);
+      if (!admin) {
+        return res.status(401).json({ error: 'Unauthorized.' });
+      }
       req.admin = admin;
       return next();
     }

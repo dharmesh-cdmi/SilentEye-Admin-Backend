@@ -1,4 +1,6 @@
 const Orders = require('../models/ordersModel');
+const { getVisitorCount } = require('../services/visitorService');
+const { getRefundData } = require('../services/refundService');
 
 const getOrders = async ({ page = 1, limit = 10, status, paymentMethod, userId, planName, minAmount, maxAmount, startDate, endDate }) => {
     // Build the filter object
@@ -47,14 +49,20 @@ const getOrders = async ({ page = 1, limit = 10, status, paymentMethod, userId, 
     const totalCount = await Orders.countDocuments(filter);
 
     return {
-        totalPages: Math.ceil(totalCount / limit),
-        currentPage: Number(page),
-        totalOrders: totalCount,
-        orders
+        statusCode: 200,
+        message: 'Data Fetched successfully',
+        data: {
+            totalPages: Math.ceil(totalCount / limit),
+            currentPage: Number(page),
+            totalOrders: totalCount,
+            orders
+        }
+      };
+
+    return {
+        
     };
 };
-
-
 
 const getTotalOrderCount = async (plan = null, startDate = null, endDate = null) => {
     let filter = {};
@@ -103,35 +111,116 @@ const getTotalOrderCount = async (plan = null, startDate = null, endDate = null)
 
     // Apply date filters to the pipeline if provided
     if (startDate && endDate) {
-        pipeline.unshift({ $match: {
-            'orderDetails.purchase': {
-                $gte: new Date(startDate),
-                $lte: new Date(endDate)
+        pipeline.unshift({
+            $match: {
+                'orderDetails.purchase': {
+                    $gte: new Date(startDate),
+                    $lte: new Date(endDate)
+                }
             }
-        }});
+        });
     } else if (startDate) {
-        pipeline.unshift({ $match: {
-            'orderDetails.purchase': { $gte: new Date(startDate) }
-        }});
+        pipeline.unshift({
+            $match: {
+                'orderDetails.purchase': { $gte: new Date(startDate) }
+            }
+        });
     } else if (endDate) {
-        pipeline.unshift({ $match: {
-            'orderDetails.purchase': { $lte: new Date(endDate) }
-        }});
+        pipeline.unshift({
+            $match: {
+                'orderDetails.purchase': { $lte: new Date(endDate) }
+            }
+        });
     }
 
     const result = await Orders.aggregate(pipeline);
     const totalAddonSales = result.length > 0 ? result[0].totalAddons : 0;
 
+    const totalAmounts = await getTotalAmounts(filter);
+
+    // Get total unique visitors
+    const uniqueVisitorsData = await getVisitorCount(null, null, startDate, endDate);
+    const uniqueVisitorsCount = uniqueVisitorsData.totalVisitorsCount;
+
+    // Get refund data
+    const refundData = await getRefundData(startDate, endDate);
+
+    // Calculate conversion rate
+    const conversionRate = uniqueVisitorsCount > 0 ? (totalOrders / uniqueVisitorsCount) * 100 : 0;
+
     return {
-        totalOrders,
-        paymentInitiated: pendingOrders,
-        totalPurchase: completedOrders,
-        trueRefund: refundedOrders,
-        totalAddonSales
+        orders: {
+            totalOrder: {
+                count: totalOrders,
+                amount: totalAmounts.totalOrderAmount
+            },
+            paymentInitiated: {
+                count: pendingOrders,
+                amount: totalAmounts.paymentInitiatedAmount
+            },
+            totalPurchase: {
+                count: completedOrders,
+                amount: totalAmounts.totalPurchaseAmount
+            },
+            refund: {
+                count: refundedOrders,
+                amount: totalAmounts.refundedAmount
+            },
+            totalAddonSales,
+            conversionRate
+        },
+        refundData
     };
 };
 
+const getTotalAmounts = async (filter) => {
+    const totalOrderAmount = await Orders.aggregate([
+        { $match: filter },
+        {
+            $group: {
+                _id: null,
+                totalAmount: { $sum: "$planDetails.amount" }
+            }
+        }
+    ]);
 
+    const paymentInitiatedAmount = await Orders.aggregate([
+        { $match: { ...filter, status: 'Pending' } },
+        {
+            $group: {
+                _id: null,
+                totalAmount: { $sum: "$planDetails.amount" }
+            }
+        }
+    ]);
+
+    const totalPurchaseAmount = await Orders.aggregate([
+        { $match: { ...filter, status: 'Completed' } },
+        {
+            $group: {
+                _id: null,
+                totalAmount: { $sum: "$planDetails.amount" }
+            }
+        }
+    ]);
+
+    const refundedAmount = await Orders.aggregate([
+        { $match: { ...filter, status: 'Refunded' } },
+        {
+            $group: {
+                _id: null,
+                totalAmount: { $sum: "$planDetails.amount" }
+            }
+        }
+    ]);
+
+    return {
+        totalOrderAmount: totalOrderAmount.length > 0 ? totalOrderAmount[0].totalAmount : 0,
+        paymentInitiatedAmount: paymentInitiatedAmount.length > 0 ? paymentInitiatedAmount[0].totalAmount : 0,
+        totalPurchaseAmount: totalPurchaseAmount.length > 0 ? totalPurchaseAmount[0].totalAmount : 0,
+        refundedAmount: refundedAmount.length > 0 ? refundedAmount[0].totalAmount : 0
+    };
+}; 
 
 module.exports = {
     getOrders,

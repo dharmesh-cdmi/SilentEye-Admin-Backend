@@ -12,10 +12,10 @@ const totalCountAnalytics = async (req, res)=>{
     }
 }
 const usersStatisticsAnalytics = async (req, res)=>{
-    const {startDate, endDate } = req.query;
+    const {startDate, endDate, groupBy,page,limit } = req.query;
 
     try {
-        const analytic = await analyticService.usersStatisticsAnalytics(startDate, endDate);
+        const analytic = await analyticService.usersStatisticsAnalytics(startDate, endDate, groupBy,page,limit);
 
         res.json(analytic);
     } catch (error) {

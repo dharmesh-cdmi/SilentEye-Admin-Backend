@@ -39,8 +39,9 @@ const AdminSchema = new Schema({
     enum: ['active', 'inactive'],
     default: 'active'
   },
-  remember_token: {
-    type: String
+  refreshToken: {
+    type: String,
+    required:false
   },
   lastLoggedInAt: {
     type: Date

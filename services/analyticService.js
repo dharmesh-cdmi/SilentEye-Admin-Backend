@@ -23,13 +23,13 @@ const analytics = async (addon = null, plan = null, page = null, action = null, 
     return response;
 }
 
-const usersStatisticsAnalytics = async (startDate = null, endDate = null, groupBy = null) => {
+const usersStatisticsAnalytics = async (startDate = null, endDate = null, groupBy = null, page = null, limit = null) => {
     let userStatistics;
 
     if (groupBy === 'plan') {
-        userStatistics = await userService.getUserStatistics(startDate, endDate);
+        userStatistics = await userService.getUserStatistics(startDate, endDate, page, limit);
     } else if (groupBy === 'country') {
-        userStatistics = await userService.getUserStatisticsByCountry(startDate, endDate);
+        userStatistics = await userService.getUserStatisticsByCountry(startDate, endDate, page, limit);
     } else {
         throw new Error('Invalid groupBy parameter. Must be "plan" or "country".');
     }

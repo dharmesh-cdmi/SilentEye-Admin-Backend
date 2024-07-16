@@ -52,17 +52,29 @@ const getUserStatistics = async (startDate = null, endDate = null) => {
       },
       {
         $group: {
-          _id: "$orders.orderDetails.country", // Group by country
-          sales: {
+          _id: "$plan._id", // Group by plan ID
+          planName: { $first: "$plan.name" },
+          totalSalesAmount: { $sum: "$orders.orderDetails.total" },
+          users: {
             $push: {
-              totalSalesAmount: "$orders.orderDetails.total",
-              totalUsersBought: 1 // Count each user once
+              userId: "$_id",
+              orderAmount: "$orders.orderDetails.total", // Include order amount
+              refunds: {
+                $cond: [{ $eq: ["$orders.status", "Refunded"] }, {
+                  refundId: "$orders.refundDetails.refundRequestId",
+                  refundedAmount: "$orders.refundDetails.refundAmount"
+                }, null]
+              }
             }
           },
-          refund: {
-            $push: {
-              totalRefunds: { $cond: [{ $eq: ["$orders.status", "Refunded"] }, 1, 0] },
-              totalRefundedAmount: "$orders.refundDetails.refundAmount"
+          totalUsersRefunds: {
+            $sum: {
+              $cond: [{ $eq: ["$orders.status", "Refunded"] }, 1, 0]
+            }
+          },
+          totalRefundedAmount: {
+            $sum: {
+              $cond: [{ $eq: ["$orders.status", "Refunded"] }, "$orders.refundDetails.refundAmount", 0]
             }
           },
           totalCheckout: {
@@ -70,37 +82,44 @@ const getUserStatistics = async (startDate = null, endDate = null) => {
           },
           totalPaymentInitiated: {
             $sum: { $cond: [{ $eq: ["$orders.status", "Pending"] }, 1, 0] }
-          },
-          totalPlans: { $addToSet: "$plan._id" } // Collect all plan IDs associated with this group
+          }
         }
       },
       {
         $project: {
-          _id: 0,
-          country: "$_id",
+          _id: 1,
+          planName: 1,
           sales: {
-            totalSalesAmount: { $sum: "$sales.totalSalesAmount" },
-            totalUsersBought: { $sum: "$sales.totalUsersBought" }
+            totalSalesAmount: "$totalSalesAmount",
+            totalUsersBought: { $size: "$users" }
           },
           refund: {
-            totalRefunds: { $sum: "$refund.totalRefunds" },
-            totalRefundedAmount: { $sum: "$refund.totalRefundedAmount" }
+            totalUsersRefunds: "$totalUsersRefunds",
+            totalRefundedAmount: "$totalRefundedAmount"
           },
+
+          // totalSalesAmount: 1,
+          // totalUsersBought: { $size: "$users" }, // Count unique users who bought the plan
+          // totalUsersRefunds: 1,
+          // totalRefundedAmount: 1,
           totalCheckout: 1,
           totalPaymentInitiated: 1,
-          totalPlan: { $size: "$totalPlans" }
+          // users: 1 // Include the array of user details with order amount and refunds
         }
       }
     );
 
     const result = await User.aggregate(pipeline);
 
-    return result;
+    // Filter out any documents with _id set to null
+    const filteredResult = result.filter(item => item._id !== null);
+
+    
+    return filteredResult;
   } catch (error) {
     throw error;
   }
 };
-
 
 
 const getUserStatisticsByCountry = async (startDate = null, endDate = null) => {

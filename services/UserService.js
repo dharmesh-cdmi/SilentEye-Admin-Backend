@@ -114,11 +114,7 @@ const getUserStatistics = async (startDate = null, endDate = null) => {
     // Filter out any documents with _id set to null
     const filteredResult = result.filter(item => item._id !== null);
 
-    return {
-      statusCode: 200,
-      message: 'User statistics fetched successfully',
-      data: filteredResult
-    };
+    return filteredResult;
   } catch (error) {
     throw error;
   }
@@ -225,11 +221,7 @@ const getUserStatisticsByCountry = async (startDate = null, endDate = null) => {
     // Filter out any documents with _id set to null
     const filteredResult = result.filter(item => item.country !== null);
 
-    return {
-      statusCode: 200,
-      message: 'User statistics fetched successfully',
-      data: filteredResult
-    };
+    return filteredResult;
   } catch (error) {
     throw error;
   }
@@ -244,11 +236,7 @@ const getUserProfile = async (userId) => {
     if (!user) {
       throw new Error('User not found');
     }
-    return {
-      statusCode: 200,
-      message: 'Data Fetched successfully',
-      data: user
-    };
+    return user;
   } catch (error) {
     throw error;
   }

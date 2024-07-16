@@ -1,13 +1,14 @@
 const adminService = require('../../services/adminService');
 const bcrypt = require('bcrypt');
+const { apiSuccessResponse, apiErrorResponse, HTTP_STATUS } = require('../../utils'); // Assuming you have imported the helper functions
 
 // Controller to create a new admin
 const createAdmin = async (req, res) => {
   try {
     const newAdmin = await adminService.createAdmin(req.body);
-    res.status(201).json(newAdmin);
+    return apiSuccessResponse(res, 'Admin created successfully', newAdmin, HTTP_STATUS.CREATED);
   } catch (err) {
-    res.status(400).json({ error: err.message });
+    return apiErrorResponse(res, err.message, null, HTTP_STATUS.BAD_REQUEST);
   }
 };
 
@@ -16,34 +17,34 @@ const getAdminDetails = async (req, res) => {
   try {
     const admin = await adminService.getAdminById(req.admin.id, ['password']);
     if (!admin) {
-      return res.status(404).json({ message: 'Admin not found' });
+      return apiErrorResponse(res, 'Admin not found', null, HTTP_STATUS.NOT_FOUND);
     }
-    res.json(admin);
+    return apiSuccessResponse(res, 'Admin details retrieved successfully', admin);
   } catch (err) {
-    res.status(500).json({ message: 'Server error' });
+    return apiErrorResponse(res, 'Server error', null, HTTP_STATUS.INTERNAL_SERVER_ERROR);
   }
 };
 
-//Reset password for admin
+// Controller to change admin password
 const changePassword = async (req, res) => {
   try {
     const { oldPassword, newPassword } = req.body;
     const adminId = req.admin?.id;
     if (!adminId) {
-      return res.status(400).json({ message: 'Inavlid Admin Id' });
+      return apiErrorResponse(res, 'Invalid Admin Id', null, HTTP_STATUS.BAD_REQUEST);
     }
     const admin = await adminService.getAdminById(adminId);
     if (!admin) {
-      return res.status(404).json({ message: 'Admin not found' });
+      return apiErrorResponse(res, 'Admin not found', null, HTTP_STATUS.NOT_FOUND);
     }
     const isMatch = await bcrypt.compare(oldPassword, admin.password);
     if (!isMatch) {
-      return res.status(401).json({ message: 'Invalid old password' });
+      return apiErrorResponse(res, 'Invalid old password', null, HTTP_STATUS.UNAUTHORIZED);
     }
     await adminService.changeAdminPassword(newPassword, admin);
-    return res.status(200).json({ message: 'Password updated successfully' });
+    return apiSuccessResponse(res, 'Password updated successfully', null, HTTP_STATUS.OK);
   } catch (error) {
-    res.status(500).json({ message: 'Server error' });
+    return apiErrorResponse(res, 'Server error', null, HTTP_STATUS.INTERNAL_SERVER_ERROR);
   }
 };
 

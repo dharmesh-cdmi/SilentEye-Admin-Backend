@@ -49,18 +49,10 @@ const getOrders = async ({ page = 1, limit = 10, status, paymentMethod, userId, 
     const totalCount = await Orders.countDocuments(filter);
 
     return {
-        statusCode: 200,
-        message: 'Data Fetched successfully',
-        data: {
-            totalPages: Math.ceil(totalCount / limit),
-            currentPage: Number(page),
-            totalOrders: totalCount,
-            orders
-        }
-      };
-
-    return {
-        
+        totalPages: Math.ceil(totalCount / limit),
+        currentPage: Number(page),
+        totalOrders: totalCount,
+        orders
     };
 };
 

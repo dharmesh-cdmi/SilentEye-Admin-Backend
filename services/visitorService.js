@@ -69,11 +69,7 @@ const getVisitorCount = async (page = null, action = null, startDate = null, end
       }))
     };
 
-    return {
-      statusCode: 200,
-      message: 'Data Fetched successfully',
-      data: response
-    };
+    return response;
   } catch (error) {
     throw error;
   }

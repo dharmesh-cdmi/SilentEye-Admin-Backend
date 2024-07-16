@@ -42,9 +42,16 @@ const createCheckoutSession = async (data) => {
   }
 };
 
-const createStripeProduct = async (data) => {
+const createStripeItem = async (data) => {
   try {
-    const { paymentGatewayId, name, amount, currency = 'usd' } = data;
+    const {
+      paymentGatewayId,
+      name,
+      amount,
+      currency = 'usd',
+      description,
+      images,
+    } = data;
     const paymentGateway = await PaymentGateway.findById(paymentGatewayId);
     if (!paymentGateway) {
       throw new Error('Payment gateway not found!');
@@ -52,22 +59,23 @@ const createStripeProduct = async (data) => {
 
     const stripeInstance = stripe(paymentGateway.saltKey);
 
-    const product = await stripeInstance.products.create({
+    let item = await stripeInstance.products.create({
       name,
+
+      description,
+      images,
     });
-    console.log('Stripe Product created:', product);
 
     const price = await stripeInstance.prices.create({
-      product: product.id,
-      unit_amount: amount, // Amount in cents
+      product: item.id,
+      unit_amount: amount * 100, // Amount in cents
       currency,
     });
-    console.log('Stripe Product Price created:', price);
 
     return {
       status: true,
       data: price,
-      message: 'Stripe product/addon created successfully',
+      message: 'Stripe item created successfully',
     };
   } catch (error) {
     console.error('Error creating on stripe:', error);
@@ -75,9 +83,17 @@ const createStripeProduct = async (data) => {
   }
 };
 
-const createStripePlan = async (data) => {
+const updateStripeItem = async (data) => {
   try {
-    const { paymentGatewayId, name, amount, currency = 'usd' } = data;
+    const {
+      paymentGatewayId,
+      itemId,
+      name,
+      itemMetadata,
+      priceId,
+      amount,
+      priceMetadata,
+    } = data;
     const paymentGateway = await PaymentGateway.findById(paymentGatewayId);
     if (!paymentGateway) {
       throw new Error('Payment gateway not found!');
@@ -85,30 +101,63 @@ const createStripePlan = async (data) => {
 
     const stripeInstance = stripe(paymentGateway.saltKey);
 
-    const product = await stripeInstance.products.create({
-      name,
-    });
+    // Prepare the update object for the product
+    const itemUpdateData = {};
+    if (name) itemUpdateData.name = name;
+    if (itemMetadata) itemUpdateData.metadata = itemMetadata;
 
-    const price = await stripeInstance.prices.create({
-      product: product.id,
-      unit_amount: amount, // Amount in cents
-      currency,
-    });
-    console.log('Stripe Product Price created:', price);
+    // Update the product if there are fields to update
+    let item;
+    if (Object.keys(itemUpdateData).length > 0) {
+      item = await stripeInstance.products.update(itemId, itemUpdateData);
+    }
+
+    // Prepare the update object for the price
+    const priceUpdateData = {};
+    if (priceMetadata) priceUpdateData.metadata = priceMetadata;
+
+    // Update the price if there are fields to update
+    if (priceId && Object.keys(priceUpdateData).length > 0) {
+      await stripeInstance.prices.update(priceId, priceUpdateData);
+      console.log('Stripe Product Price updated');
+    }
 
     return {
       status: true,
-      data: price,
-      message: 'Stripe product/addon created successfully',
+      message: 'Stripe item updated successfully',
     };
   } catch (error) {
-    console.error('Error creating on stripe:', error);
-    throw new Error(`Error creating on Stripe: ${error.message}`);
+    console.error('Error updating on stripe:', error);
+    throw new Error(`Error updating on Stripe: ${error.message}`);
+  }
+};
+
+const deleteStripeItem = async (data) => {
+  try {
+    const { paymentGatewayId, itemId } = data;
+
+    const paymentGateway = await PaymentGateway.findById(paymentGatewayId);
+    if (!paymentGateway) {
+      throw new Error('Payment gateway not found!');
+    }
+
+    const stripeInstance = stripe(paymentGateway.saltKey);
+
+    await stripeInstance.products.del(itemId);
+
+    return {
+      status: true,
+      message: 'Stripe item deleted successfully',
+    };
+  } catch (error) {
+    console.error('Error deleting on stripe:', error);
+    throw new Error(`Error deleting on Stripe: ${error.message}`);
   }
 };
 
 module.exports = {
   createCheckoutSession,
-  createStripeProduct,
-  createStripePlan,
+  createStripeItem,
+  updateStripeItem,
+  deleteStripeItem,
 };

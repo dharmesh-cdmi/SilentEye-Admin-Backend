@@ -183,6 +183,7 @@ const registerUser = async (userData) => {
     password,
     assignedBy,
     userDetails,
+    avatar,
     status,
     process,
     userStatus,
@@ -207,7 +208,10 @@ const registerUser = async (userData) => {
     email,
     password: hashedPassword,
     assignedBy,
-    userDetails: userDetails || {},
+    userDetails: {
+      profile_avatar: avatar,
+      ...userDetails
+    },
     status: status || 'active',
     userStatus: userStatus || 'Demo',
     email_verified_at: new Date(),
@@ -227,7 +231,7 @@ const registerUser = async (userData) => {
 const updateUser = async (id, data) => {
   const user = await User.findById(id);
   if (!user) {
-    throw new Error("User not found");
+    return false;
   }
 
   if (data.email && data.email !== user.email) {
@@ -245,8 +249,8 @@ const updateUser = async (id, data) => {
 
   if (data.name) user.name = data.name;
   if (data.assignedBy) user.assignedBy = data.assignedBy;
+  if (data.avatar) user.userDetails.profile_avatar = data.avatar;
   if (data.userDetails) {
-    if (data.userDetails.profile_avatar) user.userDetails.profile_avatar = data.userDetails.profile_avatar;
     if (data.userDetails.country) user.userDetails.country = data.userDetails.country;
     if (data.userDetails.phone) user.userDetails.phone = data.userDetails.phone;
     if (data.userDetails.address) user.userDetails.address = data.userDetails.address;

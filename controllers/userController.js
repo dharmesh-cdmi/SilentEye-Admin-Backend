@@ -35,10 +35,19 @@ const FetchUserById = async (req, res) => {
 
 // Register User
 const RegisterUser = async (req, res) => {
+  const avatar = req.file;
+  let avatarPath = (avatar && avatar.path) || null;
+  let data = avatarPath ? { ...req.body, avatar: avatarPath } : req.body;
   try {
-    const user = await userService.registerUser(req.body);
+    const user = await userService.registerUser(data);
     return apiSuccessResponse(res, HTTP_STATUS_MESSAGE[201], user, HTTP_STATUS.CREATED);
   } catch (error) {
+    if (error.name === 'ValidationError') {
+      return apiErrorResponse(res, HTTP_STATUS_MESSAGE[400], error.message, HTTP_STATUS.BAD_REQUEST);
+    }
+    if (error.message.includes('duplicate key error') || error.message.includes('Email is already in use')) {
+      return apiErrorResponse(res, HTTP_STATUS_MESSAGE[400], 'Email already exists', HTTP_STATUS.BAD_REQUEST);
+    }
     console.log('Error: ', error);
     return apiErrorResponse(res, HTTP_STATUS_MESSAGE[500], error, HTTP_STATUS.INTERNAL_SERVER_ERROR);
   }
@@ -46,13 +55,24 @@ const RegisterUser = async (req, res) => {
 
 // Update User
 const UpdateUser = async (req, res) => {
+  const avatar = req.file;
+  console.log(req.body);
+  let avatarPath = (avatar && avatar.path) || null;
   try {
-    const user = await userService.updateUser(req.params.userId, req.body);
+    let data = avatarPath ? { ...req.body, avatar: avatarPath } : req.body;
+    const user = await userService.updateUser(req.params.userId, data);
     if (!user) {
       return apiErrorResponse(res, HTTP_STATUS_MESSAGE[404], 'User not found', HTTP_STATUS.NOT_FOUND);
     }
     return apiSuccessResponse(res, HTTP_STATUS_MESSAGE[200], user, HTTP_STATUS.OK);
   } catch (error) {
+    console.log('Error: ', error);
+    if (error.name === 'ValidationError') {
+      return apiErrorResponse(res, HTTP_STATUS_MESSAGE[400], error.message, HTTP_STATUS.BAD_REQUEST);
+    }
+    if (error.message.includes('duplicate key error') || error.message.includes('Email is already in use')) {
+      return apiErrorResponse(res, HTTP_STATUS_MESSAGE[400], 'Email already exists', HTTP_STATUS.BAD_REQUEST);
+    }
     return apiErrorResponse(res, HTTP_STATUS_MESSAGE[500], error, HTTP_STATUS.INTERNAL_SERVER_ERROR);
   }
 }

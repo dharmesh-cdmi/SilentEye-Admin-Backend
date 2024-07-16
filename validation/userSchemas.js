@@ -71,8 +71,12 @@ const updateUserSchema = yup.object().shape({
     walletAmount: yup.number(),
 });
 
+const addUserHistorySchema = yup.object().shape({
+    action: yup.string().required('Action is required'),
+});
 module.exports = {
     resetPasswordSchema,
     createUserSchema,
     updateUserSchema,
+    addUserHistorySchema,
 };

@@ -22,7 +22,7 @@ const userSeeder = async () => {
   const users = [];
 
   // Generate additional users
-  for (let i = 1; i <= 300; i++) { // Change '30' to the desired number of users
+  for (let i = 1; i <= 20; i++) { // Change '30' to the desired number of users
     let selectedPlan;
     const randomPlanIndex = Math.floor(Math.random() * 3); // Randomly select from 0 to 2
 

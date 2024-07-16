@@ -22,13 +22,25 @@ const analytics = async (addon = null, plan = null, page = null, action = null, 
     }
     return response;
 }
-const usersStatisticsAnalytics = async (startDate = null, endDate = null,groupBy = null) =>{
-    const userStatistics = await userService.getUserStatistics(startDate, endDate,groupBy);
+
+const usersStatisticsAnalytics = async (startDate = null, endDate = null, groupBy = null) => {
+    let userStatistics;
+
+    if (groupBy === 'plan') {
+        userStatistics = await userService.getUserStatistics(startDate, endDate);
+    } else if (groupBy === 'country') {
+        userStatistics = await userService.getUserStatisticsByCountry(startDate, endDate);
+    } else {
+        throw new Error('Invalid groupBy parameter. Must be "plan" or "country".');
+    }
+
     const response = {
         userStatistics,
-    }
+    };
+
     return response;
-}
+};
+
 
 module.exports={
     analytics,

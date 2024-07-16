@@ -21,7 +21,7 @@ async function seedOrders() {
     const users = await User.find({});
 
     // Seed orders with refund data
-    for (let i = 0; i < 500; i++) {
+    for (let i = 0; i < 10; i++) {
       // Randomly select a user
       const randomUser = users[Math.floor(Math.random() * users.length)];
 

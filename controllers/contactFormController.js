@@ -29,8 +29,19 @@ const CreateContactForm = async (req, res, next) => {
     }
 };
 
+const DeleteContactForm = async (req, res, next) => {
+    try {
+        const { contactFormId } = req.params;
+        await contactFormService.deleteContactForm(contactFormId);
+        res.status(200).send('Contact form deleted successfully!');
+    } catch (error) {
+        next(error);
+    }
+};
+
 module.exports = {
     FetchAllContactsForm,
     CreateContactForm,
-    SearchContactsForm
+    SearchContactsForm,
+    DeleteContactForm
 };

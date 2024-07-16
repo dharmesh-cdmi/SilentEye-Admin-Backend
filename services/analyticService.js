@@ -38,7 +38,11 @@ const usersStatisticsAnalytics = async (startDate = null, endDate = null, groupB
         userStatistics,
     };
 
-    return response;
+    return {
+        statusCode: 200,
+        message: 'Data Fetched Successfully',
+        data: response
+      };;
 };
 
 

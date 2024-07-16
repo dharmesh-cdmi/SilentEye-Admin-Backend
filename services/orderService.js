@@ -49,10 +49,18 @@ const getOrders = async ({ page = 1, limit = 10, status, paymentMethod, userId, 
     const totalCount = await Orders.countDocuments(filter);
 
     return {
-        totalPages: Math.ceil(totalCount / limit),
-        currentPage: Number(page),
-        totalOrders: totalCount,
-        orders
+        statusCode: 200,
+        message: 'Data Fetched successfully',
+        data: {
+            totalPages: Math.ceil(totalCount / limit),
+            currentPage: Number(page),
+            totalOrders: totalCount,
+            orders
+        }
+      };
+
+    return {
+        
     };
 };
 
@@ -212,7 +220,7 @@ const getTotalAmounts = async (filter) => {
         totalPurchaseAmount: totalPurchaseAmount.length > 0 ? totalPurchaseAmount[0].totalAmount : 0,
         refundedAmount: refundedAmount.length > 0 ? refundedAmount[0].totalAmount : 0
     };
-};
+}; 
 
 module.exports = {
     getOrders,

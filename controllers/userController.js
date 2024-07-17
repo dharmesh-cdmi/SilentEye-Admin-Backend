@@ -102,6 +102,40 @@ const AddUserHistory = async (req, res) => {
   }
 }
 
+const SaveVisitor = async (req, res) => {
+  try {
+    const user = await userService.saveVisitor(req.body);
+    if (!user) {
+      return apiErrorResponse(res, HTTP_STATUS_MESSAGE[400], 'Visitor Already Exists With Same IP', HTTP_STATUS.BAD_REQUEST);
+    }
+    return apiSuccessResponse(res, HTTP_STATUS_MESSAGE[201], user, HTTP_STATUS.CREATED);
+  } catch (error) {
+    return apiErrorResponse(res, HTTP_STATUS_MESSAGE[500], error, HTTP_STATUS.INTERNAL_SERVER_ERROR);
+  }
+}
+
+const FetchVisitor = async (req, res) => {
+  try {
+    const user = await userService.fetchVisitor(req.params.ipAddress);
+    return apiSuccessResponse(res, HTTP_STATUS_MESSAGE[200], user, HTTP_STATUS.OK);
+  } catch (error) {
+    return apiErrorResponse(res, HTTP_STATUS_MESSAGE[500], error, HTTP_STATUS.INTERNAL_SERVER_ERROR);
+  }
+}
+
+const UpdateVisitor = async (req, res) => {
+  try {
+    const user = await userService.updateVisitor(req.params.ipAddress, req.body);
+    if (!user) {
+      return apiErrorResponse(res, HTTP_STATUS_MESSAGE[404], 'Visitor not found', HTTP_STATUS.NOT_FOUND);
+    }
+    return apiSuccessResponse(res, HTTP_STATUS_MESSAGE[200], user, HTTP_STATUS.OK);
+  } catch (error) {
+    return apiErrorResponse(res, HTTP_STATUS_MESSAGE[500], error, HTTP_STATUS.INTERNAL_SERVER_ERROR);
+  }
+}
+
+
 module.exports = {
   getProfile,
   FetchAllUsers,
@@ -109,5 +143,8 @@ module.exports = {
   UpdateUser,
   DeleteUser,
   AddUserHistory,
-  FetchUserById
+  FetchUserById,
+  SaveVisitor,
+  FetchVisitor,
+  UpdateVisitor
 };

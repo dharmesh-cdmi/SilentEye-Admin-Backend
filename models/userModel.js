@@ -11,10 +11,10 @@ const userDetailsSchema = new Schema({
 
 // User Schema
 const userSchema = new Schema({
-  name: { type: String, required: true },
-  email: { type: String, unique: true, required: true },
-  email_verified_at: { type: Date, required: true },
-  password: { type: String, required: true },
+  name: { type: String },
+  email: { type: String, unique: true},
+  email_verified_at: { type: Date, },
+  password: { type: String },
   assignedBy: { type: Schema.Types.ObjectId, ref: 'Admin' },
   userDetails: userDetailsSchema,
   status: { type: String, enum: ['active', 'inactive'], default: 'active' },
@@ -30,7 +30,7 @@ const userSchema = new Schema({
   blocked: { type: Boolean, default: false },
   userStatus: {
     type: String,
-    enum: ['Demo', 'Checkout', 'Paid'],
+    enum: ['Demo', 'Checkout', 'Paid', 'Visitor'],
     default: 'Demo'
   },
   process: {

@@ -60,5 +60,22 @@ router.post(
     authenticateUser,
     validateRequest(addUserHistorySchema),
     controller.AddUserHistory
-)
+);
+
+router.post(
+    "/visitor",
+    controller.SaveVisitor
+);
+
+router.get(
+    "/visitor/:ipAddress",
+    controller.FetchVisitor
+);
+
+router.put(
+    "/visitor/:ipAddress",
+    upload.single('profile_avatar'),
+    controller.UpdateVisitor
+);
+
 module.exports = router;

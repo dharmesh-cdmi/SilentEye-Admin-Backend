@@ -8,25 +8,43 @@ const userService = require("./userService");
 const analytics = async (addon = null, plan = null, page = null, action = null, startDate = null, endDate = null)=> {
     const visitorDetails = await visitorService.getVisitorCount(page, action, startDate, endDate);
     const totalLoggedInUser = await loginService.getLoginCount(startDate, endDate);
-    const totalOrder = await orderService.getTotalOrderCount(plan,startDate, endDate);
+    const orders = await orderService.getTotalOrderCount(plan,startDate, endDate);
+    // const conversion = await orderService.getTotalConversion(startDate, endDate);
     const totalSupportTicket = await ticketService.getTotalTicketsCount(startDate, endDate)
     const totalContactFormSubmited = await contactFormService.getTotalContactFormsCount(startDate, endDate)
     const response = {
         visitorDetails,
         totalLoggedInUser,
-        totalOrder,
+        orders,
+        // conversion,
         totalSupportTicket,
         totalContactFormSubmited
     }
     return response;
 }
-const usersStatisticsAnalytics = async (startDate = null, endDate = null) =>{
-    const userStatistics = await userService.getUserStatistics(startDate, endDate);
+
+const usersStatisticsAnalytics = async (startDate = null, endDate = null, groupBy = null, page = null, limit = null) => {
+    let userStatistics;
+
+    if (groupBy === 'plan') {
+        userStatistics = await userService.getUserStatistics(startDate, endDate, page, limit);
+    } else if (groupBy === 'country') {
+        userStatistics = await userService.getUserStatisticsByCountry(startDate, endDate, page, limit);
+    } else {
+        throw new Error('Invalid groupBy parameter. Must be "plan" or "country".');
+    }
+
     const response = {
         userStatistics,
-    }
-    return response;
-}
+    };
+
+    return {
+        statusCode: 200,
+        message: 'Data Fetched Successfully',
+        data: response
+      };;
+};
+
 
 module.exports={
     analytics,

@@ -7,6 +7,7 @@ const { verifyUser } = require('../middleware/authMiddleware');
 
 
 router.post('/login', authController.login);
+router.post('/refresh-token', authController.refreshToken);
 router.post('/admin/login', authController.loginAdmin);
 
 //protected route

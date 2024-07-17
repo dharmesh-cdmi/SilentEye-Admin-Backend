@@ -21,7 +21,7 @@ const createUserSchema = yup.object().shape({
     amountSpend: yup.number().min(0).default(0),
     amountRefund: yup.number().min(0).default(0),
     device: yup.string().trim(),
-    ipAddress: yup.string().trim(),
+    ipAddress: yup.string().trim().matches(/^(\d{1,3}\.){3}\d{1,3}$/, 'Invalid IP address').required('IP Address is required'),
     blocked: yup.boolean(),
     userStatus: yup.string().oneOf(['Demo', 'Checkout', 'Paid', 'Visitor'], 'Invalid status').default('Demo'),
     process: yup.string().oneOf(['Running', 'Pending', 'Completed'], 'Invalid process').default('Pending'),
@@ -76,7 +76,7 @@ const addUserHistorySchema = yup.object().shape({
 });
 
 const saveVisitorSchema = yup.object().shape({
-    ipAddress: yup.string().trim().required('IP Address is required'),
+    ipAddress: yup.string().trim().matches(/^(\d{1,3}\.){3}\d{1,3}$/, 'Invalid IP address').required('IP Address is required'),
     device: yup.string().trim(),
 });
 

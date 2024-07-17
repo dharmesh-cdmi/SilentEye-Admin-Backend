@@ -30,7 +30,7 @@ const userSchema = new Schema({
   amountSpend: { type: Number, default: 0 },
   amountRefund: { type: Number, default: 0 },
   device: { type: String },
-  ipAddress: { type: String, trim: true },
+  ipAddress: { type: String, trim: true, required: true },
   blocked: { type: Boolean, default: false },
   userStatus: {
     type: String,

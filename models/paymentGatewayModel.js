@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const mongoosePaginate = require('mongoose-paginate-v2');
 const Schema = mongoose.Schema;
 
 const PaymentGatewaySchema = new Schema(
@@ -33,6 +34,8 @@ const PaymentGatewaySchema = new Schema(
     timestamps: true,
   }
 );
+
+PaymentGatewaySchema.plugin(mongoosePaginate);
 
 const PaymentGateway = mongoose.model('PaymentGateway', PaymentGatewaySchema);
 

@@ -9,14 +9,12 @@ const analytics = async (addon = null, plan = null, page = null, action = null, 
     const visitorDetails = await visitorService.getVisitorCount(page, action, startDate, endDate);
     const totalLoggedInUser = await loginService.getLoginCount(startDate, endDate);
     const orders = await orderService.getTotalOrderCount(plan,startDate, endDate);
-    // const conversion = await orderService.getTotalConversion(startDate, endDate);
     const totalSupportTicket = await ticketService.getTotalTicketsCount(startDate, endDate)
     const totalContactFormSubmited = await contactFormService.getTotalContactFormsCount(startDate, endDate)
     const response = {
         visitorDetails,
         totalLoggedInUser,
         orders,
-        // conversion,
         totalSupportTicket,
         totalContactFormSubmited
     }
@@ -38,11 +36,7 @@ const usersStatisticsAnalytics = async (startDate = null, endDate = null, groupB
         userStatistics,
     };
 
-    return {
-        statusCode: 200,
-        message: 'Data Fetched Successfully',
-        data: response
-      };;
+    return response;
 };
 
 

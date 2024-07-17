@@ -49,18 +49,10 @@ const getOrders = async ({ page = 1, limit = 10, status, paymentMethod, userId, 
     const totalCount = await Orders.countDocuments(filter);
 
     return {
-        statusCode: 200,
-        message: 'Data Fetched successfully',
-        data: {
-            totalPages: Math.ceil(totalCount / limit),
-            currentPage: Number(page),
-            totalOrders: totalCount,
-            orders
-        }
-      };
-
-    return {
-        
+        totalPages: Math.ceil(totalCount / limit),
+        currentPage: Number(page),
+        totalOrders: totalCount,
+        orders
     };
 };
 
@@ -103,10 +95,16 @@ const getTotalOrderCount = async (plan = null, startDate = null, endDate = null)
         status: 'Refunded'
     });
 
-    // Get total addon sales count
+    // Get total add-on sales count and amount
     let pipeline = [
         { $unwind: "$addOns" }, // Unwind the addOns array
-        { $group: { _id: null, totalAddons: { $sum: 1 } } } // Sum the count of addOns
+        { 
+            $group: { 
+                _id: null, 
+                totalAddons: { $sum: 1 }, // Sum the count of addOns
+                totalAddonAmount: { $sum: "$addOns.price" } // Sum the price of addOns
+            } 
+        }
     ];
 
     // Apply date filters to the pipeline if provided
@@ -135,6 +133,7 @@ const getTotalOrderCount = async (plan = null, startDate = null, endDate = null)
 
     const result = await Orders.aggregate(pipeline);
     const totalAddonSales = result.length > 0 ? result[0].totalAddons : 0;
+    const totalAddonAmount = result.length > 0 ? result[0].totalAddonAmount : 0;
 
     const totalAmounts = await getTotalAmounts(filter);
 
@@ -158,7 +157,7 @@ const getTotalOrderCount = async (plan = null, startDate = null, endDate = null)
                 count: pendingOrders,
                 amount: totalAmounts.paymentInitiatedAmount
             },
-            totalPurchase: {
+            totalPurchaseUsers: {
                 count: completedOrders,
                 amount: totalAmounts.totalPurchaseAmount
             },
@@ -166,12 +165,16 @@ const getTotalOrderCount = async (plan = null, startDate = null, endDate = null)
                 count: refundedOrders,
                 amount: totalAmounts.refundedAmount
             },
-            totalAddonSales,
+            totalAddonSales: {
+                count: totalAddonSales,
+                amount: totalAddonAmount
+            },
             conversionRate
         },
         refundData
     };
 };
+
 
 const getTotalAmounts = async (filter) => {
     const totalOrderAmount = await Orders.aggregate([

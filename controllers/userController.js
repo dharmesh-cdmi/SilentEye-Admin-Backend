@@ -1,13 +1,15 @@
-const userService = require('../services/userService');
-const { apiErrorResponse, apiSuccessResponse, HTTP_STATUS_MESSAGE, HTTP_STATUS } = require('../utils');
 
+const userService = require('../services/UserService');
+const { apiSuccessResponse, apiErrorResponse, HTTP_STATUS } = require('../utils'); // Importing helper functions
+
+// Controller to get user profile
 const getProfile = async (req, res) => {
   try {
     const user = await userService.getUserProfile(req.user.id);
-    res.json(user);
+    return apiSuccessResponse(res, 'User profile retrieved successfully', user);
   } catch (error) {
     console.error('Profile error:', error);
-    res.status(404).json({ message: error.message });
+    return apiErrorResponse(res, error.message, null, HTTP_STATUS.NOT_FOUND);
   }
 };
 

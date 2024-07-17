@@ -18,28 +18,47 @@ const getRefundData = async (startDate = null, endDate = null) => {
     };
   }
 
-  const totalRefundRequests = await RefundRequest.countDocuments(matchCondition);
+  const pipeline = [
+    { $match: matchCondition },
+    {
+      $group: {
+        _id: "$status",
+        count: { $sum: 1 },
+        amount: { $sum: "$amount" } // Ensure this matches the field name in your documents
+      }
+    }
+  ];
 
-  const trueRefunds = await RefundRequest.countDocuments({
-    ...matchCondition,
-    status: 'True Refunded'
-  });
+  const result = await RefundRequest.aggregate(pipeline);
 
-  const refundRequests = await RefundRequest.countDocuments({
-    ...matchCondition,
-    status: { $in: ['Pending', 'Approved', 'Rejected'] }
-  });
+  const refundData = result.reduce((acc, item) => {
+    acc[item._id] = {
+      count: item.count,
+      amount: item.amount
+    };
+    return acc;
+  }, {});
 
-  const refunded = await RefundRequest.countDocuments({
-    ...matchCondition,
-    status: 'Refunded'
-  });
+  const totalRefundRequestsCount = Object.values(refundData).reduce((acc, curr) => acc + curr.count, 0);
+  const totalRefundRequestsAmount = Object.values(refundData).reduce((acc, curr) => acc + curr.amount, 0);
 
   return {
-    totalRefundRequests,
-    trueRefunds,
-    refundRequests,
-    refunded
+    totalRefundRequests: {
+      count: totalRefundRequestsCount,
+      amount: totalRefundRequestsAmount
+    },
+    trueRefunds: {
+      count: refundData['True Refunded']?.count || 0,
+      amount: refundData['True Refunded']?.amount || 0
+    },
+    refundRequests: {
+      count: refundData['Pending']?.count || 0,
+      amount: refundData['Pending']?.amount || 0
+    },
+    refunded: {
+      count: refundData['Refunded']?.count || 0,
+      amount: refundData['Refunded']?.amount || 0
+    }
   };
 };
 

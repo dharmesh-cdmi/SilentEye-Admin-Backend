@@ -66,10 +66,15 @@ const fetchAllUsers = async (queryParams) => {
     blocked,
     country,
     process,
-    search
+    search,
+    visitors = false
   } = queryParams;
 
   const filters = {};
+
+  if (!visitors) {
+    filters.userStatus = { $ne: 'Visitor' };
+  }
 
   // Date range filtering
   if (fromDate || toDate || dateFilter) {
@@ -130,7 +135,7 @@ const fetchAllUsers = async (queryParams) => {
   }
   // Blocked status filtering
   if (blocked) {
-    filters.blocked = blocked === 'true';
+    filters.blocked = (blocked === 'true' || blocked === true);
   }
 
   // Country filtering

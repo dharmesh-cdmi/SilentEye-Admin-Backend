@@ -1,14 +1,15 @@
 // controllers/paymentController.js
 
 const paymentService = require('../services/paymentService');
+const { apiSuccessResponse, apiErrorResponse, HTTP_STATUS_MESSAGE, HTTP_STATUS } = require('../utils/responseHelper')
 
 // Create a new checkout session
 const createCheckoutSession = async (req, res) => {
   try {
     const session = await paymentService.createCheckoutSession(req.body);
-    res.status(201).json(session);
+    return apiSuccessResponse(res, HTTP_STATUS_MESSAGE[201], session, HTTP_STATUS.CREATED)
   } catch (error) {
-    res.status(400).json({ error: error.message });
+    return apiErrorResponse(res, HTTP_STATUS_MESSAGE[500], error?.message ?? error, HTTP_STATUS.INTERNAL_SERVER_ERROR)
   }
 };
 
@@ -16,9 +17,9 @@ const createCheckoutSession = async (req, res) => {
 const createStripeProduct = async (req, res) => {
   try {
     const product = await paymentService.createStripeProduct(req.body);
-    res.status(201).json(product);
+    return apiSuccessResponse(res, HTTP_STATUS_MESSAGE[201], product, HTTP_STATUS.CREATED)
   } catch (error) {
-    res.status(400).json({ error: error.message });
+    return apiErrorResponse(res, HTTP_STATUS_MESSAGE[500], error?.message ?? error, HTTP_STATUS.INTERNAL_SERVER_ERROR)
   }
 };
 
@@ -26,9 +27,9 @@ const createStripeProduct = async (req, res) => {
 const createStripePlan = async (req, res) => {
   try {
     const plan = await paymentService.createStripePlan(req.body);
-    res.status(201).json(plan);
+    return apiSuccessResponse(res, HTTP_STATUS_MESSAGE[201], plan, HTTP_STATUS.CREATED)
   } catch (error) {
-    res.status(400).json({ error: error.message });
+    return apiErrorResponse(res, HTTP_STATUS_MESSAGE[500], error?.message ?? error, HTTP_STATUS.INTERNAL_SERVER_ERROR)
   }
 };
 

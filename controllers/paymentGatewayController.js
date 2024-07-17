@@ -1,6 +1,8 @@
 // controllers/paymentGatewayController.js
 
 const paymentGatewayService = require('../services/paymentGatewayService');
+const { apiSuccessResponse, apiErrorResponse, HTTP_STATUS_MESSAGE, HTTP_STATUS } = require('../utils/responseHelper')
+
 
 // Create a new payment gateway
 const createPaymentGateway = async (req, res) => {
@@ -8,9 +10,9 @@ const createPaymentGateway = async (req, res) => {
     const paymentGateway = await paymentGatewayService.createPaymentGateway(
       {...req.body, icon: req.file?.path}
     );
-    res.status(201).json(paymentGateway);
+    return apiSuccessResponse(res, HTTP_STATUS_MESSAGE[201], paymentGateway, HTTP_STATUS.CREATED)
   } catch (error) {
-    res.status(400).json({ error: error.message });
+    return apiErrorResponse(res, HTTP_STATUS_MESSAGE[500], error?.message ?? error, HTTP_STATUS.INTERNAL_SERVER_ERROR)
   }
 };
 
@@ -22,9 +24,9 @@ const getAllPaymentGateways = async (req, res) => {
       page,
       limit
     );
-    res.status(200).json(paymentGateways);
+    return apiSuccessResponse(res, HTTP_STATUS_MESSAGE[200], paymentGateways, HTTP_STATUS.OK)
   } catch (error) {
-    res.status(400).json({ error: error.message });
+    return apiErrorResponse(res, HTTP_STATUS_MESSAGE[500], error?.message ?? error, HTTP_STATUS.INTERNAL_SERVER_ERROR)
   }
 };
 
@@ -34,9 +36,9 @@ const getPaymentGatewayById = async (req, res) => {
     const paymentGateway = await paymentGatewayService.getPaymentGatewayById(
       req.params.id
     );
-    res.status(200).json(paymentGateway);
+    return apiSuccessResponse(res, HTTP_STATUS_MESSAGE[200], paymentGateway, HTTP_STATUS.OK)
   } catch (error) {
-    res.status(400).json({ error: error.message });
+    return apiErrorResponse(res, HTTP_STATUS_MESSAGE[500], error?.message ?? error, HTTP_STATUS.INTERNAL_SERVER_ERROR)
   }
 };
 
@@ -47,9 +49,9 @@ const updatePaymentGateway = async (req, res) => {
       req.params.id,
       req.body
     );
-    res.status(200).json(paymentGateway);
+    return apiSuccessResponse(res, HTTP_STATUS_MESSAGE[200], paymentGateway, HTTP_STATUS.OK)
   } catch (error) {
-    res.status(400).json({ error: error.message });
+    return apiErrorResponse(res, HTTP_STATUS_MESSAGE[500], error?.message ?? error, HTTP_STATUS.INTERNAL_SERVER_ERROR)
   }
 };
 
@@ -57,9 +59,9 @@ const updatePaymentGateway = async (req, res) => {
 const deletePaymentGateway = async (req, res) => {
   try {
     await paymentGatewayService.deletePaymentGateway(req.params.id);
-    res.status(200).json({ message: 'Payment Gateway deleted successfully' });
+    return apiSuccessResponse(res, HTTP_STATUS_MESSAGE[200], { message: 'Payment Gateway deleted successfully' }, HTTP_STATUS.OK)
   } catch (error) {
-    res.status(400).json({ error: error.message });
+    return apiErrorResponse(res, HTTP_STATUS_MESSAGE[500], error?.message ?? error, HTTP_STATUS.INTERNAL_SERVER_ERROR)
   }
 };
 

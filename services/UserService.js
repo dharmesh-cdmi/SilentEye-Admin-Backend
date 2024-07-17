@@ -197,6 +197,27 @@ const getUserStatisticsByCountry = async (startDate = null, endDate = null) => {
         }
       },
       {
+        $lookup: {
+          from: "visitors", // Collection name for visitors
+          localField: "_id",
+          foreignField: "country",
+          as: "visitors"
+        }
+      },
+      {
+        $addFields: {
+          totalDemoVisitors: {
+            $size: {
+              $filter: {
+                input: "$visitors",
+                as: "visitor",
+                cond: { $eq: ["$$visitor.action", "Demo"] }
+              }
+            }
+          }
+        }
+      },
+      {
         $project: {
           sales: {
             totalSalesAmount: "$totalSalesAmount",
@@ -211,6 +232,7 @@ const getUserStatisticsByCountry = async (startDate = null, endDate = null) => {
           totalPlan: 1,
           country: "$_id",
           plans: 1,
+          totalDemoVisitors: 1,
           _id: 0
         }
       }

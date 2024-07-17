@@ -1,5 +1,5 @@
 
-const userService = require('../services/UserService');
+const userService = require('../services/userService');
 const { apiSuccessResponse, apiErrorResponse, HTTP_STATUS } = require('../utils'); // Importing helper functions
 
 // Controller to get user profile

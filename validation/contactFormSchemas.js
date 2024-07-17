@@ -1,4 +1,7 @@
 const yup = require('yup');
+const mongoose = require('mongoose');
+
+const ObjectId = yup.string().test('is-valid', 'Invalid Contact ID', value => mongoose.Types.ObjectId.isValid(value));
 
 const createContactSchema = yup.object().shape({
     subject: yup.string().trim().required('Subject is required'),
@@ -14,8 +17,12 @@ const searchContactSchema = yup.object().shape({
     searchQuery: yup.string().trim(),
 }).noUnknown(true, 'Unknown field in search contact form data');
 
+const contactIdSchema = yup.object().shape({
+    contactFormId: ObjectId.required('Contact Form ID is required'),
+}).noUnknown(true, 'Unknown field in contact params');
 
 module.exports = {
     createContactSchema,
-    searchContactSchema
+    searchContactSchema,
+    contactIdSchema
 };

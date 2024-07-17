@@ -3,7 +3,7 @@ const visitorService = require('../services/visitorService');
 const loginService = require("./loginService");
 const ticketService = require("./ticketService");
 const contactFormService = require("./contactFormService");
-const userService = require("./UserService");
+const userService = require("./userService");
 
 const analytics = async (addon = null, plan = null, page = null, action = null, startDate = null, endDate = null)=> {
     const visitorDetails = await visitorService.getVisitorCount(page, action, startDate, endDate);

@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const mongoosePaginate = require('mongoose-paginate-v2');
 const Schema = mongoose.Schema;
 
 const ShippingSchema = new Schema(
@@ -32,6 +33,8 @@ const ShippingSchema = new Schema(
     timestamps: true,
   }
 );
+
+ShippingSchema.plugin(mongoosePaginate);
 
 const Shipping = mongoose.model('Shipping', ShippingSchema);
 

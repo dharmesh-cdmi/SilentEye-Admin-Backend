@@ -4,7 +4,7 @@ const multer = require("multer");
 
 const { verifyAdmin, authenticateUser } = require("../middleware/authMiddleware");
 const { validateRequest } = require("../middleware/validationMiddleware");
-const { createUserSchema, updateUserSchema, addUserHistorySchema } = require("../validation/userSchemas");
+const { createUserSchema, updateUserSchema, addUserHistorySchema, saveVisitorSchema } = require("../validation/userSchemas");
 const controller = require("../controllers/userController");
 const router = express.Router();
 
@@ -56,14 +56,14 @@ router.delete(
 );
 
 router.post(
-    "/user-history",
-    authenticateUser,
+    "/user-history/:userId",
     validateRequest(addUserHistorySchema),
     controller.AddUserHistory
 );
 
 router.post(
     "/visitor",
+    validateRequest(saveVisitorSchema),
     controller.SaveVisitor
 );
 
@@ -77,5 +77,12 @@ router.put(
     upload.single('profile_avatar'),
     controller.UpdateVisitor
 );
+
+router.post(
+    "visitor/user-history/:ipAddress",
+    validateRequest(addUserHistorySchema),
+    controller.AddUserHistoryByVisitor
+);
+
 
 module.exports = router;

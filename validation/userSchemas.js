@@ -74,9 +74,16 @@ const updateUserSchema = yup.object().shape({
 const addUserHistorySchema = yup.object().shape({
     action: yup.string().required('Action is required'),
 });
+
+const saveVisitorSchema = yup.object().shape({
+    ipAddress: yup.string().trim().required('IP Address is required'),
+    device: yup.string().trim(),
+});
+
 module.exports = {
     resetPasswordSchema,
     createUserSchema,
     updateUserSchema,
     addUserHistorySchema,
+    saveVisitorSchema,
 };

@@ -12,7 +12,7 @@ const userDetailsSchema = new Schema({
 // User Schema
 const userSchema = new Schema({
   name: { type: String },
-  email: { type: String, unique: true},
+  email: { type: String, unique: false },
   email_verified_at: { type: Date, },
   password: { type: String },
   assignedBy: { type: Schema.Types.ObjectId, ref: 'Admin' },
@@ -26,7 +26,7 @@ const userSchema = new Schema({
   amountSpend: { type: Number, default: 0 },
   amountRefund: { type: Number, default: 0 },
   device: { type: String },
-  ipAddress: { type: String },
+  ipAddress: { type: String, trim: true },
   blocked: { type: Boolean, default: false },
   userStatus: {
     type: String,
@@ -57,7 +57,7 @@ const userSchema = new Schema({
     }
   ],
   walletAmount: { type: Number, default: 0 },
-  
+
 });
 
 // Pre-save hook to update the `updatedAt` field

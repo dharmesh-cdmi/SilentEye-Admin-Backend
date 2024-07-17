@@ -6,7 +6,7 @@ const paymentGatewayService = require('../services/paymentGatewayService');
 const createPaymentGateway = async (req, res) => {
   try {
     const paymentGateway = await paymentGatewayService.createPaymentGateway(
-      req.body
+      {...req.body, icon: req.file?.path}
     );
     res.status(201).json(paymentGateway);
   } catch (error) {

@@ -155,9 +155,76 @@ const deleteStripeItem = async (data) => {
   }
 };
 
+const createStripeDiscount = async (data) => {
+  try {
+    const { paymentGatewayId } = data;
+
+    const paymentGateway = await PaymentGateway.findById(paymentGatewayId);
+    if (!paymentGateway) {
+      throw new Error('Payment gateway not found!');
+    }
+
+    const stripeInstance = stripe(paymentGateway.saltKey);
+
+    // Create corresponding discount in Stripe
+    return await stripeInstance.coupons.create({
+      percent_off: data.discountPercent,
+      duration: 'once',
+      // duration: 'repeating',
+      // duration_in_months: 3,
+      name: data.coupon,
+      id: data._id.toString(),
+    });
+  } catch (error) {
+    console.error('Error creating discount on stripe:', error);
+    throw new Error(`Error creating discount on Stripe: ${error.message}`);
+  }
+};
+
+const updateStripeDiscount = async (data) => {
+  try {
+    const { paymentGatewayId } = data;
+
+    const paymentGateway = await PaymentGateway.findById(paymentGatewayId);
+    if (!paymentGateway) {
+      throw new Error('Payment gateway not found!');
+    }
+
+    const stripeInstance = stripe(paymentGateway.saltKey);
+
+    return await stripeInstance.coupons.update(data.pgDiscountId, {
+      // currency, duration, amount_off are not editable
+      name: data.coupon,
+    });
+  } catch (error) {
+    console.error('Error updating discount on stripe:', error);
+    throw new Error(`Error updating discount on Stripe: ${error.message}`);
+  }
+};
+
+const deleteStripeDiscount = async (paymentGatewayId, pgDiscountId) => {
+  try {
+    const paymentGateway = await PaymentGateway.findById(paymentGatewayId);
+    if (!paymentGateway) {
+      throw new Error('Payment gateway not found!');
+    }
+
+    const stripeInstance = stripe(paymentGateway.saltKey);
+
+    // Delete corresponding discount in Stripe
+    await stripeInstance.coupons.del(pgDiscountId);
+  } catch (error) {
+    console.error('Error updating discount on stripe:', error);
+    throw new Error(`Error updating discount on Stripe: ${error.message}`);
+  }
+};
+
 module.exports = {
   createCheckoutSession,
   createStripeItem,
   updateStripeItem,
   deleteStripeItem,
+  createStripeDiscount,
+  updateStripeDiscount,
+  deleteStripeDiscount,
 };

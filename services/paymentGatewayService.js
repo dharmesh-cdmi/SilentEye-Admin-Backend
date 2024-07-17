@@ -9,8 +9,17 @@ const createPaymentGateway = async (data) => {
 };
 
 // Get all payment gateways
-const getAllPaymentGateways = async () => {
-  return await PaymentGateway.find({});
+const getAllPaymentGateways = async (page, limit) => {
+  try {
+    const options = {
+      page: parseInt(page, 10),
+      limit: parseInt(limit, 10),
+      sort: { createdAt: -1 },
+    };
+    return await PaymentGateway.find({}, options);
+  } catch (error) {
+    throw new Error('Error in fetching payment gateways: ' + error.message);
+  }
 };
 
 // Get a single payment gateway by ID

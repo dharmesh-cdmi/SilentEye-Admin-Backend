@@ -1,4 +1,135 @@
 const User = require('../models/userModel');
+const Addon = require('../models/addonModel');
+
+
+const getAddonStatistics = async (startDate = null, endDate = null) => {
+  try {
+    const matchStage = {};
+
+    if (startDate || endDate) {
+      matchStage.createdAt = {};
+      if (startDate) matchStage.createdAt.$gte = new Date(startDate);
+      if (endDate) matchStage.createdAt.$lte = new Date(endDate);
+    }
+
+    const pipeline = [];
+
+    if (Object.keys(matchStage).length > 0) {
+      pipeline.push({ $match: matchStage });
+    }
+
+    // Lookup stage to fetch orders and their associated addons
+    pipeline.push(
+      {
+        $lookup: {
+          from: "orders", // Collection name for orders
+          localField: "_id",
+          foreignField: "addonDetails.addonId",
+          as: "orders"
+        }
+      },
+      { 
+        $unwind: {
+          path: "$orders",
+          preserveNullAndEmptyArrays: true
+        }
+      },
+      {
+        $match: {
+          "orders": { $ne: [] } // Ensure there are orders
+        }
+      },
+      {
+        $group: {
+          _id: "$_id", // Group by addon ID
+          title: { $first: "$title" },
+          totalSalesAmount: { $sum: "$orders.orderDetails.total" },
+          users: {
+            $push: {
+              userId: "$orders.userId",
+              orderAmount: "$orders.orderDetails.total", // Include order amount
+              refunds: {
+                $cond: [{ $eq: ["$orders.status", "Refunded"] }, {
+                  refundId: "$orders.refundDetails.refundRequestId",
+                  refundedAmount: "$orders.refundDetails.refundAmount"
+                }, null]
+              }
+            }
+          },
+          totalUsersRefunds: {
+            $sum: {
+              $cond: [{ $eq: ["$orders.status", "Refunded"] }, 1, 0]
+            }
+          },
+          totalRefundedAmount: {
+            $sum: {
+              $cond: [{ $eq: ["$orders.status", "Refunded"] }, "$orders.refundDetails.refundAmount", 0]
+            }
+          },
+          totalCheckout: {
+            $sum: { $cond: [{ $eq: ["$orders.status", "Completed"] }, 1, 0] }
+          },
+          totalPaymentInitiated: {
+            $sum: { $cond: [{ $eq: ["$orders.status", "Pending"] }, 1, 0] }
+          }
+        }
+      },
+      {
+        $lookup: {
+          from: "visitors", // Collection name for visitors
+          let: { addonId: "$_id" },
+          pipeline: [
+            {
+              $match: {
+                $expr: {
+                  $and: [
+                    { $eq: ["$action", "Demo"] },
+                    { $eq: ["$addonId", "$$addonId"] } // Ensure to replace `addonId` with the correct field in visitors collection
+                  ]
+                }
+              }
+            }
+          ],
+          as: "demoVisitors"
+        }
+      },
+      {
+        $addFields: {
+          totalDemoVisitors: { $size: "$demoVisitors" }
+        }
+      },
+      {
+        $project: {
+          _id: 1,
+          title: 1,
+          sales: {
+            totalSalesAmount: "$totalSalesAmount",
+            totalUsersBought: { $size: "$users" }
+          },
+          refund: {
+            totalUsersRefunds: "$totalUsersRefunds",
+            totalRefundedAmount: "$totalRefundedAmount"
+          },
+          totalCheckout: 1,
+          totalPaymentInitiated: 1,
+          totalDemoVisitors: 1,
+          // users: 1 // Include the array of user details with order amount and refunds
+        }
+      }
+    );
+
+    const result = await Addon.aggregate(pipeline);
+
+    // Filter out any documents with _id set to null
+    const filteredResult = result.filter(item => item._id !== null);
+
+    return filteredResult;
+  } catch (error) {
+    throw error;
+  }
+};
+
+
 
 const getUserStatistics = async (startDate = null, endDate = null) => {
   try {
@@ -86,6 +217,30 @@ const getUserStatistics = async (startDate = null, endDate = null) => {
         }
       },
       {
+        $lookup: {
+          from: "visitors", // Collection name for visitors
+          let: { planId: "$_id" },
+          pipeline: [
+            {
+              $match: {
+                $expr: {
+                  $and: [
+                    { $eq: ["$action", "Demo"] },
+                    // { $eq: ["$planId", "$$planId"] } // Ensure to replace `planId` with the correct field in visitors collection
+                  ]
+                }
+              }
+            }
+          ],
+          as: "demoVisitors"
+        }
+      },
+      {
+        $addFields: {
+          totalDemoVisitors: { $size: "$demoVisitors" }
+        }
+      },
+      {
         $project: {
           _id: 1,
           planName: 1,
@@ -97,13 +252,9 @@ const getUserStatistics = async (startDate = null, endDate = null) => {
             totalUsersRefunds: "$totalUsersRefunds",
             totalRefundedAmount: "$totalRefundedAmount"
           },
-
-          // totalSalesAmount: 1,
-          // totalUsersBought: { $size: "$users" }, // Count unique users who bought the plan
-          // totalUsersRefunds: 1,
-          // totalRefundedAmount: 1,
           totalCheckout: 1,
           totalPaymentInitiated: 1,
+          totalDemoVisitors: 1,
           // users: 1 // Include the array of user details with order amount and refunds
         }
       }
@@ -114,7 +265,17 @@ const getUserStatistics = async (startDate = null, endDate = null) => {
     // Filter out any documents with _id set to null
     const filteredResult = result.filter(item => item._id !== null);
 
-    return filteredResult;
+
+       // Execute both pipelines
+       const addonStatistics = await getAddonStatistics(startDate, endDate); // Call addon statistics function
+
+       // Combine results
+       const combinedResult = {
+        filteredResult,
+         addonStatistics
+       };
+   
+      return combinedResult;
   } catch (error) {
     throw error;
   }
@@ -267,5 +428,6 @@ const getUserProfile = async (userId) => {
 module.exports = {
   getUserProfile,
   getUserStatistics,
+  getAddonStatistics,
   getUserStatisticsByCountry
 };

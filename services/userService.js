@@ -282,7 +282,10 @@ const getUserStatistics = async (startDate = null, endDate = null) => {
 };
 
 
-const getUserStatisticsByCountry = async (startDate = null, endDate = null) => {
+const getUserStatisticsByCountry = async (startDate = null, endDate = null,page = 1, limit = 10) => {
+  page = Number(page);
+  limit = Number(limit);
+  
   try {
     const matchStage = {};
 
@@ -396,6 +399,12 @@ const getUserStatisticsByCountry = async (startDate = null, endDate = null) => {
           totalDemoUser: 1,
           _id: 0
         }
+      },
+      {
+        $skip: (page - 1) * limit  // Skip documents based on page number
+      },
+      {
+        $limit: limit  // Limit the number of documents per page
       }
     );
 

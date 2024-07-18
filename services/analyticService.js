@@ -25,7 +25,7 @@ const analytics = async (plan = null, page = [], action = [], startDate = null, 
     return response;
 }
 
-const usersStatisticsAnalytics = async (startDate = null, endDate = null, groupBy = null, page = null, limit = null) => {
+const usersStatisticsAnalytics = async (startDate = null, endDate = null, groupBy = null, page, limit) => {
     let userStatistics;
 
     if (groupBy === 'plan') {

@@ -2,42 +2,67 @@ const Orders = require('../models/ordersModel');
 const { getVisitorCount } = require('../services/visitorService');
 const { getRefundData } = require('../services/refundService');
 
-const getOrders = async ({ page = 1, limit = 10, status, paymentMethod, userId, planName, minAmount, maxAmount, startDate, endDate }) => {
+
+
+const getOrders = async ({ page = 1, limit = 10, status = 'Completed', paymentMethod, userId, planName, minAmount, maxAmount, startDate, endDate, country, search }) => {
     // Build the filter object
     let filter = {};
 
+    // Filter by status
     if (status) {
         filter.status = new RegExp(status, 'i'); // Case insensitive search
     }
 
+    // Filter by payment method
     if (paymentMethod) {
         filter.paymentMethod = new RegExp(paymentMethod, 'i'); // Case insensitive search
     }
 
+    // Filter by user ID
     if (userId) {
         filter.userId = new RegExp(userId, 'i'); // Case insensitive search
     }
 
+    // Filter by plan name
     if (planName) {
         filter['planDetails.planName'] = new RegExp(planName, 'i'); // Case insensitive search
     }
 
+    // Filter by minimum amount
     if (minAmount) {
         filter['planDetails.amount'] = { $gte: Number(minAmount) };
     }
 
+    // Filter by maximum amount
     if (maxAmount) {
         filter['planDetails.amount'] = filter['planDetails.amount'] || {};
         filter['planDetails.amount'].$lte = Number(maxAmount);
     }
 
+    // Filter by start date
     if (startDate) {
         filter['orderDetails.purchase'] = { $gte: new Date(startDate) };
     }
 
+    // Filter by end date
     if (endDate) {
         filter['orderDetails.purchase'] = filter['orderDetails.purchase'] || {};
         filter['orderDetails.purchase'].$lte = new Date(endDate);
+    }
+
+    // Filter by country
+    if (country) {
+        filter['orderDetails.country'] = new RegExp(country, 'i'); // Case insensitive search
+    }
+
+    // General search across multiple fields
+    if (search) {
+        const searchRegExp = new RegExp(search, 'i'); // Case insensitive search
+        filter.$or = [
+            { 'orderDetails.email': searchRegExp },
+            { 'planDetails.planName': searchRegExp },
+            { 'orderDetails.country': searchRegExp }
+        ];
     }
 
     // Fetch orders with pagination
@@ -55,6 +80,7 @@ const getOrders = async ({ page = 1, limit = 10, status, paymentMethod, userId, 
         orders
     };
 };
+
 
 const getTotalOrderCount = async (plan = null, startDate = null, endDate = null) => {
     let filter = {};

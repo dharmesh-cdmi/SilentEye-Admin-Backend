@@ -4,10 +4,10 @@ const exportService = require('../../services/exportService');
 const fs = require('fs');
 
 const totalCountAnalytics = async (req, res) => {
-    const { addon, plan, page, action, startDate, endDate } = req.query;
+    const {plan, page, action, startDate, endDate } = req.query;
 
     try {
-        const analytic = await analyticService.analytics(addon, plan, page, action, startDate, endDate);
+        const analytic = await analyticService.analytics(plan, page, action, startDate, endDate);
 
         return apiSuccessResponse(res, 'Total count analytics retrieved successfully', analytic);
     } catch (error) {

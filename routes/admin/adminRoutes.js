@@ -12,9 +12,9 @@ router.post('/', adminController.createAdmin);
 router.get('/details', adminController.getAdminDetails);
 router.use('/analytics', analyticsController.totalCountAnalytics);
 router.use('/users-statistics', analyticsController.usersStatisticsAnalytics);
+router.get('/download-analytics', analyticsController.downloadAnalytics);
 router.use('/visitors/count', visitorController.getVisitorCount);
 router.use('/orders', oderController.getOrders);
-router.get('/download-analytics', analyticsController.downloadAnalytics);
 
 router.post(
     '/change-password',

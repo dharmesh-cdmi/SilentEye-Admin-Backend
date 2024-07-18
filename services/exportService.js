@@ -1,7 +1,7 @@
 const fs = require('fs');
 const ExcelJS = require('exceljs');
 
-const generateExcel = async (data, filePath) => {
+const generateHomePageAnalyticsExcel = async (data, filePath) => {
     if (!data || typeof data !== 'object') {
         throw new Error('Invalid data. Must be a non-empty object.');
     }
@@ -67,7 +67,7 @@ const generateExcel = async (data, filePath) => {
 const exportData = async (format, data) => {
     const filePath = `./downloads/export.${format}`;
     if (format === 'xlsx') {
-        await generateExcel(data, filePath);
+        await generateHomePageAnalyticsExcel(data, filePath);
     } else {
         throw new Error('Invalid format. Must be "xlsx".');
     }

@@ -16,13 +16,13 @@ const parseJSON = (value, originalValue) => {
 const timeSchema = yup.object().shape({
     quantity: yup.number().positive('Quantity must be positive'),
     unit: yup.string().oneOf(timeUnitEnum, 'Invalid time unit')
-});
+}).noUnknown(true, 'Unknown field in time data');
 
 const youTubeVideoPopUpSchema = yup.object().shape({
     status: yup.string().oneOf(['enabled', 'disabled'], 'Invalid status').required('Status is required'),
     title: yup.string().trim(),
     link: yup.string().trim()
-}).transform(parseJSON);
+}).transform(parseJSON).noUnknown(true, 'Unknown field in youtube video popup data');
 
 const salesNotificationSchema = yup.object().shape({
     status: yup.string().oneOf(['enabled', 'disabled'], 'Invalid status').required('Status is required'),
@@ -32,17 +32,17 @@ const salesNotificationSchema = yup.object().shape({
     cityState: yup.string().trim(),
     planName: yup.string().trim(),
     purchaseTime: yup.string().trim()
-}).transform(parseJSON);
+}).transform(parseJSON).noUnknown(true, 'Unknown field in sales notification data');
 
 const emailVerificationSchema = yup.object().shape({
     status: yup.string().oneOf(['enabled', 'disabled'], 'Invalid status').required('Status is required')
-}).transform(parseJSON);
+}).transform(parseJSON).noUnknown(true, 'Unknown field in email verification data');
 
 const offerPopUpSchema = yup.object().shape({
     status: yup.string().oneOf(['enabled', 'disabled'], 'Invalid status').required('Status is required'),
     delayed: timeSchema.required('Delayed time is required'),
     image: yup.string().trim()
-}).transform(parseJSON);
+}).transform(parseJSON).noUnknown(true, 'Unknown field in offer popup data');
 
 const createSettingsSchema = yup.object().shape({
     youTubeVideoPopUp: youTubeVideoPopUpSchema.required('YouTube Video PopUp settings are required'),

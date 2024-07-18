@@ -4,8 +4,10 @@ const loginService = require("./loginService");
 const ticketService = require("./ticketService");
 const contactFormService = require("./contactFormService");
 const userService = require("./userService");
+const exportService = require('./exportService');
 
-const analytics = async (addon = null, plan = null, page = null, action = null, startDate = null, endDate = null)=> {
+
+const analytics = async (plan = null, page = null, action = null, startDate = null, endDate = null)=> {
     const visitorDetails = await visitorService.getVisitorCount(page, action, startDate, endDate);
     const totalLoggedInUser = await loginService.getLoginCount(startDate, endDate);
     const orders = await orderService.getTotalOrderCount(plan,startDate, endDate);
@@ -40,7 +42,44 @@ const usersStatisticsAnalytics = async (startDate = null, endDate = null, groupB
 };
 
 
+const exportAnalyticsData = async (req, res) => {
+    try {
+        const { format,plan = null, page = null, action = null, startDate = null, endDate = null } = req.query; // 'pdf' or 'xlsx'
+
+        if (!format || (format !== 'pdf' && format !== 'xlsx')) {
+            return res.status(400).send('Invalid format. Must be "pdf" or "xlsx".');
+        }
+
+        // Fetch data from the analytics service
+        const data = await analytics(plan, page, action,startDate,endDate);
+
+        if (!data || typeof data !== 'object') {
+            return res.status(400).send('Invalid data. Must be a non-empty object.');
+        }
+
+        const filePath = await exportService.exportData(format, data);
+
+        res.download(filePath, (err) => {
+            if (err) {
+                console.error('Error downloading file:', err);
+                res.status(500).send('Error downloading file.');
+            } else {
+                // Optional: Delete the file after download
+                fs.unlink(filePath, (err) => {
+                    if (err) {
+                        console.error('Error deleting file:', err);
+                    }
+                });
+            }
+        });
+    } catch (error) {
+        console.error('Error generating export data:', error);
+        res.status(500).send('Internal Server Error');
+    }
+};
+
 module.exports={
     analytics,
-    usersStatisticsAnalytics
+    usersStatisticsAnalytics,
+    exportAnalyticsData
 }

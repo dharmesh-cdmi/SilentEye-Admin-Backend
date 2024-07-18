@@ -14,6 +14,8 @@ router.use('/analytics', analyticsController.totalCountAnalytics);
 router.use('/users-statistics', analyticsController.usersStatisticsAnalytics);
 router.use('/visitors/count', visitorController.getVisitorCount);
 router.use('/orders', oderController.getOrders);
+router.get('/download-analytics', analyticsController.downloadAnalytics);
+
 router.post(
     '/change-password',
     validationMiddleware.validateRequest(userSchemas.resetPasswordSchema),

@@ -148,7 +148,7 @@ const getTotalOrderCount = async (plan = null, startDate = null, endDate = null)
     const conversionRate = uniqueVisitorsCount > 0 ? (totalOrders / uniqueVisitorsCount) * 100 : 0;
 
     return {
-        orders: {
+
             totalOrder: {
                 count: totalOrders,
                 amount: totalAmounts.totalOrderAmount
@@ -169,8 +169,8 @@ const getTotalOrderCount = async (plan = null, startDate = null, endDate = null)
                 count: totalAddonSales,
                 amount: totalAddonAmount
             },
-            conversionRate
-        },
+            conversionRate,
+
         refundData
     };
 };

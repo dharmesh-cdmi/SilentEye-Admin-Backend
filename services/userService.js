@@ -263,7 +263,7 @@ const getUserStatistics = async (startDate = null, endDate = null) => {
     const result = await User.aggregate(pipeline);
 
     // Filter out any documents with _id set to null
-    const filteredResult = result.filter(item => item._id !== null);
+    const planStatistics = result.filter(item => item._id !== null);
 
 
        // Execute both pipelines
@@ -271,8 +271,8 @@ const getUserStatistics = async (startDate = null, endDate = null) => {
 
        // Combine results
        const combinedResult = {
-        filteredResult,
-         addonStatistics
+        planStatistics,
+        addonStatistics
        };
    
       return combinedResult;
@@ -367,7 +367,7 @@ const getUserStatisticsByCountry = async (startDate = null, endDate = null) => {
       },
       {
         $addFields: {
-          totalDemoVisitors: {
+          totalDemoUser: {
             $size: {
               $filter: {
                 input: "$visitors",
@@ -392,8 +392,8 @@ const getUserStatisticsByCountry = async (startDate = null, endDate = null) => {
           totalPaymentInitiated: 1,
           totalPlan: 1,
           country: "$_id",
-          plans: 1,
-          totalDemoVisitors: 1,
+          // plans: 1,
+          totalDemoUser: 1,
           _id: 0
         }
       }

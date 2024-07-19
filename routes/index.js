@@ -18,6 +18,8 @@ const authRoutes = require('./authRoutes');
 const userRoutes = require('./userRoutes');
 const { verifyAdmin } = require('../middleware/authMiddleware');
 
+
+
 const router = express.Router();
 
 // Set up routes
@@ -28,6 +30,7 @@ router.use('/extension', extensionRoutes);
 router.use('/content-manage', contentManageRoutes);
 router.use('/', authRoutes);
 router.use('/admin', verifyAdmin, adminRoutes);
+
 router.use('/payment', paymentRoutes);
 router.use('/payment-gateway', paymentGatewayRoutes);
 router.use('/product', productRoutes);

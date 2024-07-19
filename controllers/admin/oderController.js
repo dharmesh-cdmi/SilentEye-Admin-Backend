@@ -4,10 +4,10 @@ const { apiSuccessResponse, apiErrorResponse, HTTP_STATUS } = require('../../uti
 const getOrdersController = async (req, res) => {
     try {
         // Extract query parameters
-        const { page, limit, status, paymentMethod, userId, planName, minAmount, maxAmount, startDate, endDate } = req.query;
+        const { page, limit, status, paymentMethod, userId, planName, minAmount, maxAmount, startDate, endDate, country,search} = req.query;
 
         // Call the service function
-        const result = await getOrders({ page, limit, status, paymentMethod, userId, planName, minAmount, maxAmount, startDate, endDate });
+        const result = await getOrders({ page, limit, status, paymentMethod, userId, planName, minAmount, maxAmount, startDate, endDate, country,search});
 
         return apiSuccessResponse(res, 'Orders retrieved successfully', result);
     } catch (error) {

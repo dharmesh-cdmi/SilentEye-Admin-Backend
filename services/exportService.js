@@ -64,6 +64,42 @@ const generateHomePageAnalyticsExcel = async (data, filePath) => {
     await workbook.xlsx.writeFile(filePath);
 };
 
+
+const exportOrdersToExcel = async (orders) => {
+    const workbook = new ExcelJS.Workbook();
+    const worksheet = workbook.addWorksheet('Orders');
+
+    // Add header row
+    worksheet.columns = [
+        { header: 'Order ID', key: 'orderId', width: 20 },
+        { header: 'Email Id', key: 'email', width: 20 },
+        { header: 'Country', key: 'country', width: 20 },
+        { header: 'Checkout', key: 'purchaseDate', width: 20 },
+        { header: 'Plan', key: 'planName', width: 20 },
+        { header: 'Amount', key: 'amount', width: 10 },
+        { header: 'Method', key: 'paymentMethod', width: 10 }
+    ];
+
+    // Add data rows
+    orders.forEach(order => {
+        worksheet.addRow({
+            orderId: order._id,
+            userId: order.userId,
+            planName: order.planDetails.planName,
+            amount: order.planDetails.amount,
+            purchaseDate: order.orderDetails.purchase,
+            country: order.orderDetails.country,
+            status: order.status
+        });
+    });
+
+    // Create buffer and return
+    const buffer = await workbook.xlsx.writeBuffer();
+    return buffer;
+};
+
+
+
 const exportData = async (format, data) => {
     const filePath = `./downloads/export.${format}`;
     if (format === 'xlsx') {
@@ -76,4 +112,5 @@ const exportData = async (format, data) => {
 
 module.exports = {
     exportData,
+    exportOrdersToExcel
 };

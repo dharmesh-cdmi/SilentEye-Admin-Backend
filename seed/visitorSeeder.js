@@ -18,7 +18,7 @@ async function seedVisitors() {
       const visitor = new Visitor({
         page: faker.helpers.arrayElement(['home', 'Checkout', 'Plan']),
         visitDate: faker.date.recent(),
-        action: faker.helpers.arrayElement(['Visit', 'Checkout', 'Demo', 'Order Placed', 'Login']),
+        action: faker.helpers.arrayElement(['Visit', 'Checkout', 'Demo', 'Order', 'Login']),
         isVisit: faker.datatype.boolean(),
         country: faker.location.country(),
         device: faker.internet.userAgent(),

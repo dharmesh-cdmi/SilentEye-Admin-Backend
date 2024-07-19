@@ -4,6 +4,7 @@ const connectDB = require('../configs/db.config');
 
 const planSeeder = async () => {
   connectDB();
+  
   const plans = [
     {
       name: 'Premium',
@@ -11,7 +12,7 @@ const planSeeder = async () => {
       mrp: 120,
       discountPercent: 20,
       status: 'live',
-      paymentGatewayId: 'pg_001',
+      paymentGatewayId: null, // Set to null or remove if not applicable
       pgPlanId: 'pg_plan_premium',
       pgPriceId: 'pg_price_premium'
     },
@@ -21,21 +22,13 @@ const planSeeder = async () => {
       mrp: 60,
       discountPercent: 16.67,
       status: 'live',
-      paymentGatewayId: 'pg_002',
+      paymentGatewayId: null, // Set to null or remove if not applicable
       pgPlanId: 'pg_plan_standard',
       pgPriceId: 'pg_price_standard'
     }
   ];
 
-  // Calculate discountValue, tag, and amount before seeding
-  plans.forEach(plan => {
-    if (plan.discountPercent && plan.mrp) {
-      plan.discountValue = (plan.mrp * plan.discountPercent) / 100;
-      plan.tag = `${plan.discountPercent.toFixed(2)}% OFF`;
-      plan.amount = plan.mrp - plan.discountValue;
-    }
-  });
-
+  // No need to manually calculate discountValue, tag, and amount since it's handled in pre-validate hook
   try {
     await Plan.deleteMany({});
     await Plan.insertMany(plans);

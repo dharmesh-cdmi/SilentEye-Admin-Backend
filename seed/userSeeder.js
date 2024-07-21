@@ -11,9 +11,8 @@ const userSeeder = async () => {
   // Find all necessary plans
   const premiumPlan = await Plan.findOne({ name: 'Premium' });
   const standardPlan = await Plan.findOne({ name: 'Standard' });
-  const demoPlan = await Plan.findOne({ name: 'Demo' });
 
-  if (!premiumPlan || !standardPlan || !demoPlan) {
+  if (!premiumPlan || !standardPlan ) {
     console.error('Plans not found. Ensure plans are seeded before running user seeder.');
     return;
   }
@@ -33,9 +32,6 @@ const userSeeder = async () => {
       case 1:
         selectedPlan = standardPlan._id;
         break;
-      case 2:
-        selectedPlan = demoPlan._id;
-        break;
       default:
         selectedPlan = premiumPlan._id; // Default to premium plan if random index is out of range
         break;
@@ -54,6 +50,7 @@ const userSeeder = async () => {
         address: faker.address.streetAddress()
       },
       status: faker.helpers.arrayElement(['active', 'inactive']),
+      ipAddress:'127.0.0.1',
       lastLoggedInAt: faker.date.recent(),
       createdAt: faker.date.past(),
       updatedAt: faker.date.recent(),

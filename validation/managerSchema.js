@@ -10,7 +10,7 @@ const createManagerSchema = yup.object().shape({
     skype: yup.string().trim().required('Skype is required'),
     status: yup.string().oneOf(['active', 'inactive'], 'Invalid status').required('Status is required'),
     order: yup.number().required('Order is required'),
-    live: yup.boolean().default(false)
+    live: yup.boolean().default(true)
 }).noUnknown(true, 'Unknown field in manager data');
 
 const updateManagerSchema = yup.object().shape({

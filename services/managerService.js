@@ -60,7 +60,7 @@ const createManager = async (data) => {
         whatsapp: data.whatsapp,
         skype: data.skype,
         order: data.order,
-        live: false,
+        live: data.live || true,
     });
 
     manager.managerInfo = managerDetails._id;

@@ -13,7 +13,9 @@ jobs:
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v3
-
+      - name: Set Permissions for Repository
+        run: sudo chmod -R 755 /var/www/html/actions-runner/_work/SilentEye-Admin-Backend/SilentEye-Admin-Backend
+        
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:

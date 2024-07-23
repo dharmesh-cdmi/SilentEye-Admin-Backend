@@ -11,9 +11,11 @@ jobs:
     runs-on: self-hosted
 
     steps:
-      - name: Set Permissions for Repository
-        run: sudo chmod -R 755 /var/www/html/actions-runner/_work/SilentEye-Admin-Backend/SilentEye-Admin-Backend
-        
+      - name: Adjust Permissions
+        run: |
+          sudo chown -R $USER:$USER /var/www/html/actions-runner/_work/SilentEye-Admin-Backend/SilentEye-Admin-Backend
+          sudo chmod -R 755 /var/www/html/actions-runner/_work/SilentEye-Admin-Backend/SilentEye-Admin-Backend
+
       - name: Checkout Repository
         uses: actions/checkout@v3
 

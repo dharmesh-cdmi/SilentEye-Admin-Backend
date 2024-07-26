@@ -27,7 +27,7 @@ const fetchAllManagers = async (queryParams) => {
         .sort({ createdAt: order === 'asc' ? 1 : -1 })
         .skip((page - 1) * limit)
         .limit(limit)
-        .populate('managerInfo', 'userLimit whatsapp skype assignedUsersCount');
+        .populate('managerInfo', 'userLimit whatsapp skype assignedUsersCount order live');
 
     return {
         managers,
@@ -60,6 +60,7 @@ const createManager = async (data) => {
         whatsapp: data.whatsapp,
         skype: data.skype,
         order: data.order,
+        live: data.live || true,
     });
 
     manager.managerInfo = managerDetails._id;
@@ -95,6 +96,7 @@ const updateManager = async (id, data) => {
     if (data.whatsapp) managerDetails.whatsapp = data.whatsapp;
     if (data.skype) managerDetails.skype = data.skype;
     if (data.order !== undefined) managerDetails.order = data.order;
+    if (data.live !== undefined) managerDetails.live = data.live;
 
     await manager.save();
     return await managerDetails.save();

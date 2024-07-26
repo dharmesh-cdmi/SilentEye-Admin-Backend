@@ -6,8 +6,10 @@ const { getRefundData } = require('../services/refundService');
 
 const getOrders = async ({ page = 1, limit = 10, status = 'Completed', paymentMethod, userId, planName, minAmount, maxAmount, startDate, endDate, country, search,orderId }) => {
     // Build the filter object
-    let filter = {};
 
+    let filter = {
+        deletedAt: null // Exclude deleted orders
+    };
    // Filter by order ID
    if (orderId) {
         filter._id = orderId;
@@ -87,6 +89,15 @@ const getOrders = async ({ page = 1, limit = 10, status = 'Completed', paymentMe
     };
 };
 
+const getOrderDetails = async (orderId) => {
+    const order = await Orders.findOne({ _id: orderId, deletedAt: null });
+
+    if (!order) {
+        return { error: 'Order not found' };
+    }
+
+    return { order };
+};
 
 const getTotalOrderCount = async (plan = null, startDate = null, endDate = null) => {
     let filter = {};
@@ -257,7 +268,31 @@ const getTotalAmounts = async (filter) => {
     };
 }; 
 
+const deleteOrder = async (orderId) => {
+    // Find the order by ID
+    const order = await Orders.findById(orderId);
+
+    if (!order) {
+        return { error: 'Order not found' };
+    }
+
+    // Check if the order is already deleted
+    if (order.deletedAt) {
+        return { error: 'Order already deleted' };
+    }
+
+    // Update the deletedAt field
+    order.deletedAt = new Date();
+
+    await order.save();
+
+    return { order };
+};
+
+
 module.exports = {
     getOrders,
-    getTotalOrderCount
+    getTotalOrderCount,
+    deleteOrder,
+    getOrderDetails
 };

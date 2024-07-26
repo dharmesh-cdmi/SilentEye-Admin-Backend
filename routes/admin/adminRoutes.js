@@ -15,6 +15,8 @@ router.get('/users-statistics', analyticsController.usersStatisticsAnalytics);
 router.get('/download-analytics', analyticsController.downloadAnalytics);
 router.get('/visitors/count', visitorController.getVisitorCount);
 router.get('/orders', oderController.getOrders);
+router.get('/orders/:orderId', oderController.getOrdersDetails);
+router.delete('/orders-delete/:orderId', oderController.deleteOrders);
 router.get('/download-orders', oderController.downloadorderDetails);
 
 router.post(

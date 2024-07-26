@@ -290,9 +290,46 @@ const deleteOrder = async (orderId) => {
 };
 
 
+/**
+ * Initiates a refund for a given order.
+ *
+ * @param {string} orderId - The ID of the order to refund.
+ * @param {string} refundReason - The reason for the refund.
+ * @returns {Object} - A result object with success or error message.
+ */
+const initiateRefund = async (orderId, refundReason,refundRequestId) => {
+    // Find the order by ID, ensuring it's not deleted
+    const order = await Orders.findOne({ _id: orderId, deletedAt: null });
+    if (!order) {
+        return { error: 'Order not found' };
+    }
+
+    // Check if the order is already refunded
+    if (order.status === 'Refunded') {
+        return { error: 'Order already refunded' };
+    }
+
+    // Create refund details
+    const refundAmount = order.planDetails.amount; // Use the amount from the order
+
+    // Update the order with refund details
+    order.status = 'Refunded';
+    order.refundDetails = {
+        refundRequestId,
+        refundAmount,
+        refundReason,
+        refundDate: new Date()
+    };
+    await order.save();
+
+    return { success: true };
+};
+
+
 module.exports = {
     getOrders,
     getTotalOrderCount,
     deleteOrder,
-    getOrderDetails
+    getOrderDetails,
+    initiateRefund
 };

@@ -10,12 +10,17 @@ const userSchemas = require('../../validation/userSchemas');
 // Route to create a new admin
 router.post('/', adminController.createAdmin);
 router.get('/details', adminController.getAdminDetails);
+
+//visitors
 router.get('/analytics', analyticsController.totalCountAnalytics);
 router.get('/users-statistics', analyticsController.usersStatisticsAnalytics);
 router.get('/download-analytics', analyticsController.downloadAnalytics);
 router.get('/visitors/count', visitorController.getVisitorCount);
+
+//orders
 router.get('/orders', oderController.getOrders);
 router.get('/orders/:orderId', oderController.getOrdersDetails);
+router.post('/order/:orderId/refund-initiate', oderController.initiateRefund);
 router.delete('/orders-delete/:orderId', oderController.deleteOrders);
 router.get('/download-orders', oderController.downloadorderDetails);
 

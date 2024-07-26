@@ -68,10 +68,27 @@ const deleteOrders = async (req, res) => {
 };
 
 
+const initiateRefund= async (req, res) => {
+    const { orderId } = req.params;
+    const {refundReason,refundRequestId } = req.body;
+
+    try {
+        const result = await orderService.initiateRefund(orderId, refundReason,refundRequestId);
+        if (result.error) {
+            return res.status(400).json({ success: false, message: result.error });
+        }
+        return apiSuccessResponse(res, 'Refund initiated successfully', result);
+    } catch (error) {
+        return apiErrorResponse(res, error.message, null, HTTP_STATUS.INTERNAL_SERVER_ERROR);
+    }
+}
+
+
 
 module.exports = {
     getOrders: getOrdersController,
     getOrdersDetails,
     downloadorderDetails,
-    deleteOrders
+    deleteOrders,
+    initiateRefund
 };

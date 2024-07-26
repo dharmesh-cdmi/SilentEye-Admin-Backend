@@ -290,13 +290,7 @@ const deleteOrder = async (orderId) => {
 };
 
 
-/**
- * Initiates a refund for a given order.
- *
- * @param {string} orderId - The ID of the order to refund.
- * @param {string} refundReason - The reason for the refund.
- * @returns {Object} - A result object with success or error message.
- */
+
 const initiateRefund = async (orderId, refundReason,refundRequestId) => {
     // Find the order by ID, ensuring it's not deleted
     const order = await Orders.findOne({ _id: orderId, deletedAt: null });

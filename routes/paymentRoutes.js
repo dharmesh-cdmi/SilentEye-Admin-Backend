@@ -3,7 +3,7 @@ const express = require('express');
 const router = express.Router();
 const paymentController = require('../controllers/paymentController');
 
-console.log('Payment routes loaded');
+// console.log('Payment routes loaded');
 
 router.post(
   '/create-checkout-session',

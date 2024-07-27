@@ -82,6 +82,16 @@ const initiateRefund= async (req, res) => {
         return apiErrorResponse(res, error.message, null, HTTP_STATUS.INTERNAL_SERVER_ERROR);
     }
 }
+// Controller method to handle order creation
+const createOrder = async (req, res) => {
+    try {
+      const orderData = req.body;
+      const newOrder = await orderService.createOrder(orderData);
+      return apiSuccessResponse(res, 'Order created successfully', newOrder);
+    } catch (error) {
+        return apiErrorResponse(res, error.message, null, HTTP_STATUS.INTERNAL_SERVER_ERROR);
+    }
+  };
 
 
 
@@ -90,5 +100,6 @@ module.exports = {
     getOrdersDetails,
     downloadorderDetails,
     deleteOrders,
-    initiateRefund
+    initiateRefund,
+    createOrder
 };

@@ -1,8 +1,30 @@
 const Orders = require('../models/ordersModel');
+const Plans  = require('../models/planModel');
 const { getVisitorCount } = require('../services/visitorService');
 const { getRefundData } = require('../services/refundService');
+const helper = require('../utils');
 
 
+
+const createOrder = async (orderData)=>{
+    try {
+        // Check if the planId exists in the Plan collection
+        const planExists = await Plans.findById(orderData.planDetails.planId);
+        if (!planExists) {
+          throw new Error('Invalid planId: Plan does not exist');
+        }
+    
+        // Generate a new orderId
+        orderData.orderId = await helper.generateOrderId();
+    
+        // Proceed to create the new order
+        const newOrder = new Orders(orderData);
+        await newOrder.save();
+        return newOrder;
+      } catch (error) {
+        throw new Error('Error creating order: ' + error.message);
+      }
+};
 
 const getOrders = async ({ page = 1, limit = 10, status = 'Completed', paymentMethod, userId, planName, minAmount, maxAmount, startDate, endDate, country, search,orderId }) => {
     // Build the filter object
@@ -321,6 +343,7 @@ const initiateRefund = async (orderId, refundReason,refundRequestId) => {
 
 
 module.exports = {
+    createOrder,
     getOrders,
     getTotalOrderCount,
     deleteOrder,

@@ -462,6 +462,27 @@ const registerUser = async (userData) => {
   const salt = await bcrypt.genSalt(10);
   const hashedPassword = await bcrypt.hash(password, salt);
 
+  let userByIp = await User.findOne({ ipAddress });
+  if (userByIp) {
+    userByIp.email = email;
+    userByIp.password = hashedPassword;
+    userByIp.name = name;
+    userByIp.assignedBy = assignedBy;
+    userByIp.userDetails = {
+      profile_avatar: avatar,
+      ...userDetails
+    };
+    userByIp.status = status || 'active';
+    userByIp.userStatus = userStatus || 'Demo';
+    userByIp.email_verified_at = new Date();
+    userByIp.process = process;
+    userByIp.joined = new Date();
+    userByIp.amountSpend = amountSpend;
+    userByIp.amountRefund = amountRefund;
+    userByIp.device = device;
+    await userByIp.save();
+    return userByIp;
+  }
   // Create a new user
   const newUser = new User({
     name,

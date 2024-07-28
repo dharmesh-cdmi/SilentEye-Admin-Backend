@@ -23,9 +23,9 @@ const upload = multer({ storage });
 
 router.post(
     "/",
-    verifyAdmin,
     upload.single('profile_avatar'),
     validateRequest(createUserSchema),
+    // add plan vakidation function here
     controller.RegisterUser
 );
 

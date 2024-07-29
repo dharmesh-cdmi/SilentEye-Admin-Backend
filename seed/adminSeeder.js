@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
-const connectDB = require('../../configs/db.config');
-const Admin = require('../../models/admin/adminModel');
+const connectDB = require('../configs/db.config');
+const Admin = require('../models/admin/adminModel');
 
 // Sample Admin Data
 const admins = [
@@ -13,7 +13,6 @@ const admins = [
     password: '123456',  // Plain text password
     role: 'admin',
     status: 'active',
-    remember_token: null,
     createdAt: new Date(),
     updatedAt: new Date(),
   },
@@ -25,7 +24,6 @@ const admins = [
     password: '123456',  // Plain text password
     role: 'manager',
     status: 'active',
-    remember_token: null,
     createdAt: new Date(),
     updatedAt: new Date(),
   },

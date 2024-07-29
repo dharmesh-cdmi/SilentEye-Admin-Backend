@@ -1,14 +1,30 @@
 // controllers/productController.js
 
 const productService = require('../services/productService');
+const {
+  apiSuccessResponse,
+  apiErrorResponse,
+  HTTP_STATUS_MESSAGE,
+  HTTP_STATUS,
+} = require('../utils/responseHelper');
 
 // Create a new product
 const createProduct = async (req, res) => {
   try {
     const product = await productService.createProduct(req.body);
-    res.status(201).json(product);
+    return apiSuccessResponse(
+      res,
+      HTTP_STATUS_MESSAGE[201],
+      product,
+      HTTP_STATUS.CREATED
+    );
   } catch (error) {
-    res.status(400).json({ error: error.message });
+    return apiErrorResponse(
+      res,
+      HTTP_STATUS_MESSAGE[500],
+      error?.message ?? error,
+      HTTP_STATUS.INTERNAL_SERVER_ERROR
+    );
   }
 };
 
@@ -17,9 +33,19 @@ const getAllProducts = async (req, res) => {
   try {
     const { page = 1, limit = 10 } = req.query;
     const products = await productService.getAllProducts(page, limit);
-    res.status(200).json(products);
+    return apiSuccessResponse(
+      res,
+      HTTP_STATUS_MESSAGE[200],
+      products,
+      HTTP_STATUS.OK
+    );
   } catch (error) {
-    res.status(400).json({ error: error.message });
+    return apiErrorResponse(
+      res,
+      HTTP_STATUS_MESSAGE[500],
+      error?.message ?? error,
+      HTTP_STATUS.INTERNAL_SERVER_ERROR
+    );
   }
 };
 
@@ -27,9 +53,19 @@ const getAllProducts = async (req, res) => {
 const getProductById = async (req, res) => {
   try {
     const product = await productService.getProductById(req.params.id);
-    res.status(200).json(product);
+    return apiSuccessResponse(
+      res,
+      HTTP_STATUS_MESSAGE[200],
+      product,
+      HTTP_STATUS.OK
+    );
   } catch (error) {
-    res.status(400).json({ error: error.message });
+    return apiErrorResponse(
+      res,
+      HTTP_STATUS_MESSAGE[500],
+      error?.message ?? error,
+      HTTP_STATUS.INTERNAL_SERVER_ERROR
+    );
   }
 };
 
@@ -37,9 +73,19 @@ const getProductById = async (req, res) => {
 const updateProduct = async (req, res) => {
   try {
     const product = await productService.updateProduct(req.params.id, req.body);
-    res.status(200).json(product);
+    return apiSuccessResponse(
+      res,
+      HTTP_STATUS_MESSAGE[200],
+      product,
+      HTTP_STATUS.OK
+    );
   } catch (error) {
-    res.status(400).json({ error: error.message });
+    return apiErrorResponse(
+      res,
+      HTTP_STATUS_MESSAGE[500],
+      error?.message ?? error,
+      HTTP_STATUS.INTERNAL_SERVER_ERROR
+    );
   }
 };
 
@@ -47,9 +93,19 @@ const updateProduct = async (req, res) => {
 const deleteProduct = async (req, res) => {
   try {
     await productService.deleteProduct(req.params.id);
-    res.status(200).json({ message: 'Product deleted successfully' });
+    return apiSuccessResponse(
+      res,
+      HTTP_STATUS_MESSAGE[200],
+      { message: 'Product deleted successfully' },
+      HTTP_STATUS.OK
+    );
   } catch (error) {
-    res.status(400).json({ error: error.message });
+    return apiErrorResponse(
+      res,
+      HTTP_STATUS_MESSAGE[500],
+      error?.message ?? error,
+      HTTP_STATUS.INTERNAL_SERVER_ERROR
+    );
   }
 };
 

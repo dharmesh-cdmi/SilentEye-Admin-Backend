@@ -1,4 +1,10 @@
 const refundRequestService = require('../services/refundRequestService');
+const {
+  apiSuccessResponse,
+  apiErrorResponse,
+  HTTP_STATUS_MESSAGE,
+  HTTP_STATUS,
+} = require('../utils/responseHelper');
 
 // Create a new refund request
 const createRefundRequest = async (req, res) => {
@@ -6,9 +12,19 @@ const createRefundRequest = async (req, res) => {
     const refundRequest = await refundRequestService.createRefundRequest(
       req.body
     );
-    res.status(201).json(refundRequest);
+    return apiSuccessResponse(
+      res,
+      HTTP_STATUS_MESSAGE[201],
+      refundRequest,
+      HTTP_STATUS.CREATED
+    );
   } catch (error) {
-    res.status(400).json({ status: true, error: true, message: error.message });
+    return apiErrorResponse(
+      res,
+      HTTP_STATUS_MESSAGE[500],
+      error?.message ?? error,
+      HTTP_STATUS.INTERNAL_SERVER_ERROR
+    );
   }
 };
 
@@ -20,9 +36,19 @@ const getAllRefundRequests = async (req, res) => {
       page,
       limit
     );
-    res.status(200).json(refundRequests);
+    return apiSuccessResponse(
+      res,
+      HTTP_STATUS_MESSAGE[200],
+      refundRequests,
+      HTTP_STATUS.OK
+    );
   } catch (error) {
-    res.status(400).json({ status: true, error: true, message: error.message });
+    return apiErrorResponse(
+      res,
+      HTTP_STATUS_MESSAGE[500],
+      error?.message ?? error,
+      HTTP_STATUS.INTERNAL_SERVER_ERROR
+    );
   }
 };
 
@@ -32,9 +58,19 @@ const getRefundRequestById = async (req, res) => {
     const refundRequest = await refundRequestService.getRefundRequestById(
       req.params.id
     );
-    res.status(200).json(refundRequest);
+    return apiSuccessResponse(
+      res,
+      HTTP_STATUS_MESSAGE[200],
+      refundRequest,
+      HTTP_STATUS.OK
+    );
   } catch (error) {
-    res.status(400).json({ status: true, error: true, message: error.message });
+    return apiErrorResponse(
+      res,
+      HTTP_STATUS_MESSAGE[500],
+      error?.message ?? error,
+      HTTP_STATUS.INTERNAL_SERVER_ERROR
+    );
   }
 };
 
@@ -45,9 +81,19 @@ const updateRefundRequest = async (req, res) => {
       req.params.id,
       req.body
     );
-    res.status(200).json(refundRequest);
+    return apiSuccessResponse(
+      res,
+      HTTP_STATUS_MESSAGE[200],
+      refundRequest,
+      HTTP_STATUS.OK
+    );
   } catch (error) {
-    res.status(400).json({ status: true, error: true, message: error.message });
+    return apiErrorResponse(
+      res,
+      HTTP_STATUS_MESSAGE[500],
+      error?.message ?? error,
+      HTTP_STATUS.INTERNAL_SERVER_ERROR
+    );
   }
 };
 
@@ -55,9 +101,19 @@ const updateRefundRequest = async (req, res) => {
 const deleteRefundRequest = async (req, res) => {
   try {
     await refundRequestService.deleteRefundRequest(req.params.id);
-    res.status(204).send();
+    return apiSuccessResponse(
+      res,
+      HTTP_STATUS_MESSAGE[200],
+      { message: 'Request deleted successfully' },
+      HTTP_STATUS.OK
+    );
   } catch (error) {
-    res.status(400).json({ status: true, error: true, message: error.message });
+    return apiErrorResponse(
+      res,
+      HTTP_STATUS_MESSAGE[500],
+      error?.message ?? error,
+      HTTP_STATUS.INTERNAL_SERVER_ERROR
+    );
   }
 };
 

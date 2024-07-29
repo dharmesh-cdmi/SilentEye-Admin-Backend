@@ -5,7 +5,7 @@ const { Schema } = mongoose;
 const userDetailsSchema = new Schema({
   profile_avatar: { type: String },
   country: { type: String },
-  phone: { type: Number },
+  phone: { type: String },
   address: { type: String },
 }, { _id: false });
 
@@ -16,9 +16,13 @@ const userSchema = new Schema({
   email_verified_at: { type: Date, required: true },
   password: { type: String, required: true },
   assignedBy: { type: Schema.Types.ObjectId, ref: 'Admin' },
+  activePlanId: { type: Schema.Types.ObjectId, ref: 'Plan' },
   userDetails: userDetailsSchema,
   status: { type: String, enum: ['active', 'inactive'], default: 'active' },
-  remember_token: { type: String },
+  refreshToken: {
+    type: String,
+    required: false,
+  },
   lastLoggedInAt: { type: Date },
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now },

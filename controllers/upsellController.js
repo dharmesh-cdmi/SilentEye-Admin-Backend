@@ -1,14 +1,30 @@
 // controllers/upsellController.js
 
 const upsellService = require('../services/upsellService');
+const {
+  apiSuccessResponse,
+  apiErrorResponse,
+  HTTP_STATUS_MESSAGE,
+  HTTP_STATUS,
+} = require('../utils/responseHelper');
 
 // Create a new upsell
 const createUpsell = async (req, res) => {
   try {
     const upsell = await upsellService.createUpsell(req.body);
-    res.status(201).json(upsell);
+    return apiSuccessResponse(
+      res,
+      HTTP_STATUS_MESSAGE[201],
+      upsell,
+      HTTP_STATUS.CREATED
+    );
   } catch (error) {
-    res.status(400).json({ error: error.message });
+    return apiErrorResponse(
+      res,
+      HTTP_STATUS_MESSAGE[500],
+      error?.message ?? error,
+      HTTP_STATUS.INTERNAL_SERVER_ERROR
+    );
   }
 };
 
@@ -17,9 +33,19 @@ const getAllUpsells = async (req, res) => {
   try {
     const { page = 1, limit = 10 } = req.query;
     const upsells = await upsellService.getAllUpsells(page, limit);
-    res.status(200).json(upsells);
+    return apiSuccessResponse(
+      res,
+      HTTP_STATUS_MESSAGE[200],
+      upsells,
+      HTTP_STATUS.OK
+    );
   } catch (error) {
-    res.status(400).json({ error: error.message });
+    return apiErrorResponse(
+      res,
+      HTTP_STATUS_MESSAGE[500],
+      error?.message ?? error,
+      HTTP_STATUS.INTERNAL_SERVER_ERROR
+    );
   }
 };
 
@@ -27,9 +53,19 @@ const getAllUpsells = async (req, res) => {
 const getUpsellById = async (req, res) => {
   try {
     const upsell = await upsellService.getUpsellById(req.params.id);
-    res.status(200).json(upsell);
+    return apiSuccessResponse(
+      res,
+      HTTP_STATUS_MESSAGE[200],
+      upsell,
+      HTTP_STATUS.OK
+    );
   } catch (error) {
-    res.status(400).json({ error: error.message });
+    return apiErrorResponse(
+      res,
+      HTTP_STATUS_MESSAGE[500],
+      error?.message ?? error,
+      HTTP_STATUS.INTERNAL_SERVER_ERROR
+    );
   }
 };
 
@@ -37,9 +73,19 @@ const getUpsellById = async (req, res) => {
 const updateUpsell = async (req, res) => {
   try {
     const upsell = await upsellService.updateUpsell(req.params.id, req.body);
-    res.status(200).json(upsell);
+    return apiSuccessResponse(
+      res,
+      HTTP_STATUS_MESSAGE[200],
+      upsell,
+      HTTP_STATUS.OK
+    );
   } catch (error) {
-    res.status(400).json({ error: error.message });
+    return apiErrorResponse(
+      res,
+      HTTP_STATUS_MESSAGE[500],
+      error?.message ?? error,
+      HTTP_STATUS.INTERNAL_SERVER_ERROR
+    );
   }
 };
 
@@ -47,9 +93,19 @@ const updateUpsell = async (req, res) => {
 const deleteUpsell = async (req, res) => {
   try {
     await upsellService.deleteUpsell(req.params.id);
-    res.status(200).json({ message: 'Upsell deleted successfully' });
+    return apiSuccessResponse(
+      res,
+      HTTP_STATUS_MESSAGE[200],
+      { message: 'Upsell deleted successfully' },
+      HTTP_STATUS.OK
+    );
   } catch (error) {
-    res.status(400).json({ error: error.message });
+    return apiErrorResponse(
+      res,
+      HTTP_STATUS_MESSAGE[500],
+      error?.message ?? error,
+      HTTP_STATUS.INTERNAL_SERVER_ERROR
+    );
   }
 };
 

@@ -1,12 +1,28 @@
 const discountService = require('../services/discountService');
+const {
+  apiSuccessResponse,
+  apiErrorResponse,
+  HTTP_STATUS_MESSAGE,
+  HTTP_STATUS,
+} = require('../utils/responseHelper');
 
 // Create a new discount
 const createDiscount = async (req, res) => {
   try {
     const discount = await discountService.createDiscount(req.body);
-    res.status(201).json(discount);
+    return apiSuccessResponse(
+      res,
+      HTTP_STATUS_MESSAGE[201],
+      discount,
+      HTTP_STATUS.CREATED
+    );
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    return apiErrorResponse(
+      res,
+      HTTP_STATUS_MESSAGE[500],
+      error?.message ?? error,
+      HTTP_STATUS.INTERNAL_SERVER_ERROR
+    );
   }
 };
 
@@ -15,9 +31,19 @@ const getAllDiscounts = async (req, res) => {
   try {
     const { page = 1, limit = 10 } = req.query;
     const discounts = await discountService.getAllDiscounts(page, limit);
-    res.status(200).json(discounts);
+    return apiSuccessResponse(
+      res,
+      HTTP_STATUS_MESSAGE[200],
+      discounts,
+      HTTP_STATUS.OK
+    );
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    return apiErrorResponse(
+      res,
+      HTTP_STATUS_MESSAGE[500],
+      error?.message ?? error,
+      HTTP_STATUS.INTERNAL_SERVER_ERROR
+    );
   }
 };
 
@@ -26,11 +52,26 @@ const getDiscountById = async (req, res) => {
   try {
     const discount = await discountService.getDiscountById(req.params.id);
     if (!discount) {
-      return res.status(404).json({ message: 'Discount not found' });
+      return apiErrorResponse(
+        res,
+        HTTP_STATUS_MESSAGE[404],
+        { message: 'Discount not found' },
+        HTTP_STATUS.NOT_FOUND
+      );
     }
-    res.status(200).json(discount);
+    return apiSuccessResponse(
+      res,
+      HTTP_STATUS_MESSAGE[200],
+      discount,
+      HTTP_STATUS.OK
+    );
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    return apiErrorResponse(
+      res,
+      HTTP_STATUS_MESSAGE[500],
+      error?.message ?? error,
+      HTTP_STATUS.INTERNAL_SERVER_ERROR
+    );
   }
 };
 
@@ -42,11 +83,26 @@ const updateDiscount = async (req, res) => {
       req.body
     );
     if (!discount) {
-      return res.status(404).json({ message: 'Discount not found' });
+      return apiErrorResponse(
+        res,
+        HTTP_STATUS_MESSAGE[404],
+        { message: 'Discount not found' },
+        HTTP_STATUS.NOT_FOUND
+      );
     }
-    res.status(200).json(discount);
+    return apiSuccessResponse(
+      res,
+      HTTP_STATUS_MESSAGE[200],
+      discount,
+      HTTP_STATUS.OK
+    );
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    return apiErrorResponse(
+      res,
+      HTTP_STATUS_MESSAGE[500],
+      error?.message ?? error,
+      HTTP_STATUS.INTERNAL_SERVER_ERROR
+    );
   }
 };
 
@@ -55,11 +111,26 @@ const deleteDiscount = async (req, res) => {
   try {
     const discount = await discountService.deleteDiscount(req.params.id);
     if (!discount) {
-      return res.status(404).json({ message: 'Discount not found' });
+      return apiErrorResponse(
+        res,
+        HTTP_STATUS_MESSAGE[404],
+        { message: 'Discount not found' },
+        HTTP_STATUS.NOT_FOUND
+      );
     }
-    res.status(204).json();
+    return apiSuccessResponse(
+      res,
+      HTTP_STATUS_MESSAGE[200],
+      null,
+      HTTP_STATUS.OK
+    );
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    return apiErrorResponse(
+      res,
+      HTTP_STATUS_MESSAGE[500],
+      error?.message ?? error,
+      HTTP_STATUS.INTERNAL_SERVER_ERROR
+    );
   }
 };
 
@@ -67,9 +138,19 @@ const deleteDiscount = async (req, res) => {
 const applyDiscount = async (req, res) => {
   try {
     const discount = await discountService.applyDiscount(req.body.coupon);
-    res.status(200).json(discount);
+    return apiSuccessResponse(
+      res,
+      HTTP_STATUS_MESSAGE[200],
+      discount,
+      HTTP_STATUS.OK
+    );
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    return apiErrorResponse(
+      res,
+      HTTP_STATUS_MESSAGE[500],
+      error?.message ?? error,
+      HTTP_STATUS.INTERNAL_SERVER_ERROR
+    );
   }
 };
 

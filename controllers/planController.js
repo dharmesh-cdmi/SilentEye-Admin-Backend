@@ -1,14 +1,30 @@
 // controllers/planController.js
 
 const planService = require('../services/planService');
+const {
+  apiSuccessResponse,
+  apiErrorResponse,
+  HTTP_STATUS_MESSAGE,
+  HTTP_STATUS,
+} = require('../utils/responseHelper');
 
 // Create a new plan
 const createPlan = async (req, res) => {
   try {
     const plan = await planService.createPlan(req.body);
-    res.status(201).json(plan);
+    return apiSuccessResponse(
+      res,
+      HTTP_STATUS_MESSAGE[201],
+      plan,
+      HTTP_STATUS.CREATED
+    );
   } catch (error) {
-    res.status(400).json({ error: error.message });
+    return apiErrorResponse(
+      res,
+      HTTP_STATUS_MESSAGE[500],
+      error?.message ?? error,
+      HTTP_STATUS.INTERNAL_SERVER_ERROR
+    );
   }
 };
 
@@ -17,9 +33,19 @@ const getAllPlans = async (req, res) => {
   try {
     const { page = 1, limit = 10 } = req.query;
     const plans = await planService.getAllPlans(page, limit);
-    res.status(200).json(plans);
+    return apiSuccessResponse(
+      res,
+      HTTP_STATUS_MESSAGE[200],
+      plans,
+      HTTP_STATUS.OK
+    );
   } catch (error) {
-    res.status(400).json({ error: error.message });
+    return apiErrorResponse(
+      res,
+      HTTP_STATUS_MESSAGE[500],
+      error?.message ?? error,
+      HTTP_STATUS.INTERNAL_SERVER_ERROR
+    );
   }
 };
 
@@ -27,9 +53,19 @@ const getAllPlans = async (req, res) => {
 const getPlanById = async (req, res) => {
   try {
     const plan = await planService.getPlanById(req.params.id);
-    res.status(200).json(plan);
+    return apiSuccessResponse(
+      res,
+      HTTP_STATUS_MESSAGE[200],
+      plan,
+      HTTP_STATUS.OK
+    );
   } catch (error) {
-    res.status(400).json({ error: error.message });
+    return apiErrorResponse(
+      res,
+      HTTP_STATUS_MESSAGE[500],
+      error?.message ?? error,
+      HTTP_STATUS.INTERNAL_SERVER_ERROR
+    );
   }
 };
 
@@ -37,9 +73,19 @@ const getPlanById = async (req, res) => {
 const updatePlan = async (req, res) => {
   try {
     const plan = await planService.updatePlan(req.params.id, req.body);
-    res.status(200).json(plan);
+    return apiSuccessResponse(
+      res,
+      HTTP_STATUS_MESSAGE[200],
+      plan,
+      HTTP_STATUS.OK
+    );
   } catch (error) {
-    res.status(400).json({ error: error.message });
+    return apiErrorResponse(
+      res,
+      HTTP_STATUS_MESSAGE[500],
+      error?.message ?? error,
+      HTTP_STATUS.INTERNAL_SERVER_ERROR
+    );
   }
 };
 
@@ -47,9 +93,19 @@ const updatePlan = async (req, res) => {
 const deletePlan = async (req, res) => {
   try {
     await planService.deletePlan(req.params.id);
-    res.status(200).json({ message: 'Plan deleted successfully' });
+    return apiSuccessResponse(
+      res,
+      HTTP_STATUS_MESSAGE[200],
+      { message: 'Plan deleted successfully' },
+      HTTP_STATUS.OK
+    );
   } catch (error) {
-    res.status(400).json({ error: error.message });
+    return apiErrorResponse(
+      res,
+      HTTP_STATUS_MESSAGE[500],
+      error?.message ?? error,
+      HTTP_STATUS.INTERNAL_SERVER_ERROR
+    );
   }
 };
 

@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
-const connectDB = require('../../configs/db.config');
+const connectDB = require('../configs/db.config');
 const { faker } = require('@faker-js/faker');
-const Visitor = require('../../models/visitorModel'); // Adjust the path as per your project structure
+const Visitor = require('../models/visitorModel'); // Adjust the path as per your project structure
 
 // Function to seed visitors
 async function seedVisitors() {

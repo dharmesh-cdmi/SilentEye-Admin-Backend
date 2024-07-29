@@ -32,7 +32,7 @@ const createAddon = async (data) => {
     };
   } catch (error) {
     return {
-      status: true,
+      status: false,
       error: true,
       message: 'Error in creating addon: ' + error,
     };
@@ -97,7 +97,7 @@ const updateAddon = async (id, data) => {
     };
   } catch (error) {
     return {
-      status: true,
+      status: false,
       error: true,
       message: 'Error in updating addon: ' + error,
     };
@@ -132,7 +132,7 @@ const deleteAddon = async (id) => {
     };
   } catch (error) {
     return {
-      status: true,
+      status: false,
       error: true,
       message: 'Error in deleting addon: ' + error,
     };

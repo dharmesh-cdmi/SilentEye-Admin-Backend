@@ -32,7 +32,7 @@ const createPlan = async (data) => {
     };
   } catch (error) {
     return {
-      status: true,
+      status: false,
       error: true,
       message: 'Error in creating plan: ' + error,
     };
@@ -121,7 +121,7 @@ const deletePlan = async (id) => {
     };
   } catch (error) {
     return {
-      status: true,
+      status: false,
       error: true,
       message: 'Error in deleting plan: ' + error,
     };

@@ -2,39 +2,31 @@ const mongoose = require('mongoose');
 const mongoosePaginate = require('mongoose-paginate-v2');
 const Schema = mongoose.Schema;
 
-const PlanSchema = new Schema(
+const DiscountSchema = new Schema(
   {
-    name: {
+    coupon: {
       type: String,
       required: true,
       trim: true,
     },
-    icon: {
-      type: String,
+    validity: {
+      type: Schema.Types.Mixed, // This can be either a string or a date
       required: true,
       trim: true,
     },
-    amount: {
+    useLimit: {
       type: Number,
       required: true,
     },
-    mrp: {
-      type: Number,
-      required: true,
-    },
-    discountPercent: {
+    used: {
       type: Number,
       required: true,
       default: 0,
     },
-    discountValue: {
-      type: Number,
+    discountPercent: {
+      type: Number, // Storing as a number, which will include "% OFF"
       required: true,
-    },
-    tag: {
-      type: String,
-      required: true,
-      trim: true,
+      default: 0,
     },
     status: {
       type: String,
@@ -46,12 +38,7 @@ const PlanSchema = new Schema(
       ref: 'PaymentGateway',
       required: false,
     },
-    pgPlanId: {
-      type: String,
-      required: false,
-      trim: true,
-    },
-    pgPriceId: {
+    pgDiscountId: {
       type: String,
       required: false,
       trim: true,
@@ -62,17 +49,16 @@ const PlanSchema = new Schema(
   }
 );
 
-PlanSchema.pre('validate', function (next) {
-  if (this.discountPercent && this.mrp) {
-    this.discountValue = (this.mrp * this.discountPercent) / 100;
-    this.tag = this.discountPercent + '% OFF';
-    this.amount = this.mrp - (this.mrp * this.discountPercent) / 100;
+// Middleware to validate discount and increment used count
+DiscountSchema.pre('save', function (next) {
+  if (this.validity !== 'no limit' && new Date(this.validity) < new Date()) {
+    return next(new Error('Discount validity has expired'));
   }
   next();
 });
 
-PlanSchema.plugin(mongoosePaginate);
+DiscountSchema.plugin(mongoosePaginate);
 
-const Plan = mongoose.model('Plan', PlanSchema);
+const Discount = mongoose.model('Discount', DiscountSchema);
 
-module.exports = Plan;
+module.exports = Discount;

@@ -23,4 +23,10 @@ router.post(
     controller.CreateContactForm
 );
 
+router.delete(
+    "/delete-contact-form/:contactFormId",
+    validationMiddleware.validateParams(contactFormSchemas.contactIdSchema),
+    controller.DeleteContactForm
+);
+
 module.exports = router;

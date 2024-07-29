@@ -12,9 +12,15 @@ const createUpsell = async (data) => {
 };
 
 // Get all upsells
-const getAllUpsells = async () => {
+const getAllUpsells = async (page, limit) => {
   try {
-    return await Upsell.find({});
+    const options = {
+      page: parseInt(page, 10),
+      limit: parseInt(limit, 10),
+      sort: { createdAt: -1 },
+    };
+
+    return await Upsell.find(options);
   } catch (error) {
     throw new Error(`Error fetching upsells: ${error.message}`);
   }

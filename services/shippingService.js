@@ -12,9 +12,14 @@ const createShipping = async (data) => {
 };
 
 // Get all shippings
-const getAllShippings = async () => {
+const getAllShippings = async (page, limit) => {
   try {
-    return await Shipping.find();
+    const options = {
+      page: parseInt(page, 10),
+      limit: parseInt(limit, 10),
+      sort: { createdAt: -1 },
+    };
+    return await Shipping.find(options);
   } catch (error) {
     throw new Error(`Error in getting shippings: ${error.message}`);
   }

@@ -1,6 +1,5 @@
 const bcrypt = require('bcrypt');
 const Admin = require('../models/admin/adminModel');
-const helper = require('../utils');
 
 const SALT_ROUNDS = parseInt(process.env.SALT_ROUNDS) || 10;
 

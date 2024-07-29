@@ -66,10 +66,19 @@ const getTotalContactFormsCount = async (startDate, endDate) => {
     return totalCount;
 };
 
+const deleteContactForm = async (contactFormId) => {
+    const deletedConatctForm = await ContactForm.findByIdAndDelete(contactFormId);
+    if (!deletedConatctForm) {
+        const error = new Error('Contacts form not found!');
+        error.code = 404;
+        throw error;
+    }
+};
 
 module.exports = {
     fetchAllContactsForm,
     createContactForm,
     searchContactsForm,
-    getTotalContactFormsCount
+    getTotalContactFormsCount,
+    deleteContactForm
 };

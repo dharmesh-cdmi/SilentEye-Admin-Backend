@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const mongoosePaginate = require('mongoose-paginate-v2');
 const Schema = mongoose.Schema;
 
 const ProductSchema = new Schema(
@@ -23,9 +24,9 @@ const ProductSchema = new Schema(
       trim: true,
     },
     paymentGatewayId: {
-      type: String,
+      type: Schema.Types.ObjectId,
+      ref: 'PaymentGateway',
       required: false,
-      trim: true,
     },
     pgProductId: {
       type: String,
@@ -42,6 +43,8 @@ const ProductSchema = new Schema(
     timestamps: true,
   }
 );
+
+ProductSchema.plugin(mongoosePaginate);
 
 const Product = mongoose.model('Product', ProductSchema);
 

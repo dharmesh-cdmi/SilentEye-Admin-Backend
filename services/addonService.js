@@ -40,8 +40,17 @@ const createAddon = async (data) => {
 };
 
 // Get all addons
-const getAllAddons = async () => {
-  return await Addon.find({});
+const getAllAddons = async (page, limit) => {
+  try {
+    const options = {
+      page: parseInt(page, 10),
+      limit: parseInt(limit, 10),
+      sort: { createdAt: -1 },
+    };
+    return await Addon.find(options);
+  } catch (error) {
+    throw new Error('Error in fetching addons: ' + error.message);
+  }
 };
 
 // Get a single addon by ID

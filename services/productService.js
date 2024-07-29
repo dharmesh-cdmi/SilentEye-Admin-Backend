@@ -41,8 +41,17 @@ const createProduct = async (data) => {
 };
 
 // Get all products
-const getAllProducts = async () => {
-  return await Product.find({});
+const getAllProducts = async (page, limit) => {
+  try {
+    const options = {
+      page: parseInt(page, 10),
+      limit: parseInt(limit, 10),
+      sort: { createdAt: -1 },
+    };
+    return await Product.paginate({}, options);
+  } catch (error) {
+    throw new Error('Error in fetching products: ' + error.message);
+  }
 };
 
 // Get a single product by ID
@@ -58,6 +67,9 @@ const getProductById = async (id) => {
 const updateProduct = async (id, data) => {
   try {
     let product = await getProductById(id);
+    if (!product) {
+      throw new Error('Product not found!');
+    }
 
     const pgData = {
       paymentGatewayId: product?.paymentGatewayId,
@@ -79,10 +91,6 @@ const updateProduct = async (id, data) => {
       new: true,
       runValidators: true,
     });
-
-    if (!product) {
-      throw new Error('Product not found!');
-    }
 
     return {
       status: true,

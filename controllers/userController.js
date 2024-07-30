@@ -1,6 +1,6 @@
 
-const userService = require('../services/userService');
-const { apiSuccessResponse, apiErrorResponse, HTTP_STATUS } = require('../utils'); // Importing helper functions
+const userService = require("../services/userService")
+const { apiSuccessResponse, apiErrorResponse, HTTP_STATUS, HTTP_STATUS_MESSAGE } = require('../utils'); // Importing helper functions
 
 // Controller to get user profile
 const getProfile = async (req, res) => {

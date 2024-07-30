@@ -34,7 +34,12 @@ const createUserSchema = yup.object().shape({
     ),
     orders: yup.array().of(
         yup.string().trim().matches(/^[0-9a-fA-F]{24}$/, 'Invalid Order ID')
-    ),
+    ).optional(),
+    // plan will be object with unknown keys
+    plan: yup.object().noUnknown(true).required('Plan is required'),
+    addOns: yup.array().of(
+        yup.object().noUnknown(true)
+    ).optional(),
     targetedNumbers: yup.array().of(yup.string().trim()),
     walletAmount: yup.number().min(0).default(0),
 });

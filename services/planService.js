@@ -32,7 +32,7 @@ const createPlan = async (data) => {
     };
   } catch (error) {
     return {
-      status: true,
+      status: false,
       error: true,
       message: 'Error in creating plan: ' + error,
     };
@@ -47,7 +47,7 @@ const getAllPlans = async (page, limit) => {
       limit: parseInt(limit, 10),
       sort: { createdAt: -1 },
     };
-    return await Plan.find(options);
+    return await Plan.find({}, options);
   } catch (error) {
     throw new Error(`Error fetching plans: ${error.message}`);
   }
@@ -121,7 +121,7 @@ const deletePlan = async (id) => {
     };
   } catch (error) {
     return {
-      status: true,
+      status: false,
       error: true,
       message: 'Error in deleting plan: ' + error,
     };

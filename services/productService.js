@@ -33,7 +33,7 @@ const createProduct = async (data) => {
     };
   } catch (error) {
     return {
-      status: true,
+      status: false,
       error: true,
       message: 'Error in creating product: ' + error,
     };
@@ -99,7 +99,7 @@ const updateProduct = async (id, data) => {
     };
   } catch (error) {
     return {
-      status: true,
+      status: false,
       error: true,
       message: 'Error in updating product: ' + error,
     };
@@ -135,7 +135,7 @@ const deleteProduct = async (id) => {
     };
   } catch (error) {
     return {
-      status: true,
+      status: false,
       error: true,
       message: 'Error in deleting product: ' + error,
     };

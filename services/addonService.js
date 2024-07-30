@@ -32,7 +32,7 @@ const createAddon = async (data) => {
     };
   } catch (error) {
     return {
-      status: true,
+      status: false,
       error: true,
       message: 'Error in creating addon: ' + error,
     };
@@ -47,7 +47,7 @@ const getAllAddons = async (page, limit) => {
       limit: parseInt(limit, 10),
       sort: { createdAt: -1 },
     };
-    return await Addon.find(options);
+    return await Addon.find({}, options);
   } catch (error) {
     throw new Error('Error in fetching addons: ' + error.message);
   }
@@ -97,7 +97,7 @@ const updateAddon = async (id, data) => {
     };
   } catch (error) {
     return {
-      status: true,
+      status: false,
       error: true,
       message: 'Error in updating addon: ' + error,
     };
@@ -132,7 +132,7 @@ const deleteAddon = async (id) => {
     };
   } catch (error) {
     return {
-      status: true,
+      status: false,
       error: true,
       message: 'Error in deleting addon: ' + error,
     };

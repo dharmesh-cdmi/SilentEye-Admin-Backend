@@ -9,7 +9,8 @@ const createManagerSchema = yup.object().shape({
     whatsapp: yup.string().trim().required('Whatsapp is required'),
     skype: yup.string().trim().required('Skype is required'),
     status: yup.string().oneOf(['active', 'inactive'], 'Invalid status').required('Status is required'),
-    order: yup.number().required('Order is required')
+    order: yup.number().required('Order is required'),
+    live: yup.boolean().default(true)
 }).noUnknown(true, 'Unknown field in manager data');
 
 const updateManagerSchema = yup.object().shape({
@@ -21,7 +22,8 @@ const updateManagerSchema = yup.object().shape({
     whatsapp: yup.string().trim().optional(),
     skype: yup.string().trim().optional(),
     status: yup.string().oneOf(['active', 'inactive'], 'Invalid status').optional(),
-    order: yup.number().optional()
+    order: yup.number().optional(),
+    live: yup.boolean().optional()
 }).noUnknown(true, 'Unknown field in manager data');
 
 
@@ -30,7 +32,8 @@ const searchManagerSchema = yup.object().shape({
     limit: yup.number(),
     searchQuery: yup.string().trim(),
     order: yup.string().oneOf(['asc', 'desc'], 'Invalid order'),
-    status: yup.string().oneOf(['active', 'inactive'], 'Invalid status')
+    status: yup.string().oneOf(['active', 'inactive'], 'Invalid status'),
+    live: yup.boolean().optional()
 }).noUnknown(true, 'Unknown field in search manager form data');
 
 module.exports = {

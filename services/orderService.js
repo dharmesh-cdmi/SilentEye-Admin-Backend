@@ -1,13 +1,37 @@
 const Orders = require('../models/ordersModel');
+const Plans  = require('../models/planModel');
 const { getVisitorCount } = require('../services/visitorService');
 const { getRefundData } = require('../services/refundService');
+const helper = require('../utils');
 
 
+
+const createOrder = async (orderData)=>{
+    try {
+        // Check if the planId exists in the Plan collection
+        const planExists = await Plans.findById(orderData.planDetails.planId);
+        if (!planExists) {
+          throw new Error('Invalid planId: Plan does not exist');
+        }
+    
+        // Generate a new orderId
+        orderData.orderId = await helper.generateOrderId();
+    
+        // Proceed to create the new order
+        const newOrder = new Orders(orderData);
+        await newOrder.save();
+        return newOrder;
+      } catch (error) {
+        throw new Error('Error creating order: ' + error.message);
+      }
+};
 
 const getOrders = async ({ page = 1, limit = 10, status = 'Completed', paymentMethod, userId, planName, minAmount, maxAmount, startDate, endDate, country, search,orderId }) => {
     // Build the filter object
-    let filter = {};
 
+    let filter = {
+        deletedAt: null // Exclude deleted orders
+    };
    // Filter by order ID
    if (orderId) {
         filter._id = orderId;
@@ -87,6 +111,15 @@ const getOrders = async ({ page = 1, limit = 10, status = 'Completed', paymentMe
     };
 };
 
+const getOrderDetails = async (orderId) => {
+    const order = await Orders.findOne({ _id: orderId, deletedAt: null });
+
+    if (!order) {
+        return { error: 'Order not found' };
+    }
+
+    return { order };
+};
 
 const getTotalOrderCount = async (plan = null, startDate = null, endDate = null) => {
     let filter = {};
@@ -257,7 +290,63 @@ const getTotalAmounts = async (filter) => {
     };
 }; 
 
+const deleteOrder = async (orderId) => {
+    // Find the order by ID
+    const order = await Orders.findById(orderId);
+
+    if (!order) {
+        return { error: 'Order not found' };
+    }
+
+    // Check if the order is already deleted
+    if (order.deletedAt) {
+        return { error: 'Order already deleted' };
+    }
+
+    // Update the deletedAt field
+    order.deletedAt = new Date();
+
+    await order.save();
+
+    return { order };
+};
+
+
+
+const initiateRefund = async (orderId, refundReason,refundRequestId) => {
+    // Find the order by ID, ensuring it's not deleted
+    const order = await Orders.findOne({ _id: orderId, deletedAt: null });
+    if (!order) {
+        return { error: 'Order not found' };
+    }
+
+    // Check if the order is already refunded
+    if (order.status === 'Refunded') {
+        return { error: 'Order already refunded' };
+    }
+
+    // Create refund details
+    const refundAmount = order.planDetails.amount; // Use the amount from the order
+
+    // Update the order with refund details
+    order.status = 'Refunded';
+    order.refundDetails = {
+        refundRequestId,
+        refundAmount,
+        refundReason,
+        refundDate: new Date()
+    };
+    await order.save();
+
+    return { success: true };
+};
+
+
 module.exports = {
+    createOrder,
     getOrders,
-    getTotalOrderCount
+    getTotalOrderCount,
+    deleteOrder,
+    getOrderDetails,
+    initiateRefund
 };

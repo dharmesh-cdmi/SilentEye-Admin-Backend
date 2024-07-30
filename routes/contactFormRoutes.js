@@ -25,6 +25,7 @@ router.post(
 
 router.delete(
     "/delete-contact-form/:contactFormId",
+    authMiddleware.verifyAdmin,
     validationMiddleware.validateParams(contactFormSchemas.contactIdSchema),
     controller.DeleteContactForm
 );

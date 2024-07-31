@@ -17,12 +17,10 @@ const getAllRefundRequests = async (page, limit) => {
     const options = {
       page: parseInt(page, 10),
       limit: parseInt(limit, 10),
+      sort: { createdAt: -1 },
+      populate: { path: 'planId', select: 'name' },
     };
-
-    return await RefundRequest.find()
-      .sort({ createdAt: -1 })
-      .skip((options.page - 1) * options.limit)
-      .limit(options.limit);
+    return await RefundRequest.paginate({}, options);
   } catch (error) {
     throw new Error(`Error in getting refund requests: ${error.message}`);
   }

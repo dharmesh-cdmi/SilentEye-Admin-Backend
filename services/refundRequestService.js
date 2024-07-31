@@ -18,6 +18,7 @@ const getAllRefundRequests = async (page, limit) => {
       page: parseInt(page, 10),
       limit: parseInt(limit, 10),
       sort: { createdAt: -1 },
+      populate: { path: 'planId', select: 'name' },
     };
     return await RefundRequest.paginate({}, options);
   } catch (error) {
@@ -28,7 +29,7 @@ const getAllRefundRequests = async (page, limit) => {
 // Get refund request by ID
 const getRefundRequestById = async (id) => {
   try {
-    return await RefundRequest.findById(id);
+    return await RefundRequest.findById(id).populate('planId', 'name');
   } catch (error) {
     throw new Error(`Error in getting refund request: ${error.message}`);
   }

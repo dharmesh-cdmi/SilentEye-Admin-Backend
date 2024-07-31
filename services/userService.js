@@ -1,5 +1,6 @@
 const User = require('../models/userModel');
 const bcrypt = require('bcrypt');
+const { createOrder } = require('./orderService');
 const getUserStatistics = async (startDate = null, endDate = null) => {
     try {
         const matchStage = {};
@@ -449,8 +450,11 @@ const registerUser = async (userData) => {
         amountSpend = 0,
         ipAddress,
         device,
+        plan,
+        addOns
     } = userData;
 
+    // check if plan and addOns are valid
 
     // Check if the email is already in use
     const existingUser = await User.findOne({ email });
@@ -508,6 +512,27 @@ const registerUser = async (userData) => {
     // Save the user to the database
     await newUser.save();
 
+    // Dev working on payment can verify it
+    // Create an order for the user
+    const order = await createOrder({
+        status: 'Completed',
+        userId: newUser._id,
+        planDetails: {
+            planId: plan?._id,
+            ...plan
+        },
+        addOns,
+        orderDetails: {
+            total: plan?.price,
+            country: userDetails?.country,
+            purchase: 'New Purchase'
+        },
+        paymentMethod: 'Credit Card',
+        status: 'Pending',
+    });
+
+    newUser.orders.push(order._id);
+    await newUser.save();
     return newUser;
 };
 

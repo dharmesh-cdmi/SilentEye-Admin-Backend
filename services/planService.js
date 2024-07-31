@@ -45,9 +45,12 @@ const getAllPlans = async (page, limit) => {
     const options = {
       page: parseInt(page, 10),
       limit: parseInt(limit, 10),
-      sort: { createdAt: -1 },
     };
-    return await Plan.find({}, options);
+
+    return await Plan.find()
+      .sort({ createdAt: -1 })
+      .skip((options.page - 1) * options.limit)
+      .limit(options.limit);
   } catch (error) {
     throw new Error(`Error fetching plans: ${error.message}`);
   }

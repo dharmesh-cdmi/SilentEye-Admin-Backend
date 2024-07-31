@@ -17,9 +17,12 @@ const getAllShippings = async (page, limit) => {
     const options = {
       page: parseInt(page, 10),
       limit: parseInt(limit, 10),
-      sort: { createdAt: -1 },
     };
-    return await Shipping.find({}, options);
+
+    return await Shipping.find()
+      .sort({ createdAt: -1 })
+      .skip((options.page - 1) * options.limit)
+      .limit(options.limit);
   } catch (error) {
     throw new Error(`Error in getting shippings: ${error.message}`);
   }

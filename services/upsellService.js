@@ -20,7 +20,7 @@ const getAllUpsells = async (page, limit) => {
       sort: { createdAt: -1 },
     };
 
-    return await Upsell.find({}, options);
+    return await Upsell.paginate({}, options);
   } catch (error) {
     throw new Error(`Error fetching upsells: ${error.message}`);
   }

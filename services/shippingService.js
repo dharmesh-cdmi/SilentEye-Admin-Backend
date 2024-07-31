@@ -19,7 +19,7 @@ const getAllShippings = async (page, limit) => {
       limit: parseInt(limit, 10),
       sort: { createdAt: -1 },
     };
-    return await Shipping.find({}, options);
+    return await Shipping.paginate({}, options);
   } catch (error) {
     throw new Error(`Error in getting shippings: ${error.message}`);
   }

@@ -593,7 +593,7 @@ const deleteUser = async (id) => {
     return user;
 };
 
-const addUserHistory = async (userId, action) => {
+const addUserHistory = async (userId, body) => {
     const user = await User.findById(userId);
     if (!user) {
         return false;
@@ -601,14 +601,14 @@ const addUserHistory = async (userId, action) => {
 
     user.history.push({
         date: new Date(),
-        action
+        action: body?.action
     });
 
     await user.save();
     return user;
 }
 
-const addUserHistoryByIP = async (ipAddress, action) => {
+const addUserHistoryByIP = async (ipAddress, body) => {
     const user = await User.findOne({ ipAddress: ipAddress });
     if (!user) {
         return false;
@@ -616,7 +616,7 @@ const addUserHistoryByIP = async (ipAddress, action) => {
 
     user.history.push({
         date: new Date(),
-        action
+        action: body?.action
     });
 
     await user.save();

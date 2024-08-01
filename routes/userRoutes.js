@@ -84,5 +84,10 @@ router.post(
     controller.AddUserHistoryByVisitor
 );
 
+router.get(
+    "/analytics/download-users-data",
+    authenticateUser,
+    controller.DownloadUsersData
+);
 
 module.exports = router;

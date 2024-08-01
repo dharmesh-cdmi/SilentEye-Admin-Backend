@@ -1,6 +1,8 @@
 
+const { exportUsersData } = require("../services/exportService");
 const userService = require("../services/userService")
 const { apiSuccessResponse, apiErrorResponse, HTTP_STATUS, HTTP_STATUS_MESSAGE } = require('../utils'); // Importing helper functions
+const fs = require('fs');
 
 // Controller to get user profile
 const getProfile = async (req, res) => {
@@ -149,6 +151,33 @@ const AddUserHistoryByVisitor = async (req, res) => {
     return apiErrorResponse(res, HTTP_STATUS_MESSAGE[500], error, HTTP_STATUS.INTERNAL_SERVER_ERROR);
   }
 }
+
+const DownloadUsersData = async (req, res) => {
+  try {
+    const { format } = req.query; // 'pdf' or 'xlsx'
+    let data = await userService.fetchAllUsers(req.body);
+
+    const path = await exportUsersData(format, data?.users);
+    res.download(path, (err) => {
+      if (err) {
+        console.error('Error downloading file:', err);
+        res.status(500).send('Error downloading file.');
+      } else {
+        // Optional: Delete the file after download and downloads folder
+        fs.unlink(path, (err) => {
+          if (err) {
+            console.error('Error deleting file:', err);
+          }
+        });
+      }
+    })
+
+  } catch (error) {
+    console.error('Error generating analytics data:', error);
+    res.status(500).send('Internal Server Error');
+  }
+}
+
 module.exports = {
   getProfile,
   FetchAllUsers,
@@ -160,5 +189,6 @@ module.exports = {
   SaveVisitor,
   FetchVisitor,
   UpdateVisitor,
-  AddUserHistoryByVisitor
+  AddUserHistoryByVisitor,
+  DownloadUsersData
 };

@@ -154,10 +154,10 @@ const AddUserHistoryByVisitor = async (req, res) => {
 
 const DownloadUsersData = async (req, res) => {
   try {
-    const { format } = req.query; // 'pdf' or 'xlsx'
+    let { format } = req.query // 'pdf' or 'xlsx'
     let data = await userService.fetchAllUsers(req.body);
 
-    const path = await exportUsersData(format, data?.users);
+    const path = await exportUsersData(format || 'xlsx', data?.users);
     res.download(path, (err) => {
       if (err) {
         console.error('Error downloading file:', err);
@@ -178,6 +178,15 @@ const DownloadUsersData = async (req, res) => {
   }
 }
 
+const DeleteBulkUsers = async (req, res) => {
+  try {
+    const userIds = await userService.deleteBulkUsers(req.body?.usersIds);
+    return apiSuccessResponse(res, HTTP_STATUS_MESSAGE[200], userIds, HTTP_STATUS.OK);
+  } catch (error) {
+    return apiErrorResponse(res, HTTP_STATUS_MESSAGE[500], error, HTTP_STATUS.INTERNAL_SERVER_ERROR);
+  }
+}
+
 module.exports = {
   getProfile,
   FetchAllUsers,
@@ -190,5 +199,6 @@ module.exports = {
   FetchVisitor,
   UpdateVisitor,
   AddUserHistoryByVisitor,
-  DownloadUsersData
+  DownloadUsersData,
+  DeleteBulkUsers
 };

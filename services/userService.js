@@ -631,6 +631,20 @@ const getUserProfile = async (userId) => {
     }
 };
 
+const deleteBulkUsers = async (userIds) => {
+    try {
+        const users = await User.deleteMany({ _id: { $in: userIds } });
+        return {
+            statusCode: 200,
+            message: 'Users deleted successfully',
+            data: users
+        };
+    } catch (error) {
+        throw error;
+    }
+}
+
+
 module.exports = {
     getUserProfile,
     getUserStatistics,
@@ -644,5 +658,6 @@ module.exports = {
     fetchVisitor,
     addUserHistoryByIP,
     updateVisitor,
-    getUserStatisticsByCountry
+    getUserStatisticsByCountry,
+    deleteBulkUsers
 };

@@ -343,7 +343,14 @@ const fetchAllUsers = async (queryParams) => {
     // Pagination
     const skip = (parseInt(page) - 1) * parseInt(limit);
 
-    const users = await User.find(filters).skip(skip).limit(parseInt(limit)).exec();
+    const users = await User.find(filters)
+    .populate('assignedBy', 'name email')
+    .populate('orders', 'orderId planDetails.total orderDetails.purchase status')
+    .populate('userDetails', 'profile_avatar country phone address')
+    .sort({ createdAt: -1 })
+    .skip(skip)
+    .limit(parseInt(limit))
+    .exec();
     const totalUsers = await User.countDocuments(filters);
 
     return {

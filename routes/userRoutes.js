@@ -3,8 +3,8 @@ const path = require("path")
 const multer = require("multer");
 
 const { verifyAdmin, authenticateUser } = require("../middleware/authMiddleware");
-const { validateRequest } = require("../middleware/validationMiddleware");
-const { createUserSchema, updateUserSchema, addUserHistorySchema, saveVisitorSchema } = require("../validation/userSchemas");
+const { validateRequest, validateQuery } = require("../middleware/validationMiddleware");
+const { createUserSchema, updateUserSchema, addUserHistorySchema, saveVisitorSchema, downloadQuerySchema } = require("../validation/userSchemas");
 const controller = require("../controllers/userController");
 const router = express.Router();
 
@@ -84,5 +84,16 @@ router.post(
     controller.AddUserHistoryByVisitor
 );
 
+router.get(
+    "/download/users-data",
+    validateQuery(downloadQuerySchema),
+    authenticateUser,
+    controller.DownloadUsersData
+);
 
+router.delete(
+    "/bulk/delete",
+    verifyAdmin,
+    controller.DeleteBulkUsers
+);
 module.exports = router;

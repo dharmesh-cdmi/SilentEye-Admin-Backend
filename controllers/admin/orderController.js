@@ -1,3 +1,4 @@
+const moment = require('moment');
 const orderService = require('../../services/orderService');
 const exportService = require('../../services/exportService');
 
@@ -6,8 +7,13 @@ const { apiSuccessResponse, apiErrorResponse, HTTP_STATUS } = require('../../uti
 const getOrdersController = async (req, res) => {
     try {
         // Extract query parameters
-        const { page, limit, status, paymentMethod, userId, planName, minAmount, maxAmount, startDate, endDate, country,search,orderId} = req.query;
+        const { page, limit, status, paymentMethod, userId, planName, minAmount, maxAmount, country,search,orderId} = req.query;
+        let { startDate = null, endDate = null } = req.query;
 
+        // Validate date formats
+        startDate = startDate && moment(startDate, moment.ISO_8601, true).isValid() ? startDate : null;
+        endDate = endDate && moment(endDate, moment.ISO_8601, true).isValid() ? endDate : null;
+    
         // Call the service function
         const result = await orderService.getOrders({ page, limit, status, paymentMethod, userId, planName, minAmount, maxAmount, startDate, endDate, country,search,orderId});
 
@@ -32,8 +38,13 @@ const getOrdersDetails = async (req, res) => {
 const downloadorderDetails = async (req, res) => {
     try {
         // Extract query parameters
-        const { page, limit, status, paymentMethod, userId, planName, minAmount, maxAmount, startDate, endDate, country, search } = req.query;
+        const { page, limit, status, paymentMethod, userId, planName, minAmount, maxAmount, country, search } = req.query;
+        let { startDate = null, endDate = null } = req.query;
 
+        // Validate date formats
+        startDate = startDate && moment(startDate, moment.ISO_8601, true).isValid() ? startDate : null;
+        endDate = endDate && moment(endDate, moment.ISO_8601, true).isValid() ? endDate : null;
+    
         // Call the service function to get the orders
         const { orders } = await orderService.getOrders({ page, limit, status, paymentMethod, userId, planName, minAmount, maxAmount, startDate, endDate, country, search });
 

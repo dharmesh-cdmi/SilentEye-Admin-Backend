@@ -344,13 +344,13 @@ const fetchAllUsers = async (queryParams) => {
     const skip = (parseInt(page) - 1) * parseInt(limit);
 
     const users = await User.find(filters)
-    .populate('assignedBy', 'name email')
-    .populate('orders', 'orderId planDetails.total orderDetails.purchase status')
-    .populate('userDetails', 'profile_avatar country phone address')
-    .sort({ createdAt: -1 })
-    .skip(skip)
-    .limit(parseInt(limit))
-    .exec();
+        .populate('assignedBy', 'name email')
+        .populate('orders', 'orderId planDetails.total orderDetails.purchase status')
+        .populate('userDetails', 'profile_avatar country phone address')
+        .sort({ createdAt: -1 })
+        .skip(skip)
+        .limit(parseInt(limit))
+        .exec();
     const totalUsers = await User.countDocuments(filters);
 
     return {
@@ -476,6 +476,7 @@ const registerUser = async (userData) => {
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
 
+    let newUser = null;
     let userByIp = await User.findOne({ ipAddress });
     if (userByIp) {
         userByIp.email = email;
@@ -498,36 +499,38 @@ const registerUser = async (userData) => {
         userByIp.deviceType = deviceType;
         userByIp.targetedNumbers = targetedNumbers;
         await userByIp.save();
-        return userByIp;
+        newUser = userByIp;
     }
-    // Create a new user
-    const newUser = new User({
-        name,
-        email,
-        password: hashedPassword,
-        assignedBy,
-        userDetails: {
-            profile_avatar: avatar,
-            ...userDetails
-        },
-        status: status || 'active',
-        userStatus: userStatus || 'Demo',
-        email_verified_at: new Date(),
-        process,
-        joined: new Date(),
-        amountSpend,
-        amountRefund,
-        ipAddress,
-        device,
-        activeDashboard,
-        deviceType,
-        targetedNumbers
-        // email_verified_at: new Date(),
-    });
+    else {
+        // Create a new user
+        const userCreated = new User({
+            name,
+            email,
+            password: hashedPassword,
+            assignedBy,
+            userDetails: {
+                profile_avatar: avatar,
+                ...userDetails
+            },
+            status: status || 'active',
+            userStatus: userStatus || 'Demo',
+            email_verified_at: new Date(),
+            process,
+            joined: new Date(),
+            amountSpend,
+            amountRefund,
+            ipAddress,
+            device,
+            activeDashboard,
+            deviceType,
+            targetedNumbers
+            // email_verified_at: new Date(),
+        });
 
-    // Save the user to the database
-    await newUser.save();
-
+        // Save the user to the database
+        await userCreated.save();
+        newUser = userCreated;
+    }
     // Dev working on payment can verify it
     // Create an order for the user
     const order = await createOrder({
@@ -548,6 +551,7 @@ const registerUser = async (userData) => {
     });
 
     newUser.orders.push(order._id);
+    newUser.activePlanId = plan?._id;
     await newUser.save();
     return newUser;
 };

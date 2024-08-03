@@ -1,5 +1,6 @@
 const User = require('../models/userModel');
 const bcrypt = require('bcrypt');
+const { createOrder } = require('./orderService');
 const getUserStatistics = async (startDate = null, endDate = null) => {
     try {
         const matchStage = {};
@@ -342,7 +343,14 @@ const fetchAllUsers = async (queryParams) => {
     // Pagination
     const skip = (parseInt(page) - 1) * parseInt(limit);
 
-    const users = await User.find(filters).skip(skip).limit(parseInt(limit)).exec();
+    const users = await User.find(filters)
+    .populate('assignedBy', 'name email')
+    .populate('orders', 'orderId planDetails.total orderDetails.purchase status')
+    .populate('userDetails', 'profile_avatar country phone address')
+    .sort({ createdAt: -1 })
+    .skip(skip)
+    .limit(parseInt(limit))
+    .exec();
     const totalUsers = await User.countDocuments(filters);
 
     return {
@@ -449,8 +457,11 @@ const registerUser = async (userData) => {
         amountSpend = 0,
         ipAddress,
         device,
+        plan,
+        addOns
     } = userData;
 
+    // check if plan and addOns are valid
 
     // Check if the email is already in use
     const existingUser = await User.findOne({ email });
@@ -508,6 +519,27 @@ const registerUser = async (userData) => {
     // Save the user to the database
     await newUser.save();
 
+    // Dev working on payment can verify it
+    // Create an order for the user
+    const order = await createOrder({
+        status: 'Completed',
+        userId: newUser._id,
+        planDetails: {
+            planId: plan?._id,
+            ...plan
+        },
+        addOns,
+        orderDetails: {
+            total: plan?.price,
+            country: userDetails?.country,
+            purchase: 'New Purchase'
+        },
+        paymentMethod: 'Credit Card',
+        status: 'Pending',
+    });
+
+    newUser.orders.push(order._id);
+    await newUser.save();
     return newUser;
 };
 
@@ -561,7 +593,7 @@ const deleteUser = async (id) => {
     return user;
 };
 
-const addUserHistory = async (userId, action) => {
+const addUserHistory = async (userId, body) => {
     const user = await User.findById(userId);
     if (!user) {
         return false;
@@ -569,14 +601,14 @@ const addUserHistory = async (userId, action) => {
 
     user.history.push({
         date: new Date(),
-        action
+        action: body?.action
     });
 
     await user.save();
     return user;
 }
 
-const addUserHistoryByIP = async (ipAddress, action) => {
+const addUserHistoryByIP = async (ipAddress, body) => {
     const user = await User.findOne({ ipAddress: ipAddress });
     if (!user) {
         return false;
@@ -584,7 +616,7 @@ const addUserHistoryByIP = async (ipAddress, action) => {
 
     user.history.push({
         date: new Date(),
-        action
+        action: body?.action
     });
 
     await user.save();
@@ -606,6 +638,20 @@ const getUserProfile = async (userId) => {
     }
 };
 
+const deleteBulkUsers = async (userIds) => {
+    try {
+        const users = await User.deleteMany({ _id: { $in: userIds } });
+        return {
+            statusCode: 200,
+            message: 'Users deleted successfully',
+            data: users
+        };
+    } catch (error) {
+        throw error;
+    }
+}
+
+
 module.exports = {
     getUserProfile,
     getUserStatistics,
@@ -619,5 +665,6 @@ module.exports = {
     fetchVisitor,
     addUserHistoryByIP,
     updateVisitor,
-    getUserStatisticsByCountry
+    getUserStatisticsByCountry,
+    deleteBulkUsers
 };

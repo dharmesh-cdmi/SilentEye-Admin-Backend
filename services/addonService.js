@@ -47,7 +47,7 @@ const getAllAddons = async (page, limit) => {
       limit: parseInt(limit, 10),
       sort: { createdAt: -1 },
     };
-    return await Addon.find({}, options);
+    return await Addon.paginate({}, options);
   } catch (error) {
     throw new Error('Error in fetching addons: ' + error.message);
   }

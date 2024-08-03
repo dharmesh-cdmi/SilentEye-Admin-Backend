@@ -458,7 +458,9 @@ const registerUser = async (userData) => {
         ipAddress,
         device,
         plan,
-        addOns
+        addOns,
+        activeDashboard = true,
+        deviceType,
     } = userData;
 
     // check if plan and addOns are valid
@@ -491,6 +493,8 @@ const registerUser = async (userData) => {
         userByIp.amountSpend = amountSpend;
         userByIp.amountRefund = amountRefund;
         userByIp.device = device;
+        userByIp.activeDashboard = activeDashboard;
+        userByIp.deviceType = deviceType;
         await userByIp.save();
         return userByIp;
     }
@@ -513,6 +517,8 @@ const registerUser = async (userData) => {
         amountRefund,
         ipAddress,
         device,
+        activeDashboard,
+        deviceType,
         // email_verified_at: new Date(),
     });
 
@@ -582,7 +588,9 @@ const updateUser = async (id, data) => {
     if (data.blocked !== undefined) user.blocked = data.blocked;
     if (data.walletAmount) user.walletAmount = data.walletAmount;
     if (data.targetedNumbers) user.targetedNumbers = data.targetedNumbers;
-
+    if (data.activeDashboard !== undefined) user.activeDashboard = data.activeDashboard;
+    if (data.deviceType) user.deviceType = data.deviceType;
+    
     await user.save();
 
     return user;

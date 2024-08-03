@@ -62,6 +62,7 @@ const userSchema = new Schema({
   ],
   walletAmount: { type: Number, default: 0 },
   activeDashboard: { type: Boolean, default: true },
+  deviceType: { type: String },
 });
 
 // Pre-save hook to update the `updatedAt` field

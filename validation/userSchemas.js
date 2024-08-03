@@ -74,6 +74,8 @@ const updateUserSchema = yup.object().shape({
     ),
     targetedNumbers: yup.array().of(yup.string().trim()),
     walletAmount: yup.number(),
+    activeDashboard: yup.boolean(),
+    deviceType: yup.string().trim(),
 });
 
 const addUserHistorySchema = yup.object().shape({

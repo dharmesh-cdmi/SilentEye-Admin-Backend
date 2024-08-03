@@ -61,7 +61,6 @@ const RegisterUser = async (req, res) => {
 // Update User
 const UpdateUser = async (req, res) => {
   const avatar = req.file;
-  console.log(req.body);
   let avatarPath = (avatar && avatar.path) || null;
   try {
     let data = avatarPath ? { ...req.body, avatar: avatarPath } : req.body;

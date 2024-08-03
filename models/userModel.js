@@ -55,11 +55,7 @@ const userSchema = new Schema({
       ref: 'Orders'
     }
   ],
-  targetedNumbers: [
-    {
-      type: String
-    }
-  ],
+  targetedNumbers: [],
   walletAmount: { type: Number, default: 0 },
   activeDashboard: { type: Boolean, default: true },
   deviceType: { type: String },

@@ -72,7 +72,7 @@ const updateUserSchema = yup.object().shape({
     orders: yup.array().of(
         yup.string().trim().matches(/^[0-9a-fA-F]{24}$/, 'Invalid Order ID')
     ),
-    targetedNumbers: yup.array().of(yup.string().trim()),
+    targetedNumbers: yup.array(),
     walletAmount: yup.number(),
     activeDashboard: yup.boolean(),
     deviceType: yup.string().trim(),

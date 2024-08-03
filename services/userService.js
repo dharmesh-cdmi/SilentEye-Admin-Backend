@@ -461,6 +461,7 @@ const registerUser = async (userData) => {
         addOns,
         activeDashboard = true,
         deviceType,
+        targetedNumbers
     } = userData;
 
     // check if plan and addOns are valid
@@ -495,6 +496,7 @@ const registerUser = async (userData) => {
         userByIp.device = device;
         userByIp.activeDashboard = activeDashboard;
         userByIp.deviceType = deviceType;
+        userByIp.targetedNumbers = targetedNumbers;
         await userByIp.save();
         return userByIp;
     }
@@ -519,6 +521,7 @@ const registerUser = async (userData) => {
         device,
         activeDashboard,
         deviceType,
+        targetedNumbers
         // email_verified_at: new Date(),
     });
 
@@ -590,7 +593,7 @@ const updateUser = async (id, data) => {
     if (data.targetedNumbers) user.targetedNumbers = data.targetedNumbers;
     if (data.activeDashboard !== undefined) user.activeDashboard = data.activeDashboard;
     if (data.deviceType) user.deviceType = data.deviceType;
-    
+
     await user.save();
 
     return user;

@@ -1,3 +1,5 @@
+const moment = require('moment');
+
 const orderService = require("./orderService");
 const visitorService = require('../services/visitorService');
 const loginService = require("./loginService");
@@ -7,7 +9,14 @@ const userService = require("./userService");
 const exportService = require('./exportService');
 
 
+
 const analytics = async (plan = null, page = [], action = [], startDate = null, endDate = null)=> {
+
+     // Validate date formats
+     startDate = startDate && moment(startDate, moment.ISO_8601, true).isValid() ? startDate : null;
+     endDate = endDate && moment(endDate, moment.ISO_8601, true).isValid() ? endDate : null;
+ 
+
     const visitorDetails = await visitorService.getVisitorCount(startDate, endDate);
     const graphData = await visitorService.graphData(page, action, startDate, endDate);
     const totalLoggedInUser = await loginService.getLoginCount(startDate, endDate);
@@ -28,6 +37,11 @@ const analytics = async (plan = null, page = [], action = [], startDate = null, 
 const usersStatisticsAnalytics = async (startDate = null, endDate = null, groupBy = null, page, limit) => {
     let userStatistics;
 
+         // Validate date formats
+         startDate = startDate && moment(startDate, moment.ISO_8601, true).isValid() ? startDate : null;
+         endDate = endDate && moment(endDate, moment.ISO_8601, true).isValid() ? endDate : null;
+     
+    
     if (groupBy === 'plan') {
         userStatistics = await userService.getUserStatistics(startDate, endDate, page, limit);
     } else if (groupBy === 'country') {
@@ -46,7 +60,12 @@ const usersStatisticsAnalytics = async (startDate = null, endDate = null, groupB
 
 const exportAnalyticsData = async (req, res) => {
     try {
-        const { format,plan = null, page = null, action = null, startDate = null, endDate = null } = req.query; // 'pdf' or 'xlsx'
+        const { format, plan = null, page = null, action = null } = req.query;
+        let { startDate = null, endDate = null } = req.query;
+        // Validate date formats
+        startDate = startDate && moment(startDate, moment.ISO_8601, true).isValid() ? startDate : null;
+        endDate = endDate && moment(endDate, moment.ISO_8601, true).isValid() ? endDate : null;
+    
 
         if (!format || (format !== 'pdf' && format !== 'xlsx')) {
             return res.status(400).send('Invalid format. Must be "pdf" or "xlsx".');

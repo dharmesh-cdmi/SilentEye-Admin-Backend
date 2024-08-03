@@ -34,7 +34,7 @@ const userSchema = new Schema({
   blocked: { type: Boolean, default: false },
   userStatus: {
     type: String,
-    enum: ['Demo', 'Checkout', 'Paid', 'Visitor'],
+    enum: ['Demo', 'Checkout', 'Paid', 'Visitor', 'Payment_Initiated', 'Purchased', 'Logged_In', 'Refund_Requested', 'Blocked'],
     default: 'Demo'
   },
   process: {
@@ -61,7 +61,7 @@ const userSchema = new Schema({
     }
   ],
   walletAmount: { type: Number, default: 0 },
-
+  activeDashboard: { type: Boolean, default: true },
 });
 
 // Pre-save hook to update the `updatedAt` field

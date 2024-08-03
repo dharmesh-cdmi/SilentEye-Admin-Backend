@@ -673,6 +673,22 @@ const deleteBulkUsers = async (userIds) => {
 }
 
 
+const placeOrder = async (userId, data) => {
+    const user = await User.findById(userId);
+    if (!user) {
+        return false;
+    }
+
+    const order = await createOrder(data);
+
+    user.orders.push(order._id);
+    user.activePlanId = data.planDetails.planId;
+    user.amountSpend += data.orderDetails.total;
+
+    await user.save();
+    return order;
+}
+
 module.exports = {
     getUserProfile,
     getUserStatistics,
@@ -687,5 +703,6 @@ module.exports = {
     addUserHistoryByIP,
     updateVisitor,
     getUserStatisticsByCountry,
-    deleteBulkUsers
+    deleteBulkUsers,
+    placeOrder
 };

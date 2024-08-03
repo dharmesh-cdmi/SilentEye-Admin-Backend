@@ -96,4 +96,11 @@ router.delete(
     verifyAdmin,
     controller.DeleteBulkUsers
 );
+
+router.post(
+    "/place-order",
+    authenticateUser,
+    controller.PlaceOrder
+);
+
 module.exports = router;

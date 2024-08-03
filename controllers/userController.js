@@ -186,6 +186,16 @@ const DeleteBulkUsers = async (req, res) => {
   }
 }
 
+const PlaceOrder = async (req, res) => {
+  try {
+    const user = req.user;
+    const order = await userService.placeOrder(user?._id, req.body);
+    return apiSuccessResponse(res, HTTP_STATUS_MESSAGE[201], order, HTTP_STATUS.CREATED);
+  } catch (error) {
+    return apiErrorResponse(res, HTTP_STATUS_MESSAGE[500], error, HTTP_STATUS.INTERNAL_SERVER_ERROR);
+  }
+}
+
 module.exports = {
   getProfile,
   FetchAllUsers,
@@ -199,5 +209,6 @@ module.exports = {
   UpdateVisitor,
   AddUserHistoryByVisitor,
   DownloadUsersData,
-  DeleteBulkUsers
+  DeleteBulkUsers,
+  PlaceOrder
 };

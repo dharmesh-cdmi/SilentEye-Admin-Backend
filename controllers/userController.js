@@ -18,8 +18,8 @@ const getProfile = async (req, res) => {
 // Fetch All Users
 const FetchAllUsers = async (req, res) => {
   try {
-    // getting params through req.body
-    const users = await userService.fetchAllUsers(req.body);
+    // getting params through req.params
+    const users = await userService.fetchAllUsers(req.params);
     return apiSuccessResponse(res, HTTP_STATUS_MESSAGE[200], users, HTTP_STATUS.OK);
   } catch (error) {
     return apiErrorResponse(res, HTTP_STATUS_MESSAGE[500], error, HTTP_STATUS.INTERNAL_SERVER_ERROR);

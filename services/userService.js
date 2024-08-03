@@ -552,6 +552,8 @@ const registerUser = async (userData) => {
 
     newUser.orders.push(order._id);
     newUser.activePlanId = plan?._id;
+    let totalAmount = Number(plan?.amount) + Number(addOns?.reduce((acc, curr) => acc + curr.amount, 0));
+    newUser.amountSpend += totalAmount;
     await newUser.save();
     return newUser;
 };
@@ -597,6 +599,10 @@ const updateUser = async (id, data) => {
     if (data.targetedNumbers) user.targetedNumbers = data.targetedNumbers;
     if (data.activeDashboard !== undefined) user.activeDashboard = data.activeDashboard;
     if (data.deviceType) user.deviceType = data.deviceType;
+
+    if (data.activePlanId) {
+        user.activePlanId = data.activePlanId;
+    }
 
     await user.save();
 

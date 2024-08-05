@@ -11,8 +11,22 @@ const createUpsell = async (data) => {
   }
 };
 
+// // Get all upsells
+// const getAllUpsells = async (page, limit) => {
+//   try {
+//     const options = {
+//       page: parseInt(page, 10),
+//       limit: parseInt(limit, 10),
+//       sort: { createdAt: -1 },
+//     };
+
+//     return await Upsell.paginate({}, options);
+//   } catch (error) {
+//     throw new Error(`Error fetching upsells: ${error.message}`);
+//   }
+// };
 // Get all upsells
-const getAllUpsells = async (page, limit) => {
+const getAllUpsells = async (page, limit, search) => {
   try {
     const options = {
       page: parseInt(page, 10),
@@ -20,7 +34,21 @@ const getAllUpsells = async (page, limit) => {
       sort: { createdAt: -1 },
     };
 
-    return await Upsell.paginate({}, options);
+    // Create a query object
+    const query = {};
+
+    // If a search term is provided, add it to the query
+    if (search) {
+      // const lowerCaseSearch = search.toLowerCase();
+      query.$or = [
+        { 'planName.name': { $regex: lowerCaseSearch, $options: 'i' } },
+        { 'upsell.name': { $regex: lowerCaseSearch, $options: 'i' } },
+        { tag: { $regex: lowerCaseSearch, $options: 'i' } },
+        { status: { $regex: lowerCaseSearch, $options: 'i' } },
+      ];
+    }
+
+    return await Upsell.paginate(query, options);
   } catch (error) {
     throw new Error(`Error fetching upsells: ${error.message}`);
   }

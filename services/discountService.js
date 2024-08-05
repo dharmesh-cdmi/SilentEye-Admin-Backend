@@ -19,14 +19,27 @@ const createDiscount = async (data) => {
 };
 
 // Get all discounts
-const getAllDiscounts = async (page, limit) => {
+const getAllDiscounts = async (page, limit, search) => {
   try {
     const options = {
       page: parseInt(page, 10),
       limit: parseInt(limit, 10),
       sort: { createdAt: -1 },
     };
-    return await Discount.paginate({}, options);
+
+    // Create a query object
+    const query = {};
+
+    // If a search term is provided, add it to the query
+    if (search) {
+      query.$or = [
+        { coupon: { $regex: search, $options: 'i' } },
+        { validity: { $regex: search, $options: 'i' } },
+        { status: { $regex: search, $options: 'i' } },
+      ];
+    }
+
+    return await Discount.paginate(query, options);
   } catch (error) {
     throw new Error('Error in fetching discounts: ' + error.message);
   }

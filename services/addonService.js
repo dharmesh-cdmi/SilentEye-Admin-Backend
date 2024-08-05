@@ -40,14 +40,26 @@ const createAddon = async (data) => {
 };
 
 // Get all addons
-const getAllAddons = async (page, limit) => {
+const getAllAddons = async (page, limit, search) => {
   try {
     const options = {
       page: parseInt(page, 10),
       limit: parseInt(limit, 10),
       sort: { createdAt: -1 },
     };
-    return await Addon.paginate({}, options);
+    // Create a query object
+    const query = {};
+
+    // If a search term is provided, add it to the query
+    if (search) {
+      query.$or = [
+        { title: { $regex: search, $options: 'i' } },
+        { description: { $regex: search, $options: 'i' } },
+        { status: { $regex: search, $options: 'i' } },
+      ];
+    }
+
+    return await Addon.paginate(query, options);
   } catch (error) {
     throw new Error('Error in fetching addons: ' + error.message);
   }

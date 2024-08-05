@@ -31,8 +31,8 @@ const createPlan = async (req, res) => {
 // Get all plans
 const getAllPlans = async (req, res) => {
   try {
-    const { page = 1, limit = 10 } = req.query;
-    const plans = await planService.getAllPlans(page, limit);
+    const { page = 1, limit = 10, search } = req.query;
+    const plans = await planService.getAllPlans(page, limit, search);
     return apiSuccessResponse(
       res,
       HTTP_STATUS_MESSAGE[200],

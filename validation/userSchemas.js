@@ -61,7 +61,7 @@ const updateUserSchema = yup.object().shape({
     device: yup.string().trim(),
     ipAddress: yup.string().trim(),
     blocked: yup.boolean(),
-    status: yup.string().oneOf(['Demo', 'Checkout', 'Paid', 'Visitor'], 'Invalid status'),
+    status: yup.string().oneOf(['Demo', 'Checkout', 'Paid', 'Visitor', 'Payment_Initiated', 'Purchased', 'Logged_In', 'Refund_Requested', 'Blocked'], 'Invalid status'),
     process: yup.string().oneOf(['Running', 'Pending', 'Completed'], 'Invalid process'),
     history: yup.array().of(
         yup.object().shape({
@@ -72,8 +72,10 @@ const updateUserSchema = yup.object().shape({
     orders: yup.array().of(
         yup.string().trim().matches(/^[0-9a-fA-F]{24}$/, 'Invalid Order ID')
     ),
-    targetedNumbers: yup.array().of(yup.string().trim()),
+    targetedNumbers: yup.array(),
     walletAmount: yup.number(),
+    activeDashboard: yup.boolean(),
+    deviceType: yup.string().trim(),
 });
 
 const addUserHistorySchema = yup.object().shape({

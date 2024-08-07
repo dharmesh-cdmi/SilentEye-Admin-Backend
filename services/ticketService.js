@@ -33,7 +33,13 @@ const fetchAllTickets = async (page = 1, limit = 10, searchQuery = "", status, o
         .populate("user", "name email");
 
     return {
-        tickets,
+        tickets: tickets.map(ticket => {
+            return {
+                ...ticket._doc,
+                index: parseInt(ticket.ticketId.match(/\d+$/)[0]),
+                lastMessage: ticket.comments.length > 0 ? ticket.comments[ticket.comments.length - 1]?.text : ""
+            }
+        }),
         page,
         limit,
         total,

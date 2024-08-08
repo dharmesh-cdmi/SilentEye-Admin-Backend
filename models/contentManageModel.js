@@ -4,15 +4,13 @@ const Schema = mongoose.Schema;
 const contactDetailsSchema = new Schema(
     {
         status: {
-            type: String,
-            default: 'disabled',
-            enum: ['enabled', 'disabled']
+            type: Boolean,
+            dafault: false
         },
         contact: {
             status: {
-                type: String,
-                default: 'disabled',
-                enum: ['enabled', 'disabled']
+                type: Boolean,
+                dafault: false
             },
             value: {
                 type: String,
@@ -22,9 +20,8 @@ const contactDetailsSchema = new Schema(
         },
         email: {
             status: {
-                type: String,
-                default: 'disabled',
-                enum: ['enabled', 'disabled']
+                type: Boolean,
+                dafault: false
             },
             value: {
                 type: String,
@@ -34,9 +31,8 @@ const contactDetailsSchema = new Schema(
         },
         address: {
             status: {
-                type: String,
-                default: 'disabled',
-                enum: ['enabled', 'disabled']
+                type: Boolean,
+                dafault: false
             },
             value: {
                 type: String,
@@ -76,9 +72,8 @@ const FeatureSchema = new Schema({
         required: true
     },
     status: {
-        type: String,
+        type: Boolean,
         required: true,
-        enum: ['enabled', 'disabled']
     }
 });
 
@@ -94,9 +89,8 @@ const PageSchema = new Schema({
         trim: true
     },
     status: {
-        type: String,
+        type: Boolean,
         required: true,
-        enum: ['enabled', 'disabled']
     }
 }, {
     timestamps: true
@@ -117,9 +111,8 @@ const FaqSchema = new Schema({
 
 const FaqCategorySchema = new Schema({
     status: {
-        type: String,
+        type: Boolean,
         required: true,
-        enum: ['enabled', 'disabled']
     },
     title: {
         type: String,
@@ -149,16 +142,22 @@ const ReviewSchema = new Schema({
         type: Number,
         required: true
     },
+    title: {
+        type: String,
+        required: true,
+        trim: true
+    },
     review: {
         type: String,
         required: true,
         trim: true
     },
     status: {
-        type: String,
+        type: Boolean,
         required: true,
-        enum: ['enabled', 'disabled']
     }
+}, {
+    timestamps: true
 });
 
 const ContentManageSchema = new Schema({

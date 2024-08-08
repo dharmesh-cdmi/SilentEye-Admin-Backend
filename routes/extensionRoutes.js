@@ -6,7 +6,7 @@ const validationMiddleware = require('../middleware/validationMiddleware');
 
 router.get(
   "/fetch-extensions",
-  authMiddleware.verifyAdmin,
+  // authMiddleware.verifyAdmin,
   controller.FetchExtensions
 );
 

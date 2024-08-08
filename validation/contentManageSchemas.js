@@ -4,29 +4,29 @@ const mongoose = require('mongoose');
 const ObjectId = yup.string().test('is-valid', 'Invalid ID', value => mongoose.Types.ObjectId.isValid(value));
 
 const contactSchema = yup.object().shape({
-    status: yup.string().oneOf(['enabled', 'disabled'], 'Invalid status').required('Status is required'),
+    status: yup.boolean().required('Status is required'),
     value: yup.string().trim().default(''),
 }).noUnknown(true, 'Unknown field in contact data');
 
 const emailSchema = yup.object().shape({
-    status: yup.string().oneOf(['enabled', 'disabled'], 'Invalid status').required('Status is required'),
+    status: yup.boolean().required('Status is required'),
     value: yup.string().trim().default(''),
 }).noUnknown(true, 'Unknown field in email data');
 
 const addressSchema = yup.object().shape({
-    status: yup.string().oneOf(['enabled', 'disabled'], 'Invalid status').required('Status is required'),
+    status: yup.boolean().required('Status is required'),
     value: yup.string().trim().default(''),
 }).noUnknown(true, 'Unknown field in address data');
 
 const contactDetailsSchema = yup.object().shape({
-    status: yup.string().oneOf(['enabled', 'disabled'], 'Invalid status').required('Status is required'),
+    status: yup.boolean().required('Status is required'),
     contact: contactSchema.required('Contact data is required'),
     email: emailSchema.required('Email data is required'),
     address: addressSchema.required('Address data is required'),
 }).noUnknown(true, 'Unknown field in contact details data');
 
 const featureSchema = yup.object().shape({
-    status: yup.string().oneOf(['enabled', 'disabled'], 'Invalid status').required('Status is required'),
+    status: yup.boolean().required('Status is required'),
     title: yup.string().trim().required('Title is required'),
     description: yup.string().trim().required('Description is required'),
     stopHere: yup.boolean().required('Stop Here is required'),
@@ -44,9 +44,9 @@ const fetchFeaturesSchema = yup.object().shape({
 }).noUnknown(true, 'Unknown field in fetch features data');
 
 const pageSchema = yup.object().shape({
-    status: yup.string().oneOf(['enabled', 'disabled'], 'Invalid status').required('Status is required'),
+    status: yup.boolean().required('Status is required'),
     title: yup.string().trim().required('Title is required'),
-    text: yup.string().trim().required('text is required'),
+    text: yup.string().trim().required('Text is required'),
 }).noUnknown(true, 'Unknown field in page data');
 
 const pageIdSchema = yup.object().shape({
@@ -59,9 +59,10 @@ const fetchPagesSchema = yup.object().shape({
 }).noUnknown(true, 'Unknown field in fetch pages data');
 
 const reviewSchema = yup.object().shape({
-    status: yup.string().oneOf(['enabled', 'disabled'], 'Invalid status').required('Status is required'),
+    status: yup.boolean().required('Status is required'),
     name: yup.string().trim().required('Name is required'),
     rating: yup.number().positive('Rating must be positive').max(5, 'Rating must be less than or equal to 5').required('Rating is required'),
+    title: yup.string().trim().required('Title is required'),
     review: yup.string().trim().required('Review is required'),
 }).noUnknown(true, 'Unknown field in review data');
 
@@ -75,7 +76,7 @@ const fetchReviewsSchema = yup.object().shape({
 }).noUnknown(true, 'Unknown field in fetch reviews data');
 
 const faqCategorySchema = yup.object().shape({
-    status: yup.string().oneOf(['enabled', 'disabled'], 'Invalid status').required('Status is required'),
+    status: yup.boolean().required('Status is required'),
     title: yup.string().trim().required('Title is required'),
 }).noUnknown(true, 'Unknown field in review data');
 

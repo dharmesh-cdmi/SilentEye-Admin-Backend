@@ -24,7 +24,7 @@ const ContactFormSchema = new Schema({
     },
     contact: {
         type: String,
-        required: true,
+        default: null,
         trim: true
     }
 }, {

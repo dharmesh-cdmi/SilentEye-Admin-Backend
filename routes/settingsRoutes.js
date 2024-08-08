@@ -21,7 +21,7 @@ const upload = multer({ storage });
 
 router.get(
   "/fetch-settings",
-  authMiddleware.verifyAdmin,
+  // authMiddleware.verifyAdmin,
   controller.FetchSettings
 );
 

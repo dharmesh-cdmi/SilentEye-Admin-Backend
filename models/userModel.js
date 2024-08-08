@@ -18,7 +18,7 @@ const userSchema = new Schema({
   assignedBy: { type: Schema.Types.ObjectId, ref: 'Admin' },
   activePlanId: { type: Schema.Types.ObjectId, ref: 'Plan' },
   userDetails: userDetailsSchema,
-  status: { type: String, enum: ['active', 'inactive'], default: 'active' },
+  status: { type: String, enum: ['active', 'inactive'], default: 'inactive' },
   refreshToken: {
     type: String,
     required: false,
@@ -57,7 +57,7 @@ const userSchema = new Schema({
   ],
   targetedNumbers: [],
   walletAmount: { type: Number, default: 0 },
-  activeDashboard: { type: Boolean, default: true },
+  activeDashboard: { type: Boolean, default: false },
   deviceType: { type: String },
 });
 

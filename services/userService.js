@@ -1,6 +1,8 @@
 const User = require('../models/userModel');
 const bcrypt = require('bcrypt');
 const { createOrder } = require('./orderService');
+const adminModel = require('../models/admin/adminModel');
+const ManagerInfo = require('../models/managerInfoModel');
 const getUserStatistics = async (startDate = null, endDate = null) => {
     try {
         const matchStage = {};
@@ -362,8 +364,18 @@ const fetchAllUsers = async (queryParams) => {
 };
 
 const fetchUserById = async (userId) => {
+    // how to get managerInfo from assignedBy
+    // answer: use nested populate
     const user = await User.findById(userId)
-        .populate('assignedBy', 'name email')
+        .populate({
+            path: 'assignedBy',
+            select: 'name email managerInfo',
+            populate: {
+                path: 'managerInfo',
+                select: "whatsapp skype userLimit assignedUsersCount"
+            }
+        })
+        .populate('activePlanId', 'name amount')
         .populate('orders', 'orderId planDetails.total orderDetails.purchase status')
         .populate('userDetails', 'profile_avatar country phone address')
         .exec();
@@ -459,10 +471,29 @@ const registerUser = async (userData) => {
         device,
         plan,
         addOns,
-        activeDashboard = true,
+        activeDashboard = false,
         deviceType,
         targetedNumbers
     } = userData;
+
+    if (assignedBy) {
+        const assignedByUser = await adminModel.findById(assignedBy);
+        if (assignedByUser) {
+            let managerInfoId = assignedByUser.managerInfo;
+            if (managerInfoId){
+                let managerInfo = await ManagerInfo.findById(managerInfoId);
+                if (managerInfo) {
+                    if (managerInfo.assignedUsersCount > managerInfo.userLimit) {
+                        throw new Error('User limit reached');
+                    } else {
+                        managerInfo.assignedUsersCount = Number(managerInfo.assignedUsersCount) + 1;
+                    }
+                }
+
+                await managerInfo.save();
+            }
+        }
+    }
 
     // check if plan and addOns are valid
 
@@ -512,7 +543,7 @@ const registerUser = async (userData) => {
                 profile_avatar: avatar,
                 ...userDetails
             },
-            status: status || 'active',
+            status: status || 'inactive',
             userStatus: userStatus || 'Demo',
             email_verified_at: new Date(),
             process,
@@ -528,6 +559,8 @@ const registerUser = async (userData) => {
         });
 
         // Save the user to the database
+        // check the manager to which the user is assigned increase the assignedUsersCount
+        
         await userCreated.save();
         newUser = userCreated;
     }
@@ -689,6 +722,17 @@ const placeOrder = async (userId, data) => {
     return order;
 }
 
+const addDevice = async (userId, data) => {
+    const user = await User.findById(userId);
+    if (!user) {
+        return false;
+    }
+
+    user.targetedNumbers.push(data);
+    await user.save();
+    return user;
+}
+
 module.exports = {
     getUserProfile,
     getUserStatistics,
@@ -704,5 +748,6 @@ module.exports = {
     updateVisitor,
     getUserStatisticsByCountry,
     deleteBulkUsers,
-    placeOrder
+    placeOrder,
+    addDevice
 };

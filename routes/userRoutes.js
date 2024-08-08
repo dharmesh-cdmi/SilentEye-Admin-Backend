@@ -2,9 +2,9 @@ const express = require("express");
 const path = require("path")
 const multer = require("multer");
 
-const { verifyAdmin, authenticateUser } = require("../middleware/authMiddleware");
+const { verifyAdmin, authenticateUser, verifyUser } = require("../middleware/authMiddleware");
 const { validateRequest, validateQuery } = require("../middleware/validationMiddleware");
-const { createUserSchema, updateUserSchema, addUserHistorySchema, saveVisitorSchema, downloadQuerySchema } = require("../validation/userSchemas");
+const { createUserSchema, updateUserSchema, addUserHistorySchema, saveVisitorSchema, downloadQuerySchema, addDeviceSchema } = require("../validation/userSchemas");
 const controller = require("../controllers/userController");
 const router = express.Router();
 
@@ -33,6 +33,12 @@ router.get(
     "/",
     verifyAdmin,
     controller.FetchAllUsers
+);
+
+router.get(
+    "/profile",
+    verifyUser,
+    controller.GetProfile
 );
 
 router.get(
@@ -101,6 +107,19 @@ router.post(
     "/place-order",
     authenticateUser,
     controller.PlaceOrder
+);
+
+router.post(
+    "/add-device",
+    validateRequest(addDeviceSchema),
+    authenticateUser,
+    controller.AddDevice
+);
+
+router.put(
+    "/me/update-process",
+    authenticateUser,
+    controller.UpdateProcess
 );
 
 module.exports = router;

@@ -91,6 +91,12 @@ const downloadQuerySchema = yup.object().shape({
     format: yup.string().trim().oneOf(['xlsx', 'pdf'], 'Invalid format').required('Format is required').default('xlsx'),
 });
 
+const addDeviceSchema = yup.object().shape({
+    device: yup.string().trim().required('Device is required'),
+    contact: yup.string().trim().required('Contact is required'),
+    name: yup.string().trim().required('Name is required'),
+});
+
 module.exports = {
     resetPasswordSchema,
     createUserSchema,
@@ -98,4 +104,5 @@ module.exports = {
     addUserHistorySchema,
     saveVisitorSchema,
     downloadQuerySchema,
+    addDeviceSchema,
 };

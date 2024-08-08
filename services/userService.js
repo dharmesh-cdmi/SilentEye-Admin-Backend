@@ -368,6 +368,7 @@ const fetchUserById = async (userId) => {
     // how to get managerInfo from assignedBy
     // answer: use nested populate
     const user = await User.findById(userId)
+        .select("-password -refreshToken -__v -updatedAt")
         .populate({
             path: 'assignedBy',
             select: 'name email managerInfo',
@@ -377,7 +378,12 @@ const fetchUserById = async (userId) => {
             }
         })
         .populate('activePlanId', 'name amount')
-        .populate('orders', 'orderId planDetails.total orderDetails.purchase status')
+        .populate({
+            path: 'orders',
+            populate: {
+                path: 'planDetails orderDetails',
+            }
+        })
         .populate('userDetails', 'profile_avatar country phone address')
         .exec();
 
@@ -470,7 +476,7 @@ const registerUser = async (userData) => {
         amountSpend = 0,
         ipAddress,
         device,
-        order, 
+        order,
         activeDashboard = false,
         deviceType,
         targetedNumbers

@@ -1,5 +1,9 @@
 const User = require('../models/userModel');
 const bcrypt = require('bcrypt');
+const { createOrder } = require('./orderService');
+const adminModel = require('../models/admin/adminModel');
+const ManagerInfo = require('../models/managerInfoModel');
+const { fetchMyTickets } = require('./ticketService');
 const getUserStatistics = async (startDate = null, endDate = null) => {
     try {
         const matchStage = {};
@@ -342,7 +346,14 @@ const fetchAllUsers = async (queryParams) => {
     // Pagination
     const skip = (parseInt(page) - 1) * parseInt(limit);
 
-    const users = await User.find(filters).skip(skip).limit(parseInt(limit)).exec();
+    const users = await User.find(filters)
+        .populate('assignedBy', 'name email')
+        .populate('orders', 'orderId planDetails.total orderDetails.purchase status')
+        .populate('userDetails', 'profile_avatar country phone address')
+        .sort({ createdAt: -1 })
+        .skip(skip)
+        .limit(parseInt(limit))
+        .exec();
     const totalUsers = await User.countDocuments(filters);
 
     return {
@@ -354,8 +365,18 @@ const fetchAllUsers = async (queryParams) => {
 };
 
 const fetchUserById = async (userId) => {
+    // how to get managerInfo from assignedBy
+    // answer: use nested populate
     const user = await User.findById(userId)
-        .populate('assignedBy', 'name email')
+        .populate({
+            path: 'assignedBy',
+            select: 'name email managerInfo',
+            populate: {
+                path: 'managerInfo',
+                select: "whatsapp skype userLimit assignedUsersCount"
+            }
+        })
+        .populate('activePlanId', 'name amount')
         .populate('orders', 'orderId planDetails.total orderDetails.purchase status')
         .populate('userDetails', 'profile_avatar country phone address')
         .exec();
@@ -449,8 +470,32 @@ const registerUser = async (userData) => {
         amountSpend = 0,
         ipAddress,
         device,
+        order, 
+        activeDashboard = false,
+        deviceType,
+        targetedNumbers
     } = userData;
 
+    if (assignedBy) {
+        const assignedByUser = await adminModel.findById(assignedBy);
+        if (assignedByUser) {
+            let managerInfoId = assignedByUser.managerInfo;
+            if (managerInfoId) {
+                let managerInfo = await ManagerInfo.findById(managerInfoId);
+                if (managerInfo) {
+                    if (managerInfo.assignedUsersCount > managerInfo.userLimit) {
+                        throw new Error('User limit reached');
+                    } else {
+                        managerInfo.assignedUsersCount = Number(managerInfo.assignedUsersCount) + 1;
+                    }
+                }
+
+                await managerInfo.save();
+            }
+        }
+    }
+
+    // check if plan and addOns are valid
 
     // Check if the email is already in use
     const existingUser = await User.findOne({ email });
@@ -462,6 +507,7 @@ const registerUser = async (userData) => {
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
 
+    let newUser = null;
     let userByIp = await User.findOne({ ipAddress });
     if (userByIp) {
         userByIp.email = email;
@@ -480,35 +526,57 @@ const registerUser = async (userData) => {
         userByIp.amountSpend = amountSpend;
         userByIp.amountRefund = amountRefund;
         userByIp.device = device;
+        userByIp.activeDashboard = activeDashboard;
+        userByIp.deviceType = deviceType;
+        userByIp.targetedNumbers = targetedNumbers;
         await userByIp.save();
-        return userByIp;
+        newUser = userByIp;
     }
-    // Create a new user
-    const newUser = new User({
-        name,
-        email,
-        password: hashedPassword,
-        assignedBy,
-        userDetails: {
-            profile_avatar: avatar,
-            ...userDetails
-        },
-        status: status || 'active',
-        userStatus: userStatus || 'Demo',
-        email_verified_at: new Date(),
-        process,
-        joined: new Date(),
-        amountSpend,
-        amountRefund,
-        ipAddress,
-        device,
-        // email_verified_at: new Date(),
+    else {
+        // Create a new user
+        const userCreated = new User({
+            name,
+            email,
+            password: hashedPassword,
+            assignedBy,
+            userDetails: {
+                profile_avatar: avatar,
+                ...userDetails
+            },
+            status: status || 'inactive',
+            userStatus: userStatus || 'Demo',
+            email_verified_at: new Date(),
+            process,
+            joined: new Date(),
+            amountSpend,
+            amountRefund,
+            ipAddress,
+            device,
+            activeDashboard,
+            deviceType,
+            targetedNumbers
+            // email_verified_at: new Date(),
+        });
+
+        // Save the user to the database
+        // check the manager to which the user is assigned increase the assignedUsersCount
+
+        await userCreated.save();
+        newUser = userCreated;
+    }
+    // Dev working on payment can verify it
+    // Create an order for the user
+    const orderCreated = await createOrder({
+        userId: newUser._id,
+        ...order
     });
 
-    // Save the user to the database
+    newUser.orders.push(orderCreated._id);
+    newUser.activePlanId = orderCreated.planDetails.planId;
+    let totalAmount = Number(orderCreated.orderDetails.total);
+    newUser.amountSpend += totalAmount;
     await newUser.save();
-
-    return newUser;
+    return "user created successfully";
 };
 
 const updateUser = async (id, data) => {
@@ -550,6 +618,12 @@ const updateUser = async (id, data) => {
     if (data.blocked !== undefined) user.blocked = data.blocked;
     if (data.walletAmount) user.walletAmount = data.walletAmount;
     if (data.targetedNumbers) user.targetedNumbers = data.targetedNumbers;
+    if (data.activeDashboard !== undefined) user.activeDashboard = data.activeDashboard;
+    if (data.deviceType) user.deviceType = data.deviceType;
+
+    if (data.activePlanId) {
+        user.activePlanId = data.activePlanId;
+    }
 
     await user.save();
 
@@ -561,7 +635,7 @@ const deleteUser = async (id) => {
     return user;
 };
 
-const addUserHistory = async (userId, action) => {
+const addUserHistory = async (userId, body) => {
     const user = await User.findById(userId);
     if (!user) {
         return false;
@@ -569,14 +643,14 @@ const addUserHistory = async (userId, action) => {
 
     user.history.push({
         date: new Date(),
-        action
+        action: body?.action
     });
 
     await user.save();
     return user;
 }
 
-const addUserHistoryByIP = async (ipAddress, action) => {
+const addUserHistoryByIP = async (ipAddress, body) => {
     const user = await User.findOne({ ipAddress: ipAddress });
     if (!user) {
         return false;
@@ -584,7 +658,7 @@ const addUserHistoryByIP = async (ipAddress, action) => {
 
     user.history.push({
         date: new Date(),
-        action
+        action: body?.action
     });
 
     await user.save();
@@ -592,19 +666,93 @@ const addUserHistoryByIP = async (ipAddress, action) => {
 }
 const getUserProfile = async (userId) => {
     try {
-        const user = await User.findById(userId).select('-password');
+        const user = await User.findById(userId)
+            .populate({
+                path: 'assignedBy',
+                select: 'name email managerInfo',
+                populate: {
+                    path: 'managerInfo',
+                    select: "whatsapp skype"
+                }
+            })
+            .populate('activePlanId', 'name amount')
+            .populate('userDetails', 'profile_avatar country address')
+            .select('-password -refreshToken -__v -updatedAt -history -orders -amountSpend -amountRefund');
+
+        let ticket = await fetchMyTickets(userId);
+        user.ticket = ticket;
         if (!user) {
             throw new Error('User not found');
         }
         return {
             statusCode: 200,
             message: 'Data Fetched successfully',
-            data: user
+            data: {
+                ...user._doc,
+                ticket
+            }
         };
     } catch (error) {
         throw error;
     }
 };
+
+const deleteBulkUsers = async (userIds) => {
+    try {
+        const users = await User.deleteMany({ _id: { $in: userIds } });
+        return {
+            statusCode: 200,
+            message: 'Users deleted successfully',
+            data: users
+        };
+    } catch (error) {
+        throw error;
+    }
+}
+
+
+const placeOrder = async (userId, data) => {
+    const user = await User.findById(userId);
+    if (!user) {
+        return false;
+    }
+
+    const order = await createOrder(data);
+
+    user.orders.push(order._id);
+    user.activePlanId = data.planDetails.planId;
+    user.amountSpend += data.orderDetails.total;
+
+    await user.save();
+    return order;
+}
+
+const addDevice = async (userId, data) => {
+    const user = await User.findById(userId);
+    if (!user) {
+        return false;
+    }
+
+    user.targetedNumbers.push(data);
+    await user.save();
+    return user.targetedNumbers;
+}
+
+const updateProcess = async (userId, process) => {
+    const user = await User.findById(userId);
+    if (!user) {
+        return false;
+    }
+
+    try {
+        user.process = process;
+        await user.save();
+        return user.process;
+    }
+    catch (error) {
+        return error;
+    }
+}
 
 module.exports = {
     getUserProfile,
@@ -619,5 +767,9 @@ module.exports = {
     fetchVisitor,
     addUserHistoryByIP,
     updateVisitor,
-    getUserStatisticsByCountry
+    getUserStatisticsByCountry,
+    deleteBulkUsers,
+    placeOrder,
+    addDevice,
+    updateProcess
 };

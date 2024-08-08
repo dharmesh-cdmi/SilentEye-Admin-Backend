@@ -29,8 +29,12 @@ const createShipping = async (req, res) => {
 // Get all shippings
 const getAllShippings = async (req, res) => {
   try {
-    const { page = 1, limit = 10 } = req.query;
-    const shippings = await shippingService.getAllShippings(page, limit);
+    const { page = 1, limit = 10, search } = req.query;
+    const shippings = await shippingService.getAllShippings(
+      page,
+      limit,
+      search
+    );
     return apiSuccessResponse(
       res,
       HTTP_STATUS_MESSAGE[200],

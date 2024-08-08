@@ -29,8 +29,12 @@ const createDiscount = async (req, res) => {
 // Get all discounts
 const getAllDiscounts = async (req, res) => {
   try {
-    const { page = 1, limit = 10 } = req.query;
-    const discounts = await discountService.getAllDiscounts(page, limit);
+    const { page = 1, limit = 10, search } = req.query;
+    const discounts = await discountService.getAllDiscounts(
+      page,
+      limit,
+      search
+    );
     return apiSuccessResponse(
       res,
       HTTP_STATUS_MESSAGE[200],

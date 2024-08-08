@@ -28,11 +28,11 @@ const searchContactsForm = async (pageIndex, limit, searchQuery) => {
         .skip(skip)
         .limit(limit);
 
-    if (!contactsForm || contactsForm.length <= 0) {
-        const error = new Error('Contacts form not found!');
-        error.code = 404;
-        throw error;
-    }
+    // if (!contactsForm || contactsForm.length <= 0) {
+    //     const error = new Error('Contacts form not found!');
+    //     error.code = 404;
+    //     throw error;
+    // }
 
     return {
         contactsForm,

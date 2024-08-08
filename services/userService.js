@@ -691,9 +691,9 @@ const getUserProfile = async (userId) => {
             .populate('activePlanId', 'name amount')
             .populate('userDetails', 'profile_avatar country address')
             .select('-password -refreshToken -__v -updatedAt -history -orders -amountSpend -amountRefund');
-        
-            let ticket = await fetchMyTickets(userId);
-            user.ticket = ticket;
+
+        let ticket = await fetchMyTickets(userId);
+        user.ticket = ticket;
         if (!user) {
             throw new Error('User not found');
         }
@@ -748,7 +748,23 @@ const addDevice = async (userId, data) => {
 
     user.targetedNumbers.push(data);
     await user.save();
-    return user;
+    return user.targetedNumbers;
+}
+
+const updateProcess = async (userId, process) => {
+    const user = await User.findById(userId);
+    if (!user) {
+        return false;
+    }
+
+    try {
+        user.process = process;
+        await user.save();
+        return user.process;
+    }
+    catch (error) {
+        return error;
+    }
 }
 
 module.exports = {
@@ -767,5 +783,6 @@ module.exports = {
     getUserStatisticsByCountry,
     deleteBulkUsers,
     placeOrder,
-    addDevice
+    addDevice,
+    updateProcess
 };

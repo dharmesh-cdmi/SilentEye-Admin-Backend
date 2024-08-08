@@ -38,7 +38,7 @@ const CreateTicket = async (req, res) => {
             message,
             user: req.user._id
         });
-        apiSuccessResponse(res, 'Ticket created successfully', ticket, HTTP_STATUS.CREATED);
+        apiSuccessResponse(res, 'Ticket created successfully', null, HTTP_STATUS.CREATED);
     } catch (error) {
         apiErrorResponse(res, 'Internal Server Error', error.message, HTTP_STATUS.INTERNAL_SERVER_ERROR);
     }

@@ -231,7 +231,11 @@ const AddDevice = async (req, res) => {
 const UpdateProcess = async (req, res) => {
   try {
     const user = req.user;
-    const process = await userService.updateUser(user?._id, req.body);
+    if (!req.body?.process) {
+      return apiErrorResponse(res, HTTP_STATUS_MESSAGE[400], 'Process is required', HTTP_STATUS.BAD_REQUEST);
+    }
+    
+    const process = await userService.updateProcess(user?._id, req.body?.process);
     return apiSuccessResponse(res, HTTP_STATUS_MESSAGE[200], process, HTTP_STATUS.OK);
   } catch (error) {
     return apiErrorResponse(res, HTTP_STATUS_MESSAGE[500], error, HTTP_STATUS.INTERNAL_SERVER_ERROR);

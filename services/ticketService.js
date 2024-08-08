@@ -48,13 +48,13 @@ const fetchAllTickets = async (page = 1, limit = 10, searchQuery = "", status, o
 }
 
 // get my tickets
-const fetchMyTickets = async (userId) => {
+const fetchMyTickets = async (userId, getComments = true) => {
     let admin = await adminModel.findOne({ role: 'admin' });
     let ticket = await Ticket.findOne({
         user: userId,
-        //status: { $in: ['Active', 'Pending'] }
+        status: { $in: ['Active', 'Pending'] }
     }).populate('comments')
-    .select("-__v -targetedNumber -ticketId -_id -user");
+        .select("-__v -targetedNumber -ticketId -user");
     if (!ticket) {
         return null;
     }
@@ -96,10 +96,10 @@ const createTicket = async (data) => {
     let ticket = await Ticket.findOne({ user: data.user, status: { $in: ['Active', 'Pending'] } });
     if (ticket) {
         console.log('Ticket already exists');
-        
+
         return ticket;
     }
-    
+
     ticket = new Ticket({
         ticketId,
         type: data.type,

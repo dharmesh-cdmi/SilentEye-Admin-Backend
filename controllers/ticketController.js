@@ -92,12 +92,12 @@ const BulkDeleteTickets = async (req, res) => {
 }
 
 const CreateTicketComment = async (req, res) => {
-    let userRole = req.user ? 'user': req.admin ? 'admin': 'guest';
+    let userRole = req.user ? 'user' : req.admin ? 'admin' : 'guest';
     try {
         const { ticketId } = req.params;
         const { comment } = req.body;
         const ticket = await addComment(ticketId, comment, userRole);
-        apiSuccessResponse(res, 'Comment added successfully', ticket, HTTP_STATUS.OK);
+        apiSuccessResponse(res, 'Comment added successfully', null, HTTP_STATUS.OK);
     } catch (error) {
         apiErrorResponse(res, 'Internal Server Error', error.message, HTTP_STATUS.INTERNAL_SERVER_ERROR);
     }

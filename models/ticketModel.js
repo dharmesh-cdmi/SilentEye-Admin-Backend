@@ -5,6 +5,8 @@ const TicketSchema = new mongoose.Schema({
     type: { type: String, required: true },
     message: { type: String, required: true },
     user: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+    email: { type: String },
+    targetedNumber: { type: String },
     comments: [{
         text: { type: String, required: true },
         createdBy: { type: String, enum: ['User', 'Admin'], required: true },

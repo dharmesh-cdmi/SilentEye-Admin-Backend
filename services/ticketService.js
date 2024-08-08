@@ -1,3 +1,4 @@
+const adminModel = require("../models/admin/adminModel");
 const Ticket = require("../models/ticketModel");
 /**
  * 
@@ -48,12 +49,39 @@ const fetchAllTickets = async (page = 1, limit = 10, searchQuery = "", status, o
 
 // get my tickets
 const fetchMyTickets = async (userId) => {
-    return await Ticket.find({ user: userId }).populate('comments');
+    let admin = await adminModel.findOne({ role: 'admin' });
+    let ticket = await Ticket.findOne({
+        user: userId,
+        //status: { $in: ['Active', 'Pending'] }
+    }).populate('comments')
+    .select("-__v -targetedNumber -ticketId -_id -user");
+    if (!ticket) {
+        return null;
+    }
+    return {
+        ...ticket._doc,
+        admin: {
+            name: admin.name,
+            email: admin.email
+        }
+    };
 }
 
 // get ticket by id
 const fetchTicketById = async (ticketId) => {
-    return await Ticket.findById(ticketId).populate('comments');
+    let admin = await adminModel.findOne({ role: 'admin' });
+    let ticket = await Ticket.findById(ticketId).populate('comments').populate("user", "name email");
+    if (!ticket) {
+        return null;
+    }
+    return {
+        ...ticket._doc,
+        index: parseInt(ticket.ticketId.match(/\d+$/)[0]),
+        admin: {
+            name: admin.name,
+            email: admin.email
+        }
+    };
 }
 
 /**
@@ -63,12 +91,23 @@ const fetchTicketById = async (ticketId) => {
  */
 const createTicket = async (data) => {
     const ticketId = await getNextTicketId();
-    const ticket = new Ticket({
+
+    // check if user has already created a ticket and it is still active or pending
+    let ticket = await Ticket.findOne({ user: data.user, status: { $in: ['Active', 'Pending'] } });
+    if (ticket) {
+        console.log('Ticket already exists');
+        
+        return ticket;
+    }
+    
+    ticket = new Ticket({
         ticketId,
         type: data.type,
         message: data.message,
         status: data?.status || 'Pending',
         user: data.user,
+        email: data.email,
+        targetedNumber: data.targetedNumber
     });
     return await ticket.save();
 }

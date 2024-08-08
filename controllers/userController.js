@@ -29,7 +29,7 @@ const FetchAllUsers = async (req, res) => {
 const GetProfile = async (req, res) => {
   try {
     const userId = req.user._id;
-    const user = await userService.fetchUserById(userId);
+    const user = await userService.getUserProfile(userId);
     if (!user) {
       return apiErrorResponse(res, HTTP_STATUS_MESSAGE[404], 'User not found', HTTP_STATUS.NOT_FOUND);
     }

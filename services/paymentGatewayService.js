@@ -9,14 +9,26 @@ const createPaymentGateway = async (data) => {
 };
 
 // Get all payment gateways
-const getAllPaymentGateways = async (page, limit) => {
+const getAllPaymentGateways = async (page, limit, search) => {
   try {
     const options = {
       page: parseInt(page, 10),
       limit: parseInt(limit, 10),
       sort: { createdAt: -1 },
     };
-    return await PaymentGateway.paginate({}, options);
+
+    // Create a query object
+    const query = {};
+
+    // If a search term is provided, add it to the query
+    if (search) {
+      query.$or = [
+        { name: { $regex: search, $options: 'i' } },
+        { status: { $regex: search, $options: 'i' } },
+      ];
+    }
+
+    return await PaymentGateway.paginate(query, options);
   } catch (error) {
     throw new Error('Error in fetching payment gateways: ' + error.message);
   }

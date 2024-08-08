@@ -470,8 +470,7 @@ const registerUser = async (userData) => {
         amountSpend = 0,
         ipAddress,
         device,
-        plan,
-        addOns,
+        order, 
         activeDashboard = false,
         deviceType,
         targetedNumbers
@@ -567,29 +566,17 @@ const registerUser = async (userData) => {
     }
     // Dev working on payment can verify it
     // Create an order for the user
-    const order = await createOrder({
-        status: 'Completed',
+    const orderCreated = await createOrder({
         userId: newUser._id,
-        planDetails: {
-            planId: plan?._id,
-            ...plan
-        },
-        addOns,
-        orderDetails: {
-            total: plan?.price,
-            country: userDetails?.country,
-            purchase: 'New Purchase'
-        },
-        paymentMethod: 'Credit Card',
-        status: 'Pending',
+        ...order
     });
 
-    newUser.orders.push(order._id);
-    newUser.activePlanId = plan?._id;
-    let totalAmount = Number(plan?.amount) + Number(addOns?.reduce((acc, curr) => acc + curr.amount, 0));
+    newUser.orders.push(orderCreated._id);
+    newUser.activePlanId = orderCreated.planDetails.planId;
+    let totalAmount = Number(orderCreated.orderDetails.total);
     newUser.amountSpend += totalAmount;
     await newUser.save();
-    return newUser;
+    return "user created successfully";
 };
 
 const updateUser = async (id, data) => {

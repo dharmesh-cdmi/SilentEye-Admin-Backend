@@ -159,6 +159,8 @@ const ReviewSchema = new Schema({
         required: true,
         enum: ['enabled', 'disabled']
     }
+}, {
+    timestamps: true
 });
 
 const ContentManageSchema = new Schema({

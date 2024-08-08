@@ -10,10 +10,10 @@ router.get(
     controller.FetchAllContactsForm
 );
 
-router.post(
+router.get(
     "/search-contact-form",
     authMiddleware.verifyAdmin,
-    validationMiddleware.validateRequest(contactFormSchemas.searchContactSchema),
+    validationMiddleware.validateQuery(contactFormSchemas.searchContactSchema),
     controller.SearchContactsForm
 );
 

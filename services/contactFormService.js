@@ -2,11 +2,11 @@ const ContactForm = require('../models/contactFormModel');
 
 const fetchAllContactsForm = async () => {
     const contactsForm = await ContactForm.find({});
-    if (!contactsForm || contactsForm.length <= 0) {
-        const error = new Error('Contacts form not found!');
-        error.code = 404;
-        throw error;
-    }
+    // if (!contactsForm || contactsForm.length <= 0) {
+    //     const error = new Error('Contacts form not found!');
+    //     error.code = 404;
+    //     throw error;
+    // }
     return contactsForm;
 };
 

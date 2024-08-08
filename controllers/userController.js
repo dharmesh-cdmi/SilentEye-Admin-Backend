@@ -26,6 +26,19 @@ const FetchAllUsers = async (req, res) => {
   }
 }
 
+const GetProfile = async (req, res) => {
+  try {
+    const userId = req.user._id;
+    const user = await userService.getUserProfile(userId);
+    if (!user) {
+      return apiErrorResponse(res, HTTP_STATUS_MESSAGE[404], 'User not found', HTTP_STATUS.NOT_FOUND);
+    }
+    return apiSuccessResponse(res, HTTP_STATUS_MESSAGE[200], user, HTTP_STATUS.OK);
+  } catch (error) {
+    return apiErrorResponse(res, HTTP_STATUS_MESSAGE[500], error, HTTP_STATUS.INTERNAL_SERVER_ERROR);
+  }
+}
+
 const FetchUserById = async (req, res) => {
   try {
     const user = await userService.fetchUserById(req.params.userId);
@@ -53,7 +66,16 @@ const RegisterUser = async (req, res) => {
     if (error.message.includes('duplicate key error') || error.message.includes('Email is already in use')) {
       return apiErrorResponse(res, HTTP_STATUS_MESSAGE[400], 'Email already exists', HTTP_STATUS.BAD_REQUEST);
     }
-    console.log('Error: ', error);
+    if (error.message.includes('Invalid plan')) {
+      return apiErrorResponse(res, HTTP_STATUS_MESSAGE[400], 'Invalid Plan ID', HTTP_STATUS.BAD_REQUEST);
+    }
+    if (error.message.includes('Invalid AddOns')) {
+      return apiErrorResponse(res, HTTP_STATUS_MESSAGE[400], 'Invalid AddOns', HTTP_STATUS.BAD_REQUEST);
+    }
+    if (error.message.includes('User limit reached')) {
+      return apiErrorResponse(res, HTTP_STATUS_MESSAGE[400], 'User limit reached for this manager', HTTP_STATUS.BAD_REQUEST);
+    }
+    console.log('Error: ', error?.message);
     return apiErrorResponse(res, HTTP_STATUS_MESSAGE[500], error, HTTP_STATUS.INTERNAL_SERVER_ERROR);
   }
 }
@@ -196,6 +218,30 @@ const PlaceOrder = async (req, res) => {
   }
 }
 
+const AddDevice = async (req, res) => {
+  try {
+    const user = req.user;
+    const device = await userService.addDevice(user?._id, req.body);
+    return apiSuccessResponse(res, HTTP_STATUS_MESSAGE[201], device, HTTP_STATUS.CREATED);
+  } catch (error) {
+    return apiErrorResponse(res, HTTP_STATUS_MESSAGE[500], error, HTTP_STATUS.INTERNAL_SERVER_ERROR);
+  }
+}
+
+const UpdateProcess = async (req, res) => {
+  try {
+    const user = req.user;
+    if (!req.body?.process) {
+      return apiErrorResponse(res, HTTP_STATUS_MESSAGE[400], 'Process is required', HTTP_STATUS.BAD_REQUEST);
+    }
+    
+    const process = await userService.updateProcess(user?._id, req.body?.process);
+    return apiSuccessResponse(res, HTTP_STATUS_MESSAGE[200], process, HTTP_STATUS.OK);
+  } catch (error) {
+    return apiErrorResponse(res, HTTP_STATUS_MESSAGE[500], error, HTTP_STATUS.INTERNAL_SERVER_ERROR);
+  }
+}
+
 module.exports = {
   getProfile,
   FetchAllUsers,
@@ -210,5 +256,8 @@ module.exports = {
   AddUserHistoryByVisitor,
   DownloadUsersData,
   DeleteBulkUsers,
-  PlaceOrder
+  PlaceOrder,
+  GetProfile,
+  AddDevice,
+  UpdateProcess
 };

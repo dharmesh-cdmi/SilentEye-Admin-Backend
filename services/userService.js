@@ -1,6 +1,9 @@
 const User = require('../models/userModel');
 const bcrypt = require('bcrypt');
 const { createOrder } = require('./orderService');
+const adminModel = require('../models/admin/adminModel');
+const ManagerInfo = require('../models/managerInfoModel');
+const { fetchMyTickets } = require('./ticketService');
 const getUserStatistics = async (startDate = null, endDate = null) => {
     try {
         const matchStage = {};
@@ -362,8 +365,18 @@ const fetchAllUsers = async (queryParams) => {
 };
 
 const fetchUserById = async (userId) => {
+    // how to get managerInfo from assignedBy
+    // answer: use nested populate
     const user = await User.findById(userId)
-        .populate('assignedBy', 'name email')
+        .populate({
+            path: 'assignedBy',
+            select: 'name email managerInfo',
+            populate: {
+                path: 'managerInfo',
+                select: "whatsapp skype userLimit assignedUsersCount"
+            }
+        })
+        .populate('activePlanId', 'name amount')
         .populate('orders', 'orderId planDetails.total orderDetails.purchase status')
         .populate('userDetails', 'profile_avatar country phone address')
         .exec();
@@ -457,12 +470,30 @@ const registerUser = async (userData) => {
         amountSpend = 0,
         ipAddress,
         device,
-        plan,
-        addOns,
-        activeDashboard = true,
+        order, 
+        activeDashboard = false,
         deviceType,
         targetedNumbers
     } = userData;
+
+    if (assignedBy) {
+        const assignedByUser = await adminModel.findById(assignedBy);
+        if (assignedByUser) {
+            let managerInfoId = assignedByUser.managerInfo;
+            if (managerInfoId) {
+                let managerInfo = await ManagerInfo.findById(managerInfoId);
+                if (managerInfo) {
+                    if (managerInfo.assignedUsersCount > managerInfo.userLimit) {
+                        throw new Error('User limit reached');
+                    } else {
+                        managerInfo.assignedUsersCount = Number(managerInfo.assignedUsersCount) + 1;
+                    }
+                }
+
+                await managerInfo.save();
+            }
+        }
+    }
 
     // check if plan and addOns are valid
 
@@ -512,7 +543,7 @@ const registerUser = async (userData) => {
                 profile_avatar: avatar,
                 ...userDetails
             },
-            status: status || 'active',
+            status: status || 'inactive',
             userStatus: userStatus || 'Demo',
             email_verified_at: new Date(),
             process,
@@ -528,34 +559,24 @@ const registerUser = async (userData) => {
         });
 
         // Save the user to the database
+        // check the manager to which the user is assigned increase the assignedUsersCount
+
         await userCreated.save();
         newUser = userCreated;
     }
     // Dev working on payment can verify it
     // Create an order for the user
-    const order = await createOrder({
-        status: 'Completed',
+    const orderCreated = await createOrder({
         userId: newUser._id,
-        planDetails: {
-            planId: plan?._id,
-            ...plan
-        },
-        addOns,
-        orderDetails: {
-            total: plan?.price,
-            country: userDetails?.country,
-            purchase: 'New Purchase'
-        },
-        paymentMethod: 'Credit Card',
-        status: 'Pending',
+        ...order
     });
 
-    newUser.orders.push(order._id);
-    newUser.activePlanId = plan?._id;
-    let totalAmount = Number(plan?.amount) + Number(addOns?.reduce((acc, curr) => acc + curr.amount, 0));
+    newUser.orders.push(orderCreated._id);
+    newUser.activePlanId = orderCreated.planDetails.planId;
+    let totalAmount = Number(orderCreated.orderDetails.total);
     newUser.amountSpend += totalAmount;
     await newUser.save();
-    return newUser;
+    return "user created successfully";
 };
 
 const updateUser = async (id, data) => {
@@ -645,14 +666,31 @@ const addUserHistoryByIP = async (ipAddress, body) => {
 }
 const getUserProfile = async (userId) => {
     try {
-        const user = await User.findById(userId).select('-password');
+        const user = await User.findById(userId)
+            .populate({
+                path: 'assignedBy',
+                select: 'name email managerInfo',
+                populate: {
+                    path: 'managerInfo',
+                    select: "whatsapp skype"
+                }
+            })
+            .populate('activePlanId', 'name amount')
+            .populate('userDetails', 'profile_avatar country address')
+            .select('-password -refreshToken -__v -updatedAt -history -orders -amountSpend -amountRefund');
+
+        let ticket = await fetchMyTickets(userId);
+        user.ticket = ticket;
         if (!user) {
             throw new Error('User not found');
         }
         return {
             statusCode: 200,
             message: 'Data Fetched successfully',
-            data: user
+            data: {
+                ...user._doc,
+                ticket
+            }
         };
     } catch (error) {
         throw error;
@@ -689,6 +727,33 @@ const placeOrder = async (userId, data) => {
     return order;
 }
 
+const addDevice = async (userId, data) => {
+    const user = await User.findById(userId);
+    if (!user) {
+        return false;
+    }
+
+    user.targetedNumbers.push(data);
+    await user.save();
+    return user.targetedNumbers;
+}
+
+const updateProcess = async (userId, process) => {
+    const user = await User.findById(userId);
+    if (!user) {
+        return false;
+    }
+
+    try {
+        user.process = process;
+        await user.save();
+        return user.process;
+    }
+    catch (error) {
+        return error;
+    }
+}
+
 module.exports = {
     getUserProfile,
     getUserStatistics,
@@ -704,5 +769,7 @@ module.exports = {
     updateVisitor,
     getUserStatisticsByCountry,
     deleteBulkUsers,
-    placeOrder
+    placeOrder,
+    addDevice,
+    updateProcess
 };

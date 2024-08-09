@@ -35,11 +35,14 @@ const createUserSchema = yup.object().shape({
     orders: yup.array().of(
         yup.string().trim().matches(/^[0-9a-fA-F]{24}$/, 'Invalid Order ID')
     ).optional(),
-    // plan will be object with unknown keys
-    plan: yup.object().noUnknown(true).required('Plan is required'),
-    addOns: yup.array().of(
-        yup.object().noUnknown(true)
-    ).optional(),
+    order: yup.object().shape({
+        userId: yup.string().optional(),
+        orderDetails: yup.object().unknown(true, 'Unknown field in order data').required('Order details are required'),
+        planDetails: yup.object().unknown(true, 'Unknown field in plan data').required('Plan details are required'),
+        addOns: yup.array().of(yup.object().unknown(true, 'Unknown field in addOn data')).optional(),
+        paymentMethod: yup.string().required('Payment method is required'),
+        status: yup.string().default('Pending').required('Status is required'),
+    }).optional(),
     targetedNumbers: yup.array().of(yup.string().trim()),
     walletAmount: yup.number().min(0).default(0),
 });
@@ -61,7 +64,7 @@ const updateUserSchema = yup.object().shape({
     device: yup.string().trim(),
     ipAddress: yup.string().trim(),
     blocked: yup.boolean(),
-    status: yup.string().oneOf(['Demo', 'Checkout', 'Paid', 'Visitor'], 'Invalid status'),
+    status: yup.string().oneOf(['Demo', 'Checkout', 'Paid', 'Visitor', 'Payment_Initiated', 'Purchased', 'Logged_In', 'Refund_Requested', 'Blocked'], 'Invalid status'),
     process: yup.string().oneOf(['Running', 'Pending', 'Completed'], 'Invalid process'),
     history: yup.array().of(
         yup.object().shape({
@@ -72,8 +75,10 @@ const updateUserSchema = yup.object().shape({
     orders: yup.array().of(
         yup.string().trim().matches(/^[0-9a-fA-F]{24}$/, 'Invalid Order ID')
     ),
-    targetedNumbers: yup.array().of(yup.string().trim()),
+    targetedNumbers: yup.array(),
     walletAmount: yup.number(),
+    activeDashboard: yup.boolean(),
+    deviceType: yup.string().trim(),
 });
 
 const addUserHistorySchema = yup.object().shape({
@@ -89,6 +94,12 @@ const downloadQuerySchema = yup.object().shape({
     format: yup.string().trim().oneOf(['xlsx', 'pdf'], 'Invalid format').required('Format is required').default('xlsx'),
 });
 
+const addDeviceSchema = yup.object().shape({
+    device: yup.string().trim().required('Device is required'),
+    contact: yup.string().trim().required('Contact is required'),
+    name: yup.string().trim().required('Name is required'),
+});
+
 module.exports = {
     resetPasswordSchema,
     createUserSchema,
@@ -96,4 +107,5 @@ module.exports = {
     addUserHistorySchema,
     saveVisitorSchema,
     downloadQuerySchema,
+    addDeviceSchema,
 };

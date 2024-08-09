@@ -3,7 +3,9 @@ const yup = require('yup');
 const createTicketSchema = yup.object().shape({
     type: yup.string().trim().required('Type is required'),
     message: yup.string().trim().required('Message is required'),
-    status: yup.string().oneOf(['Pending', 'Active', 'Answered', 'Closed'], 'Invalid status').required('Status is required')
+    status: yup.string().oneOf(['Pending', 'Active', 'Answered', 'Closed'], 'Invalid status').required('Status is required'),
+    email: yup.string().email('Invalid email').optional(),
+    targetedNumber: yup.string().trim().optional(),
 }).noUnknown(true, 'Unknown field in ticket data');
 
 const ticketCommentSchema = yup.object().shape({

@@ -41,14 +41,25 @@ const createProduct = async (data) => {
 };
 
 // Get all products
-const getAllProducts = async (page, limit) => {
+const getAllProducts = async (page, limit, search) => {
   try {
     const options = {
       page: parseInt(page, 10),
       limit: parseInt(limit, 10),
       sort: { createdAt: -1 },
     };
-    return await Product.paginate({}, options);
+    // Create a query object
+    const query = {};
+
+    // If a search term is provided, add it to the query
+    if (search) {
+      query.$or = [
+        { title: { $regex: search, $options: 'i' } },
+        { status: { $regex: search, $options: 'i' } },
+      ];
+    }
+
+    return await Product.paginate(query, options);
   } catch (error) {
     throw new Error('Error in fetching products: ' + error.message);
   }

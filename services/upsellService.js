@@ -12,7 +12,7 @@ const createUpsell = async (data) => {
 };
 
 // Get all upsells
-const getAllUpsells = async (page, limit) => {
+const getAllUpsells = async (page, limit, search) => {
   try {
     const options = {
       page: parseInt(page, 10),
@@ -20,7 +20,20 @@ const getAllUpsells = async (page, limit) => {
       sort: { createdAt: -1 },
     };
 
-    return await Upsell.paginate({}, options);
+    // Create a query object
+    const query = {};
+
+    // If a search term is provided, add it to the query
+    if (search) {
+      query.$or = [
+        { 'planName.name': { $regex: search, $options: 'i' } },
+        { 'upsell.name': { $regex: search, $options: 'i' } },
+        { tag: { $regex: search, $options: 'i' } },
+        { status: { $regex: search, $options: 'i' } },
+      ];
+    }
+
+    return await Upsell.paginate(query, options);
   } catch (error) {
     throw new Error(`Error fetching upsells: ${error.message}`);
   }

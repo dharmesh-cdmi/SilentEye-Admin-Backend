@@ -40,21 +40,19 @@ const createPlan = async (data) => {
 };
 
 // Get all plans
-const getAllPlans = async (page, limit, search) => {
+const getAllPlans = async (page, limit, search, filterStatus) => {
   try {
     const options = {
       page: parseInt(page, 10),
       limit: parseInt(limit, 10),
       sort: { createdAt: -1 },
     };
-    // Create a query object
-    const query = {};
 
-    // If a search term is provided, add it to the query
+    const query = {};
+    if (filterStatus) query.status = filterStatus;
     if (search) {
       query.$or = [
         { name: { $regex: search, $options: 'i' } },
-        { status: { $regex: search, $options: 'i' } },
         { tag: { $regex: search, $options: 'i' } },
       ];
     }

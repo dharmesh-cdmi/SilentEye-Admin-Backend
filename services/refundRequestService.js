@@ -12,7 +12,7 @@ const createRefundRequest = async (data) => {
 };
 
 // Get all refund requests
-const getAllRefundRequests = async (page, limit, search) => {
+const getAllRefundRequests = async (page, limit, search, filterStatus) => {
   try {
     const options = {
       page: parseInt(page, 10),
@@ -21,14 +21,12 @@ const getAllRefundRequests = async (page, limit, search) => {
       populate: { path: 'planId', select: 'name' },
     };
 
-    // Create a query object
     const query = {};
-    // If a search term is provided, add it to the query
+    if (filterStatus) query.status = filterStatus;
     if (search) {
       query.$or = [
         { requestId: { $regex: search, $options: 'i' } },
         { email: { $regex: search, $options: 'i' } },
-        { status: { $regex: search, $options: 'i' } },
         { type: { $regex: search, $options: 'i' } },
       ];
     }

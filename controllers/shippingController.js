@@ -29,11 +29,12 @@ const createShipping = async (req, res) => {
 // Get all shippings
 const getAllShippings = async (req, res) => {
   try {
-    const { page = 1, limit = 10, search } = req.query;
+    const { page = 1, limit = 10, search, filterStatus } = req.query;
     const shippings = await shippingService.getAllShippings(
       page,
       limit,
-      search
+      search,
+      filterStatus
     );
     return apiSuccessResponse(
       res,

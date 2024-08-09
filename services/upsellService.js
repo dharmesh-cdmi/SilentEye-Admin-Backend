@@ -12,7 +12,7 @@ const createUpsell = async (data) => {
 };
 
 // Get all upsells
-const getAllUpsells = async (page, limit, search) => {
+const getAllUpsells = async (page, limit, search, filterStatus) => {
   try {
     const options = {
       page: parseInt(page, 10),
@@ -20,16 +20,15 @@ const getAllUpsells = async (page, limit, search) => {
       sort: { createdAt: -1 },
     };
 
-    // Create a query object
     const query = {};
-
-    // If a search term is provided, add it to the query
+    if (filterStatus) {
+      query.status = filterStatus;
+    }
     if (search) {
       query.$or = [
         { 'planName.name': { $regex: search, $options: 'i' } },
         { 'upsell.name': { $regex: search, $options: 'i' } },
         { tag: { $regex: search, $options: 'i' } },
-        { status: { $regex: search, $options: 'i' } },
       ];
     }
 

@@ -31,11 +31,12 @@ const createRefundRequest = async (req, res) => {
 // Get all refund requests
 const getAllRefundRequests = async (req, res) => {
   try {
-    const { page = 1, limit = 10, search } = req.query;
+    const { page = 1, limit = 10, search, filterStatus } = req.query;
     const refundRequests = await refundRequestService.getAllRefundRequests(
       page,
       limit,
-      search
+      search,
+      filterStatus
     );
     return apiSuccessResponse(
       res,

@@ -1,6 +1,5 @@
 const Orders = require('../models/ordersModel');
 const Plans  = require('../models/planModel');
-const { getVisitorCount } = require('../services/visitorService');
 const { getRefundData } = require('../services/refundService');
 const helper = require('../utils');
 
@@ -203,6 +202,7 @@ const getTotalOrderCount = async (plan = null, startDate = null, endDate = null)
     const totalAmounts = await getTotalAmounts(filter);
 
     // Get total unique visitors
+    const { getVisitorCount } = require('../services/visitorService'); // please dont import this as global directly its will throw error 
     const uniqueVisitorsData = await getVisitorCount(null, null, startDate, endDate);
     const uniqueVisitorsCount = uniqueVisitorsData.totalVisitorsCount;
 
@@ -342,11 +342,38 @@ const initiateRefund = async (orderId, refundReason,refundRequestId) => {
 };
 
 
+const getOrdersByDateRange = async (startDate, endDate) => {
+    try {
+      const orders = await Orders.aggregate([
+        {
+          $match: {
+            createdAt: { $gte: new Date(startDate), $lte: new Date(endDate) }
+          }
+        },
+        {
+          $group: {
+            _id: {
+              month: { $month: "$createdAt" },
+              year: { $year: "$createdAt" }
+            },
+            totalCount: { $sum: 1 }
+          }
+        }
+      ]);
+      return orders;
+    } catch (error) {
+      console.error('Error fetching orders by date range:', error);
+      throw error;
+    }
+  };
+  
+
 module.exports = {
     createOrder,
     getOrders,
     getTotalOrderCount,
     deleteOrder,
     getOrderDetails,
-    initiateRefund
+    initiateRefund,
+    getOrdersByDateRange,
 };

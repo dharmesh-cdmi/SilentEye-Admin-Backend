@@ -58,7 +58,36 @@ const getLoginCount = async (startDate = null, endDate = null) => {
 
 
 
+const getLoginDataByDateRange = async (startDate, endDate) => {
+  try {
+    return await Login.aggregate([
+      {
+        $match: {
+          loggedInAt: { $gte: new Date(startDate), $lte: new Date(endDate) }
+        }
+      },
+      {
+        $group: {
+          _id: {
+            month: { $month: "$loggedInAt" },
+            year: { $year: "$loggedInAt" }
+          },
+          totalCount: { $sum: 1 }
+        }
+      },
+      {
+        $sort: { "_id.year": 1, "_id.month": 1 }
+      }
+    ]);
+  } catch (error) {
+    throw error;
+  }
+};
+
+
+
 module.exports = {
   logUserLogin,
-  getLoginCount
+  getLoginCount,
+  getLoginDataByDateRange
 };

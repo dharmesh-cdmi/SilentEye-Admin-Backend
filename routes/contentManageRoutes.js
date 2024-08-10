@@ -27,7 +27,7 @@ router.post(
 
 router.get(
     "/fetch-contact-details",
-    authMiddleware.verifyAdmin,
+    // authMiddleware.verifyAdmin,
     controller.FetchContactDetails
 );
 
@@ -40,13 +40,13 @@ router.put(
 
 router.get(
     "/fetch-all-features",
-    authMiddleware.verifyAdmin,
+    // authMiddleware.verifyAdmin,
     controller.FetchAllFeatures
 );
 
 router.get(
     "/fetch-features",
-    authMiddleware.verifyAdmin,
+    // authMiddleware.verifyAdmin,
     validationMiddleware.validateQuery(contentManageSchemas.fetchFeaturesSchema),
     controller.FetchFeatures
 );
@@ -79,13 +79,13 @@ router.delete(
 
 router.get(
     "/fetch-all-pages",
-    authMiddleware.verifyAdmin,
+    // authMiddleware.verifyAdmin,
     controller.FetchAllPages
 );
 
 router.get(
     "/fetch-pages",
-    authMiddleware.verifyAdmin,
+    // authMiddleware.verifyAdmin,
     validationMiddleware.validateQuery(contentManageSchemas.fetchPagesSchema),
     controller.FetchPages
 );
@@ -114,7 +114,7 @@ router.delete(
 
 router.get(
     "/fetch-all-faq-categories",
-    authMiddleware.verifyAdmin,
+    // authMiddleware.verifyAdmin,
     controller.FetchAllFaqCategories
 );
 
@@ -146,7 +146,7 @@ router.delete(
 
 router.get(
     "/fetch-all-faqs-by-category/:categoryId",
-    authMiddleware.verifyAdmin,
+    // authMiddleware.verifyAdmin,
     validationMiddleware.validateParams(contentManageSchemas.faqCategoryIdSchema),
     controller.FetchAllFaqsByCategory
 );
@@ -176,13 +176,13 @@ router.delete(
 
 router.get(
     "/fetch-all-reviews",
-    authMiddleware.verifyAdmin,
+    // authMiddleware.verifyAdmin,
     controller.FetchAllReviews
 );
 
 router.get(
     "/fetch-reviews",
-    authMiddleware.verifyAdmin,
+    // authMiddleware.verifyAdmin,
     validationMiddleware.validateQuery(contentManageSchemas.fetchReviewsSchema),
     controller.FetchReviews
 );

@@ -45,11 +45,11 @@ const fetchAllFeatures = async () => {
         error.code = 404;
         throw error;
     }
-    if (!contentManage.features || contentManage.features.length <= 0) {
-        const error = new Error('Features not found!');
-        error.code = 404;
-        throw error;
-    }
+    // if (!contentManage.features || contentManage.features.length <= 0) {
+    //     const error = new Error('Features not found!');
+    //     error.code = 404;
+    //     throw error;
+    // }
     return contentManage.features;
 };
 
@@ -60,20 +60,24 @@ const fetchFeatures = async (pageIndex, limit) => {
         error.code = 404;
         throw error;
     }
-    if (!contentManage.features || contentManage.features.length <= 0) {
-        const error = new Error('Features not found!');
-        error.code = 404;
-        throw error;
-    }
+    // if (!contentManage.features || contentManage.features.length <= 0) {
+    //     const error = new Error('Features not found!');
+    //     error.code = 404;
+    //     throw error;
+    // }
     const totalCount = contentManage.features.length;
-    const totalPages = Math.ceil(totalCount / limit);
-    const startIndex = (pageIndex - 1) * limit;
-    const endIndex = pageIndex * limit;
-    const features = contentManage.features.slice(startIndex, endIndex);
-    if (!features || features.length <= 0) {
-        const error = new Error('Features not found!');
-        error.code = 404;
-        throw error;
+    let totalPages = 0;
+    let features = [];
+    if (totalCount > 0) {
+        totalPages = Math.ceil(totalCount / limit);
+        const startIndex = (pageIndex - 1) * limit;
+        const endIndex = pageIndex * limit;
+        features = contentManage.features.slice(startIndex, endIndex);
+        // if (!features || features.length <= 0) {
+        //     const error = new Error('Features not found!');
+        //     error.code = 404;
+        //     throw error;
+        // }
     }
 
     return {
@@ -140,11 +144,11 @@ const fetchAllPages = async () => {
         error.code = 404;
         throw error;
     }
-    if (!contentManage.pages || contentManage.pages.length <= 0) {
-        const error = new Error('Pages not found!');
-        error.code = 404;
-        throw error;
-    }
+    // if (!contentManage.pages || contentManage.pages.length <= 0) {
+    //     const error = new Error('Pages not found!');
+    //     error.code = 404;
+    //     throw error;
+    // }
     return contentManage.pages;
 };
 
@@ -155,20 +159,24 @@ const fetchPages = async (pageIndex, limit) => {
         error.code = 404;
         throw error;
     }
-    if (!contentManage.pages || contentManage.pages.length <= 0) {
-        const error = new Error('Pages not found!');
-        error.code = 404;
-        throw error;
-    }
+    // if (!contentManage.pages || contentManage.pages.length <= 0) {
+    //     const error = new Error('Pages not found!');
+    //     error.code = 404;
+    //     throw error;
+    // }
     const totalCount = contentManage.pages.length;
-    const totalPages = Math.ceil(totalCount / limit);
-    const startIndex = (pageIndex - 1) * limit;
-    const endIndex = pageIndex * limit;
-    const pages = contentManage.pages.slice(startIndex, endIndex);
-    if (!pages || pages.length <= 0) {
-        const error = new Error('Pages not found!');
-        error.code = 404;
-        throw error;
+    let totalPages = 0;
+    let pages = [];
+    if (totalCount > 0) {
+        totalPages = Math.ceil(totalCount / limit);
+        const startIndex = (pageIndex - 1) * limit;
+        const endIndex = pageIndex * limit;
+        pages = contentManage.pages.slice(startIndex, endIndex);
+        // if (!pages || pages.length <= 0) {
+        //     const error = new Error('Pages not found!');
+        //     error.code = 404;
+        //     throw error;
+        // }
     }
 
     return {
@@ -235,11 +243,11 @@ const fetchAllFaqCategories = async () => {
         error.code = 404;
         throw error;
     }
-    if (!contentManage.faqCategories || contentManage.faqCategories.length <= 0) {
-        const error = new Error('Faq Categories not found!');
-        error.code = 404;
-        throw error;
-    }
+    // if (!contentManage.faqCategories || contentManage.faqCategories.length <= 0) {
+    //     const error = new Error('Faq Categories not found!');
+    //     error.code = 404;
+    //     throw error;
+    // }
 
     const faqCategoriesWithoutFaqs = contentManage.faqCategories.map(category => {
         const { faqs, ...categoryWithoutFaqs } = category.toObject();
@@ -254,6 +262,12 @@ const addFaqCategory = async (categoryData) => {
     if (!contentManage) {
         const error = new Error('Content manage not found!');
         error.code = 404;
+        throw error;
+    }
+    const existingFaqCategory = contentManage.faqCategories.find(category => category.title === categoryData.title);
+    if (existingFaqCategory) {
+        const error = new Error('Faq Category already exist!');
+        error.code = 400;
         throw error;
     }
     contentManage.faqCategories.push(categoryData);
@@ -317,11 +331,11 @@ const fetchAllFaqsByCategory = async (categoryId) => {
         error.code = 404;
         throw error;
     }
-    if (!category.faqs || category.faqs.length <= 0) {
-        const error = new Error('Faqs not found!');
-        error.code = 404;
-        throw error;
-    }
+    // if (!category.faqs || category.faqs.length <= 0) {
+    //     const error = new Error('Faqs not found!');
+    //     error.code = 404;
+    //     throw error;
+    // }
     return category.faqs;
 };
 
@@ -410,11 +424,11 @@ const fetchAllReviews = async () => {
         error.code = 404;
         throw error;
     }
-    if (!contentManage.reviews || contentManage.reviews.length <= 0) {
-        const error = new Error('Reviews not found!');
-        error.code = 404;
-        throw error;
-    }
+    // if (!contentManage.reviews || contentManage.reviews.length <= 0) {
+    //     const error = new Error('Reviews not found!');
+    //     error.code = 404;
+    //     throw error;
+    // }
     return contentManage.reviews;
 };
 
@@ -425,20 +439,24 @@ const fetchReviews = async (pageIndex, limit) => {
         error.code = 404;
         throw error;
     }
-    if (!contentManage.reviews || contentManage.reviews.length <= 0) {
-        const error = new Error('Reviews not found!');
-        error.code = 404;
-        throw error;
-    }
+    // if (!contentManage.reviews || contentManage.reviews.length <= 0) {
+    //     const error = new Error('Reviews not found!');
+    //     error.code = 404;
+    //     throw error;
+    // }
     const totalCount = contentManage.reviews.length;
-    const totalPages = Math.ceil(totalCount / limit);
-    const startIndex = (pageIndex - 1) * limit;
-    const endIndex = pageIndex * limit;
-    const reviews = contentManage.reviews.slice(startIndex, endIndex);
-    if (!reviews || reviews.length <= 0) {
-        const error = new Error('Reviews not found!');
-        error.code = 404;
-        throw error;
+    let totalPages = 0;
+    let reviews = [];
+    if (totalCount > 0) {
+        totalPages = Math.ceil(totalCount / limit);
+        const startIndex = (pageIndex - 1) * limit;
+        const endIndex = pageIndex * limit;
+        reviews = contentManage.reviews.slice(startIndex, endIndex);
+        // if (!reviews || reviews.length <= 0) {
+        //     const error = new Error('Reviews not found!');
+        //     error.code = 404;
+        //     throw error;
+        // }
     }
 
     return {

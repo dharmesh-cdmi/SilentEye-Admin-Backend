@@ -90,6 +90,13 @@ router.get(
     controller.FetchPages
 );
 
+router.get(
+    "/fetch-page-by-id/:pageId",
+    authMiddleware.verifyAdmin,
+    validationMiddleware.validateParams(contentManageSchemas.pageIdSchema),
+    controller.FetchPageById
+);
+
 router.post(
     "/add-page",
     authMiddleware.verifyAdmin,

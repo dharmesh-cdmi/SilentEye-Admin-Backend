@@ -120,6 +120,16 @@ const FetchPages = async (req, res, next) => {
     }
 };
 
+const FetchPageById = async (req, res, next) => {
+    try {
+        const { pageId } = req.params;
+        const page = await contentManageService.fetchPageById(pageId);
+        res.status(200).json({ page });
+    } catch (error) {
+        next(error);
+    }
+};
+
 const AddPage = async (req, res, next) => {
     try {
         const data = req.body;
@@ -329,6 +339,7 @@ module.exports = {
     DeleteFeature,
     FetchAllPages,
     FetchPages,
+    FetchPageById,
     AddPage,
     UpdatePage,
     DeletePage,

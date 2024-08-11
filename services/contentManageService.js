@@ -186,6 +186,27 @@ const fetchPages = async (pageIndex, limit) => {
     };
 };
 
+const fetchPageById = async (pageId) => {
+    const contentManage = await ContentManage.findOne({});
+    if (!contentManage) {
+        const error = new Error('Content manage not found!');
+        error.code = 404;
+        throw error;
+    }
+    if (!contentManage.pages || contentManage.pages.length <= 0) {
+        const error = new Error('Pages not found!');
+        error.code = 404;
+        throw error;
+    }
+    const page = contentManage.pages.find(page => page.id === pageId);
+    if (!page) {
+        const error = new Error('Page not found!');
+        error.code = 404;
+        throw error;
+    }
+    return page;
+};
+
 const addPage = async (pageData) => {
     const contentManage = await ContentManage.findOne({});
     if (!contentManage) {
@@ -527,6 +548,7 @@ module.exports = {
     deleteFeature,
     fetchAllPages,
     fetchPages,
+    fetchPageById,
     addPage,
     updatePage,
     deletePage,

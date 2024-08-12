@@ -78,17 +78,27 @@ const updateAddon = async (id, data) => {
   try {
     let addon = await getAddonById(id);
 
+    if (!addon) {
+      throw new Error('Addon not found!');
+    }
+    if (!addon?.paymentGatewayId) {
+      throw new Error('Addon is not associated with payment gateway!');
+    }
+    if (!addon?.pgProductId) {
+      throw new Error('Addon does not exist on payment gateway!');
+    }
+
     const pgData = {
       paymentGatewayId: addon?.paymentGatewayId,
-      productId: addon?.pgProductId,
+      itemId: addon?.pgProductId,
       name: data?.title,
       productMetadata: data?.productMetadata ? data.productMetadata : undefined,
       priceId: addon?.pgPriceId,
       amount: data?.mrp ? data.mrp : undefined,
       priceMetadata: data?.priceMetadata ? data.priceMetadata : undefined,
     };
+    const pgProduct = await paymentService.updateStripeItem(pgData);
 
-    const pgProduct = await paymentService.updateStripeProduct(pgData);
     if (!pgProduct) {
       throw new Error('Addon not updated on stripe!');
     }
@@ -97,9 +107,6 @@ const updateAddon = async (id, data) => {
       new: true,
       runValidators: true,
     });
-    if (!addon) {
-      throw new Error('Addon not found!');
-    }
 
     return {
       status: true,
@@ -110,7 +117,7 @@ const updateAddon = async (id, data) => {
     return {
       status: false,
       error: true,
-      message: 'Error in updating addon: ' + error,
+      message: error?.message ? error?.message : 'Error in updating addon',
     };
   }
 };

@@ -82,7 +82,7 @@ const updateProduct = async (id, data) => {
 
     const pgData = {
       paymentGatewayId: product?.paymentGatewayId,
-      productId: product?.pgProductId,
+      itemId: product?.pgProductId,
       name: data?.title,
       productMetadata: data?.productMetadata ? data.productMetadata : undefined,
       priceId: product?.pgPriceId,

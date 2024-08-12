@@ -36,7 +36,7 @@ const AddonSchema = new Schema(
       ref: 'PaymentGateway',
       required: false,
     },
-    pgAddonId: {
+    pgProductId: {
       type: String,
       required: false,
       trim: true,

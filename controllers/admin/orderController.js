@@ -4,7 +4,7 @@ const exportService = require('../../services/exportService');
 
 const { apiSuccessResponse, apiErrorResponse, HTTP_STATUS } = require('../../utils'); // Importing helper functions
 
-const getOrdersController = async (req, res) => {
+const getAllOrders = async (req, res) => {
     try {
         // Extract query parameters
         const { page, limit, status, paymentMethod, userId, planName, minAmount, maxAmount, country,search,orderId} = req.query;
@@ -93,6 +93,8 @@ const initiateRefund= async (req, res) => {
         return apiErrorResponse(res, error.message, null, HTTP_STATUS.INTERNAL_SERVER_ERROR);
     }
 }
+
+
 // Controller method to handle order creation
 const createOrder = async (req, res) => {
     try {
@@ -107,7 +109,7 @@ const createOrder = async (req, res) => {
 
 
 module.exports = {
-    getOrders: getOrdersController,
+    getOrders: getAllOrders,
     getOrdersDetails,
     downloadorderDetails,
     deleteOrders,

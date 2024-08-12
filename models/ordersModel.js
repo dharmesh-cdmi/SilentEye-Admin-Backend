@@ -20,7 +20,7 @@ const addOnSchema = new Schema({
 });
 
 const refundDetailsSchema = new Schema({
-  refundRequestId: { type: Schema.Types.ObjectId, ref: 'refund', required: true },  // Reference to RefundRequest collection
+  refundRequestId: { type: Schema.Types.ObjectId, ref: 'refund' },  // Reference to RefundRequest collection
   refundAmount: { type: Number, required: true },
   refundDate: { type: Date, default: Date.now },
   refundReason: String

@@ -63,6 +63,7 @@ router.delete(
 
 router.post(
     "/user-history/:userId",
+    authenticateUser,
     validateRequest(addUserHistorySchema),
     controller.AddUserHistory
 );

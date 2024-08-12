@@ -11,7 +11,7 @@ const {
 // Create a new upsell
 const createUpsell = async (req, res) => {
   try {
-    const upsell = await upsellService.createUpsell(req.body);
+    const upsell = await upsellService.createUpsell(req);
     return apiSuccessResponse(
       res,
       HTTP_STATUS_MESSAGE[201],

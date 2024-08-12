@@ -4,15 +4,10 @@ const Schema = mongoose.Schema;
 
 const UpsellSchema = new Schema(
   {
-    planName: {
-      type: new Schema(
-        {
-          name: { type: String, required: true, trim: true },
-          icom: { type: String, required: true, trim: true },
-        },
-        { _id: false }
-      ),
-      required: true,
+    plan: {
+      type: Schema.Types.ObjectId,
+      ref: 'Plan',
+      required: false,
     },
     upsell: {
       type: new Schema(

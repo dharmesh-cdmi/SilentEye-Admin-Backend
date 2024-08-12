@@ -14,8 +14,7 @@ const SearchContactsForm = async (req, res, next) => {
         const { pageIndex, limit, searchQuery } = req.query;
         const parsedPageIndex = parseInt(pageIndex);
         const parsedLimit = parseInt(limit);
-        const parsedSearchQuery = parseInt(searchQuery);
-        const result = await contactFormService.searchContactsForm(parsedPageIndex, parsedLimit, parsedSearchQuery);
+        const result = await contactFormService.searchContactsForm(parsedPageIndex, parsedLimit, searchQuery);
         res.status(200).json({ result });
     } catch (error) {
         next(error);

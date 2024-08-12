@@ -54,7 +54,7 @@ const downloadAnalytics = async (req, res) => {
             return res.status(400).send('Invalid format. Must be "pdf" or "xlsx".');
         }
 
-        const data = await analyticService.analytics(addon, plan, page, action, startDate, endDate);
+        const data = await analyticService.exportAnalyticsData(plan, page, action, startDate, endDate);
         const filePath = await exportService.exportData(format, data);
 
         res.download(filePath, (err) => {

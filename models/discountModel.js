@@ -33,29 +33,29 @@ const DiscountSchema = new Schema(
       required: true,
       enum: ['live', 'test'],
     },
-    paymentGatewayId: {
-      type: Schema.Types.ObjectId,
-      ref: 'PaymentGateway',
-      required: false,
-    },
-    pgDiscountId: {
-      type: String,
-      required: false,
-      trim: true,
-    },
+    // paymentGatewayId: {
+    //   type: Schema.Types.ObjectId,
+    //   ref: 'PaymentGateway',
+    //   required: false,
+    // },
+    // pgDiscountId: {
+    //   type: String,
+    //   required: false,
+    //   trim: true,
+    // },
   },
   {
     timestamps: true,
   }
 );
 
-// Middleware to validate discount and increment used count
-DiscountSchema.pre('save', function (next) {
-  if (this.validity !== 'no limit' && new Date(this.validity) < new Date()) {
-    return next(new Error('Discount validity has expired'));
-  }
-  next();
-});
+// // Middleware to validate discount and increment used count
+// DiscountSchema.pre('save', function (next) {
+//   if (this.validity !== 'no limit' && new Date(this.validity) < new Date()) {
+//     return next(new Error('Discount validity has expired'));
+//   }
+//   next();
+// });
 
 DiscountSchema.plugin(mongoosePaginate);
 

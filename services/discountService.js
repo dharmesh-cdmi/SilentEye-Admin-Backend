@@ -7,11 +7,6 @@ const createDiscount = async (data) => {
     const discount = new Discount(data);
     await discount.save();
 
-    const stripeDiscount = await paymentService.createStripeDiscount(discount);
-
-    discount.pgDiscountId = stripeDiscount.id;
-    await discount.save();
-
     return discount;
   } catch (error) {
     throw new Error('Error in creating discount: ' + error.message);
@@ -19,7 +14,7 @@ const createDiscount = async (data) => {
 };
 
 // Get all discounts
-const getAllDiscounts = async (page, limit, search, filterStatus) => {
+const getAllDiscounts = async (page, limit, search, filterValidity) => {
   try {
     const options = {
       page: parseInt(page, 10),
@@ -27,16 +22,95 @@ const getAllDiscounts = async (page, limit, search, filterStatus) => {
       sort: { createdAt: -1 },
     };
 
+    // const query = {};
+    // // Apply validity filter
+    // if (filterValidity) {
+    //   const currentDate = new Date();
+    //   if (filterValidity.toLowerCase() === 'active') {
+    //     query.$or = [
+    //       { validity: { $regex: /^no limit$/i } }, // Matches 'No Limit' with any case
+    //       {
+    //         $and: [
+    //           { validity: { $not: { $regex: /^no limit$/i } } }, // Exclude 'No Limit'
+    //           {
+    //             $expr: {
+    //               $gt: [
+    //                 { $dateFromString: { dateString: '$validity' } },
+    //                 currentDate,
+    //               ],
+    //             },
+    //           }, // Active discounts with a valid date
+    //         ],
+    //       },
+    //     ];
+    //   } else if (filterValidity.toLowerCase() === 'expired') {
+    //     query.$and = [
+    //       { validity: { $not: { $regex: /^no limit$/i } } }, // Exclude 'No Limit'
+    //       {
+    //         $expr: {
+    //           $lte: [
+    //             { $dateFromString: { dateString: '$validity' } },
+    //             currentDate,
+    //           ],
+    //         },
+    //       }, // Expired discounts with a valid date
+    //     ];
+    //   }
+    // }
+    // if (search) {
+    //   query.$or = [{ coupon: { $regex: search, $options: 'i' } }];
+    // }
     const query = {};
-    if (filterStatus) query.status = filterStatus;
-    if (search) {
-      query.$or = [
-        { coupon: { $regex: search, $options: 'i' } },
-        { validity: { $regex: search, $options: 'i' } },
-        { status: { $regex: search, $options: 'i' } },
-      ];
+    const andConditions = [];
+
+    // Apply validity filter
+    if (filterValidity) {
+      const currentDate = new Date();
+      if (filterValidity.toLowerCase() === 'active') {
+        andConditions.push({
+          $or: [
+            { validity: { $regex: /^no limit$/i } }, // Matches 'No Limit' with any case
+            {
+              $and: [
+                { validity: { $not: { $regex: /^no limit$/i } } }, // Exclude 'No Limit'
+                {
+                  $expr: {
+                    $gt: [
+                      { $dateFromString: { dateString: '$validity' } },
+                      currentDate,
+                    ],
+                  },
+                }, // Active discounts with a valid date
+              ],
+            },
+          ],
+        });
+      } else if (filterValidity.toLowerCase() === 'expired') {
+        andConditions.push({
+          $and: [
+            { validity: { $not: { $regex: /^no limit$/i } } }, // Exclude 'No Limit'
+            {
+              $expr: {
+                $lte: [
+                  { $dateFromString: { dateString: '$validity' } },
+                  currentDate,
+                ],
+              },
+            }, // Expired discounts with a valid date
+          ],
+        });
+      }
     }
 
+    // Apply search filter
+    if (search) {
+      andConditions.push({ coupon: { $regex: search, $options: 'i' } });
+    }
+
+    // Combine all conditions
+    if (andConditions.length > 0) {
+      query.$and = andConditions;
+    }
     return await Discount.paginate(query, options);
   } catch (error) {
     throw new Error('Error in fetching discounts: ' + error.message);
@@ -59,8 +133,6 @@ const updateDiscount = async (id, data) => {
     if (!discount) {
       throw new Error('Discount not found!');
     }
-    // Update corresponding discount in Stripe
-    await paymentService.updateStripeDiscount(discount);
 
     return discount;
   } catch (error) {
@@ -72,12 +144,6 @@ const updateDiscount = async (id, data) => {
 const deleteDiscount = async (id) => {
   try {
     const discount = await Discount.findByIdAndDelete(id);
-
-    // Delete corresponding discount in Stripe
-    await paymentService.deleteStripeDiscount(
-      discount.paymentGatewayId,
-      discount?.pgDiscountId
-    );
 
     return discount;
   } catch (error) {

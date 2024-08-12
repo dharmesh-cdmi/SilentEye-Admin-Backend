@@ -31,8 +31,13 @@ const createUpsell = async (req, res) => {
 // Get all upsells
 const getAllUpsells = async (req, res) => {
   try {
-    const { page = 1, limit = 10, search } = req.query;
-    const upsells = await upsellService.getAllUpsells(page, limit, search);
+    const { page = 1, limit = 10, search, filterStatus } = req.query;
+    const upsells = await upsellService.getAllUpsells(
+      page,
+      limit,
+      search,
+      filterStatus
+    );
     return apiSuccessResponse(
       res,
       HTTP_STATUS_MESSAGE[200],

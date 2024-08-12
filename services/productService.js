@@ -41,22 +41,20 @@ const createProduct = async (data) => {
 };
 
 // Get all products
-const getAllProducts = async (page, limit, search) => {
+const getAllProducts = async (page, limit, search, filterStatus) => {
   try {
     const options = {
       page: parseInt(page, 10),
       limit: parseInt(limit, 10),
       sort: { createdAt: -1 },
     };
-    // Create a query object
-    const query = {};
 
-    // If a search term is provided, add it to the query
+    const query = {};
+    if (filterStatus) {
+      query.status = filterStatus;
+    }
     if (search) {
-      query.$or = [
-        { title: { $regex: search, $options: 'i' } },
-        { status: { $regex: search, $options: 'i' } },
-      ];
+      query.$or = [{ title: { $regex: search, $options: 'i' } }];
     }
 
     return await Product.paginate(query, options);
@@ -84,7 +82,7 @@ const updateProduct = async (id, data) => {
 
     const pgData = {
       paymentGatewayId: product?.paymentGatewayId,
-      productId: product?.pgProductId,
+      itemId: product?.pgProductId,
       name: data?.title,
       productMetadata: data?.productMetadata ? data.productMetadata : undefined,
       priceId: product?.pgPriceId,

@@ -12,22 +12,22 @@ const createShipping = async (data) => {
 };
 
 // Get all shippings
-const getAllShippings = async (page, limit, search) => {
+const getAllShippings = async (page, limit, search, filterStatus) => {
   try {
     const options = {
       page: parseInt(page, 10),
       limit: parseInt(limit, 10),
       sort: { createdAt: -1 },
     };
-    // Create a query object
-    const query = {};
 
-    // If a search term is provided, add it to the query
+    const query = {};
+    if (filterStatus) {
+      query.status = filterStatus;
+    }
     if (search) {
       query.$or = [
         { title: { $regex: search, $options: 'i' } },
         { daysRange: { $regex: search, $options: 'i' } },
-        { status: { $regex: search, $options: 'i' } },
       ];
     }
 

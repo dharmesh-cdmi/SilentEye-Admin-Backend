@@ -34,11 +34,12 @@ const createPaymentGateway = async (req, res) => {
 // Get all payment gateways
 const getAllPaymentGateways = async (req, res) => {
   try {
-    const { page = 1, limit = 10, search } = req.query;
+    const { page = 1, limit = 10, search, filterStatus } = req.query;
     const paymentGateways = await paymentGatewayService.getAllPaymentGateways(
       page,
       limit,
-      search
+      search,
+      filterStatus
     );
     return apiSuccessResponse(
       res,

@@ -61,7 +61,6 @@ const createStripeItem = async (data) => {
 
     let item = await stripeInstance.products.create({
       name,
-
       description,
       images,
     });

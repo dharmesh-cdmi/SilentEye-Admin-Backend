@@ -9,7 +9,7 @@ const createPaymentGateway = async (data) => {
 };
 
 // Get all payment gateways
-const getAllPaymentGateways = async (page, limit, search) => {
+const getAllPaymentGateways = async (page, limit, search, filterStatus) => {
   try {
     const options = {
       page: parseInt(page, 10),
@@ -17,15 +17,10 @@ const getAllPaymentGateways = async (page, limit, search) => {
       sort: { createdAt: -1 },
     };
 
-    // Create a query object
     const query = {};
-
-    // If a search term is provided, add it to the query
+    if (filterStatus) query.status = filterStatus;
     if (search) {
-      query.$or = [
-        { name: { $regex: search, $options: 'i' } },
-        { status: { $regex: search, $options: 'i' } },
-      ];
+      query.$or = [{ name: { $regex: search, $options: 'i' } }];
     }
 
     return await PaymentGateway.paginate(query, options);

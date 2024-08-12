@@ -5,12 +5,26 @@ const generateHomePageAnalyticsExcel = async (data, filePath) => {
     if (!data || typeof data !== 'object') {
         throw new Error('Invalid data. Must be a non-empty object.');
     }
+ 
 
     const workbook = new ExcelJS.Workbook();
     const sheet = workbook.addWorksheet('Sheet1');
 
     const addDataToSheet = (headers, data, startRow) => {
-        sheet.addRow(headers);
+        // sheet.addRow(headers);
+        const headerRow = sheet.addRow(headers);
+        
+          // Apply formatting to headers
+          headerRow.font = { bold: true };
+          headerRow.alignment = { vertical: 'middle', horizontal: 'center' };
+          headerRow.fill = {
+              type: 'pattern',
+              pattern: 'solid',
+              fgColor: { argb: 'FFFFE599' }, // Light yellow background
+          };
+          sheet.getRow(startRow).height = 20; // Increase row height for better readability
+
+          
         data.forEach(item => {
             const row = headers.map(header => item[header] !== undefined ? item[header].toString() : '');
             sheet.addRow(row);
@@ -19,11 +33,11 @@ const generateHomePageAnalyticsExcel = async (data, filePath) => {
     };
 
     let startRow = 1;
-
     // Process visitorDetails
-    if (data.visitorDetails && data.visitorDetails.visitorDetails.length) {
+    if (data.visitorDetails && data.visitorDetails.pageData) {
+        console.log(data.visitorDetails)
         const headers = ['page', 'action', 'totalCount'];
-        startRow = addDataToSheet(headers, data.visitorDetails.visitorDetails, startRow);
+        startRow = addDataToSheet(headers, data.visitorDetails.pageData, startRow);
     }
 
     // Process orders
@@ -93,6 +107,17 @@ const exportOrdersToExcel = async (orders) => {
         });
     });
 
+      // Add optional formatting to the header row
+      worksheet.getRow(1).font = { bold: true };
+      worksheet.getRow(1).alignment = { vertical: 'middle', horizontal: 'center' };
+      worksheet.getRow(1).fill = {
+          type: 'pattern',
+          pattern: 'solid',
+          fgColor: { argb: 'FFFFE599' }, // Light yellow background
+      };
+      worksheet.getRow(1).height = 20; // Increase row height for better readability
+
+      
     // Create buffer and return
     const buffer = await workbook.xlsx.writeBuffer();
     return buffer;
@@ -101,7 +126,7 @@ const exportOrdersToExcel = async (orders) => {
 
 
 const exportData = async (format, data) => {
-    const filePath = `./downloads/export.${format}`;
+    const filePath = `./downloads/export_analytics.${format}`;
     if (format === 'xlsx') {
         await generateHomePageAnalyticsExcel(data, filePath);
     } else {

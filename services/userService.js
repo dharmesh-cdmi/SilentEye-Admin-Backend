@@ -58,6 +58,7 @@ const getUserStatistics = async (startDate = null, endDate = null) => {
                 $group: {
                     _id: "$plan._id", // Group by plan ID
                     planName: { $first: "$plan.name" },
+                    planIcon: { $first: "$plan.icon" },
                     totalSalesAmount: { $sum: "$orders.orderDetails.total" },
                     users: {
                         $push: {
@@ -93,6 +94,7 @@ const getUserStatistics = async (startDate = null, endDate = null) => {
                 $project: {
                     _id: 1,
                     planName: 1,
+                    planIcon: 1,
                     sales: {
                         totalSalesAmount: "$totalSalesAmount",
                         totalUsersBought: { $size: "$users" }
@@ -199,6 +201,7 @@ const getUserStatisticsByCountry = async (startDate = null, endDate = null) => {
                     plans: {
                         $push: {
                             planName: "$plan.name",
+                            planIcon: "$plan.icon",
                             planId: "$plan._id"
                         }
                     }

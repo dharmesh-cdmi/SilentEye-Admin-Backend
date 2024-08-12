@@ -29,7 +29,7 @@ router.use('/contact-form', contactFormRoutes);
 router.use('/extension', extensionRoutes);
 router.use('/content-manage', contentManageRoutes);
 router.use('/', authRoutes);
-router.use('/admin', adminRoutes);
+router.use('/admin', verifyAdmin, adminRoutes);
 
 router.use('/payment', paymentRoutes);
 router.use('/payment-gateway', paymentGatewayRoutes);

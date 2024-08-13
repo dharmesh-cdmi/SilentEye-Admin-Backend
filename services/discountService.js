@@ -22,44 +22,6 @@ const getAllDiscounts = async (page, limit, search, filterValidity) => {
       sort: { createdAt: -1 },
     };
 
-    // const query = {};
-    // // Apply validity filter
-    // if (filterValidity) {
-    //   const currentDate = new Date();
-    //   if (filterValidity.toLowerCase() === 'active') {
-    //     query.$or = [
-    //       { validity: { $regex: /^no limit$/i } }, // Matches 'No Limit' with any case
-    //       {
-    //         $and: [
-    //           { validity: { $not: { $regex: /^no limit$/i } } }, // Exclude 'No Limit'
-    //           {
-    //             $expr: {
-    //               $gt: [
-    //                 { $dateFromString: { dateString: '$validity' } },
-    //                 currentDate,
-    //               ],
-    //             },
-    //           }, // Active discounts with a valid date
-    //         ],
-    //       },
-    //     ];
-    //   } else if (filterValidity.toLowerCase() === 'expired') {
-    //     query.$and = [
-    //       { validity: { $not: { $regex: /^no limit$/i } } }, // Exclude 'No Limit'
-    //       {
-    //         $expr: {
-    //           $lte: [
-    //             { $dateFromString: { dateString: '$validity' } },
-    //             currentDate,
-    //           ],
-    //         },
-    //       }, // Expired discounts with a valid date
-    //     ];
-    //   }
-    // }
-    // if (search) {
-    //   query.$or = [{ coupon: { $regex: search, $options: 'i' } }];
-    // }
     const query = {};
     const andConditions = [];
 
@@ -69,35 +31,27 @@ const getAllDiscounts = async (page, limit, search, filterValidity) => {
       if (filterValidity.toLowerCase() === 'active') {
         andConditions.push({
           $or: [
-            { validity: { $regex: /^no limit$/i } }, // Matches 'No Limit' with any case
+            { validity: 'No Limit' }, // Matches exactly 'No Limit'
             {
-              $and: [
-                { validity: { $not: { $regex: /^no limit$/i } } }, // Exclude 'No Limit'
-                {
-                  $expr: {
-                    $gt: [
-                      { $dateFromString: { dateString: '$validity' } },
-                      currentDate,
-                    ],
-                  },
-                }, // Active discounts with a valid date
-              ],
+              validity: { $ne: 'No Limit' }, // Exclude 'No Limit'
+              $expr: {
+                $gt: [
+                  { $dateFromString: { dateString: '$validity' } },
+                  currentDate,
+                ],
+              }, // Active discounts with a valid date
             },
           ],
         });
       } else if (filterValidity.toLowerCase() === 'expired') {
         andConditions.push({
-          $and: [
-            { validity: { $not: { $regex: /^no limit$/i } } }, // Exclude 'No Limit'
-            {
-              $expr: {
-                $lte: [
-                  { $dateFromString: { dateString: '$validity' } },
-                  currentDate,
-                ],
-              },
-            }, // Expired discounts with a valid date
-          ],
+          validity: { $ne: 'No Limit' }, // Exclude 'No Limit'
+          $expr: {
+            $lte: [
+              { $dateFromString: { dateString: '$validity' } },
+              currentDate,
+            ],
+          }, // Expired discounts with a valid date
         });
       }
     }

@@ -242,6 +242,36 @@ const UpdateProcess = async (req, res) => {
   }
 }
 
+const CreateCountry = async (req, res) => {
+  try {
+    const country = await userService.addCountry(req.body);
+    return apiSuccessResponse(res, HTTP_STATUS_MESSAGE[201], country, HTTP_STATUS.CREATED);
+  } catch (error) {
+    return apiErrorResponse(res, HTTP_STATUS_MESSAGE[500], error?.message, HTTP_STATUS.INTERNAL_SERVER_ERROR);
+  }
+}
+
+const FetchAllCountries = async (req, res) => {
+  try {
+    const countries = await userService.fetchCountries();
+    return apiSuccessResponse(res, HTTP_STATUS_MESSAGE[200], countries, HTTP_STATUS.OK);
+  } catch (error) {
+    return apiErrorResponse(res, HTTP_STATUS_MESSAGE[500], error, HTTP_STATUS.INTERNAL_SERVER_ERROR);
+  }
+}
+
+const UpdateCountry = async (req, res) => {
+  try {
+    const country = await userService.updateCountry(req.params.countryId, req.body);
+    if (!country) {
+      return apiErrorResponse(res, HTTP_STATUS_MESSAGE[404], 'Country not found', HTTP_STATUS.NOT_FOUND);
+    }
+    return apiSuccessResponse(res, HTTP_STATUS_MESSAGE[200], country, HTTP_STATUS.OK);
+  } catch (error) {
+    return apiErrorResponse(res, HTTP_STATUS_MESSAGE[500], error, HTTP_STATUS.INTERNAL_SERVER_ERROR);
+  }
+}
+
 module.exports = {
   getProfile,
   FetchAllUsers,
@@ -259,5 +289,8 @@ module.exports = {
   PlaceOrder,
   GetProfile,
   AddDevice,
-  UpdateProcess
+  UpdateProcess,
+  CreateCountry,
+  FetchAllCountries,
+  UpdateCountry,
 };

@@ -100,6 +100,13 @@ const addDeviceSchema = yup.object().shape({
     name: yup.string().trim().required('Name is required'),
 });
 
+const countrySchema = yup.object().shape({
+    label: yup.string().trim().required('Label is required'),
+    countryId: yup.string().trim().required('Country ID is required'),
+    icon: yup.string().trim().required('Icon is required'),
+    status: yup.string().trim().oneOf(['active', 'inactive'], 'Invalid status').default('active'),
+});
+
 module.exports = {
     resetPasswordSchema,
     createUserSchema,
@@ -108,4 +115,5 @@ module.exports = {
     saveVisitorSchema,
     downloadQuerySchema,
     addDeviceSchema,
+    countrySchema,
 };

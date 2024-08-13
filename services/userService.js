@@ -4,6 +4,7 @@ const { createOrder } = require('./orderService');
 const adminModel = require('../models/admin/adminModel');
 const ManagerInfo = require('../models/managerInfoModel');
 const { fetchMyTickets } = require('./ticketService');
+const { Country } = require('../models/countrymodel');
 const getUserStatistics = async (startDate = null, endDate = null) => {
     try {
         const matchStage = {};
@@ -326,8 +327,12 @@ const fetchAllUsers = async (queryParams) => {
 
     // Country filtering
     if (country) {
-        filters['userDetails.country'] = { $in: country.split(',') };
+        // Make sure case-insensitive regex search and handle the case where country is an array
+        filters['userDetails.country'] = {
+            $in: country.split(',').map(c => new RegExp(c.trim(), 'i'))
+        };
     }
+
 
     // Process filtering
     if (process) {
@@ -761,6 +766,41 @@ const updateProcess = async (userId, process) => {
     }
 }
 
+const addCountry = async (data) => {
+    let existingCountry = await Country.findOne({ countryId: data.countryId });
+    if (existingCountry) {
+        throw new Error('Country already exists');
+    }
+    
+    const country = new Country(data);
+    return await country.save();
+}
+
+const fetchCountries = async () => {
+    const countries = await Country.find().select('-__v -_id -createdAt -updatedAt').exec();
+    return countries.map(country => {
+        return {
+            id: country.countryId,
+            label: country.label,
+            icon: country.icon,
+        }
+    });
+}
+
+const updateCountry = async (countryId, data) => {
+    const country = await Country.findById(countryId);
+    if (!country) {
+        return false;
+    }
+
+    if (data.label) country.label = data.label;
+    if (data.icon) country.icon = data.icon;
+    if (data.status) country.status = data.status;
+
+    await country.save();
+    return country;
+}
+
 module.exports = {
     getUserProfile,
     getUserStatistics,
@@ -778,5 +818,8 @@ module.exports = {
     deleteBulkUsers,
     placeOrder,
     addDevice,
-    updateProcess
+    updateProcess,
+    addCountry,
+    fetchCountries,
+    updateCountry
 };

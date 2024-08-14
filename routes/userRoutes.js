@@ -104,6 +104,12 @@ router.delete(
     controller.DeleteBulkUsers
 );
 
+router.put(
+    "/bulk/update",
+    verifyAdmin,
+    controller.UpdateBulkUsers
+);
+
 router.post(
     "/place-order",
     authenticateUser,

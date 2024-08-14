@@ -722,6 +722,18 @@ const deleteBulkUsers = async (userIds) => {
     }
 }
 
+const updateBulkUsers = async (userIds, data) => {
+    try {
+        const users = await User.updateMany({ _id: { $in: userIds } }, data);
+        return {
+            statusCode: 200,
+            message: 'Users updated successfully',
+            data: users.modifiedCount
+        };
+    } catch (error) {
+        throw error;
+    }
+}
 
 const placeOrder = async (userId, data) => {
     const user = await User.findById(userId);
@@ -821,5 +833,6 @@ module.exports = {
     updateProcess,
     addCountry,
     fetchCountries,
-    updateCountry
+    updateCountry,
+    updateBulkUsers
 };

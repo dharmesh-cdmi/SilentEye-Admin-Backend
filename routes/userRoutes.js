@@ -123,4 +123,21 @@ router.put(
     controller.UpdateProcess
 );
 
+router.get(
+    "/countries/list",
+    controller.FetchAllCountries
+);
+
+router.post(
+    "/countries",
+    verifyAdmin,
+    controller.CreateCountry
+);
+
+router.put(
+    "/countries/:countryId",
+    authenticateUser,
+    controller.UpdateCountry
+);
+
 module.exports = router;

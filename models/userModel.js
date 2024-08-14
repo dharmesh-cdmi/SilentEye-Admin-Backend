@@ -46,7 +46,11 @@ const userSchema = new Schema({
   history: [
     {
       date: { type: Date, default: Date.now },
-      action: { type: String, required: true }
+      action: {
+        type: String,
+        required: true,
+        enum: ['Account Created', 'Home Page', 'Pricing Page', 'Contact Page', 'Demo Page', 'Purchased', 'Refund Requested', 'Logged In', 'Logged Out', 'Blocked']
+      },
     }
   ],
   orders: [

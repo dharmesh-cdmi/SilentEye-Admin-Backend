@@ -82,7 +82,7 @@ const updateUserSchema = yup.object().shape({
 });
 
 const addUserHistorySchema = yup.object().shape({
-    action: yup.string().required('Action is required'),
+    action: yup.string().trim().oneOf(['Account Created', 'Home Page', 'Pricing Page', 'Contact Page', 'Demo Page', 'Purchased', 'Refund Requested', 'Logged In', 'Logged Out', 'Blocked'], 'Invalid action').required('Action is required'),
 });
 
 const saveVisitorSchema = yup.object().shape({
@@ -100,6 +100,13 @@ const addDeviceSchema = yup.object().shape({
     name: yup.string().trim().required('Name is required'),
 });
 
+const countrySchema = yup.object().shape({
+    label: yup.string().trim().required('Label is required'),
+    countryId: yup.string().trim().required('Country ID is required'),
+    icon: yup.string().trim().required('Icon is required'),
+    status: yup.string().trim().oneOf(['active', 'inactive'], 'Invalid status').default('active'),
+});
+
 module.exports = {
     resetPasswordSchema,
     createUserSchema,
@@ -108,4 +115,5 @@ module.exports = {
     saveVisitorSchema,
     downloadQuerySchema,
     addDeviceSchema,
+    countrySchema,
 };

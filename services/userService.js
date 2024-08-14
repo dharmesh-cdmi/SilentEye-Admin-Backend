@@ -352,10 +352,10 @@ const fetchAllUsers = async (queryParams) => {
     const skip = (parseInt(page) - 1) * parseInt(limit);
 
     const users = await User.find(filters)
+        .select("-password -refreshToken -__v -updatedAt")
         .populate('assignedBy', 'name email')
         .populate('orders', 'orderId planDetails.total orderDetails.purchase status')
         .populate('userDetails', 'profile_avatar country phone address')
-        .select("-password -refreshToken -__v -updatedAt")
         .sort({ createdAt: -1 })
         .skip(skip)
         .limit(parseInt(limit))
@@ -771,7 +771,7 @@ const addCountry = async (data) => {
     if (existingCountry) {
         throw new Error('Country already exists');
     }
-    
+
     const country = new Country(data);
     return await country.save();
 }

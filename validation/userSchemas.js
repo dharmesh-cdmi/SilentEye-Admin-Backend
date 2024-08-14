@@ -82,7 +82,7 @@ const updateUserSchema = yup.object().shape({
 });
 
 const addUserHistorySchema = yup.object().shape({
-    action: yup.string().required('Action is required'),
+    action: yup.string().trim().oneOf(['Account Created', 'Home Page', 'Pricing Page', 'Contact Page', 'Demo Page', 'Purchased', 'Refund Requested', 'Logged In', 'Logged Out', 'Blocked'], 'Invalid action').required('Action is required'),
 });
 
 const saveVisitorSchema = yup.object().shape({

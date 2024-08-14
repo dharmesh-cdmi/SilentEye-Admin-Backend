@@ -2,9 +2,9 @@ const express = require("express");
 const path = require("path")
 const multer = require("multer");
 
-const { verifyAdmin, authenticateUser } = require("../middleware/authMiddleware");
-const { validateRequest } = require("../middleware/validationMiddleware");
-const { createUserSchema, updateUserSchema, addUserHistorySchema, saveVisitorSchema } = require("../validation/userSchemas");
+const { verifyAdmin, authenticateUser, verifyUser } = require("../middleware/authMiddleware");
+const { validateRequest, validateQuery } = require("../middleware/validationMiddleware");
+const { createUserSchema, updateUserSchema, addUserHistorySchema, saveVisitorSchema, downloadQuerySchema, addDeviceSchema } = require("../validation/userSchemas");
 const controller = require("../controllers/userController");
 const router = express.Router();
 
@@ -23,9 +23,9 @@ const upload = multer({ storage });
 
 router.post(
     "/",
-    verifyAdmin,
     upload.single('profile_avatar'),
     validateRequest(createUserSchema),
+    // add plan vakidation function here
     controller.RegisterUser
 );
 
@@ -33,6 +33,12 @@ router.get(
     "/",
     verifyAdmin,
     controller.FetchAllUsers
+);
+
+router.get(
+    "/profile",
+    verifyUser,
+    controller.GetProfile
 );
 
 router.get(
@@ -57,6 +63,7 @@ router.delete(
 
 router.post(
     "/user-history/:userId",
+    authenticateUser,
     validateRequest(addUserHistorySchema),
     controller.AddUserHistory
 );
@@ -84,5 +91,53 @@ router.post(
     controller.AddUserHistoryByVisitor
 );
 
+router.get(
+    "/download/users-data",
+    validateQuery(downloadQuerySchema),
+    authenticateUser,
+    controller.DownloadUsersData
+);
+
+router.delete(
+    "/bulk/delete",
+    verifyAdmin,
+    controller.DeleteBulkUsers
+);
+
+router.post(
+    "/place-order",
+    authenticateUser,
+    controller.PlaceOrder
+);
+
+router.post(
+    "/add-device",
+    validateRequest(addDeviceSchema),
+    authenticateUser,
+    controller.AddDevice
+);
+
+router.put(
+    "/me/update-process",
+    authenticateUser,
+    controller.UpdateProcess
+);
+
+router.get(
+    "/countries/list",
+    controller.FetchAllCountries
+);
+
+router.post(
+    "/countries",
+    verifyAdmin,
+    controller.CreateCountry
+);
+
+router.put(
+    "/countries/:countryId",
+    authenticateUser,
+    controller.UpdateCountry
+);
 
 module.exports = router;

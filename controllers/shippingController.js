@@ -1,24 +1,54 @@
 const shippingService = require('../services/shippingService');
-const { apiSuccessResponse, apiErrorResponse, HTTP_STATUS_MESSAGE, HTTP_STATUS } = require('../utils/responseHelper')
+const {
+  apiSuccessResponse,
+  apiErrorResponse,
+  HTTP_STATUS_MESSAGE,
+  HTTP_STATUS,
+} = require('../utils/responseHelper');
 
 // Create a new shipping
 const createShipping = async (req, res) => {
   try {
     const shipping = await shippingService.createShipping(req.body);
-    return apiSuccessResponse(res, HTTP_STATUS_MESSAGE[201], shipping, HTTP_STATUS.CREATED)
+    return apiSuccessResponse(
+      res,
+      HTTP_STATUS_MESSAGE[201],
+      shipping,
+      HTTP_STATUS.CREATED
+    );
   } catch (error) {
-    return apiErrorResponse(res, HTTP_STATUS_MESSAGE[500], error?.message ?? error, HTTP_STATUS.INTERNAL_SERVER_ERROR)
+    return apiErrorResponse(
+      res,
+      HTTP_STATUS_MESSAGE[500],
+      error?.message ?? error,
+      HTTP_STATUS.INTERNAL_SERVER_ERROR
+    );
   }
 };
 
 // Get all shippings
 const getAllShippings = async (req, res) => {
   try {
-    const { page = 1, limit = 10 } = req.query;
-    const shippings = await shippingService.getAllShippings(page, limit);
-    return apiSuccessResponse(res, HTTP_STATUS_MESSAGE[200], shippings, HTTP_STATUS.OK)
+    const { page = 1, limit = 10, search, filterStatus } = req.query;
+    const shippings = await shippingService.getAllShippings(
+      page,
+      limit,
+      search,
+      filterStatus
+    );
+    return apiSuccessResponse(
+      res,
+      HTTP_STATUS_MESSAGE[200],
+      shippings,
+      HTTP_STATUS.OK
+    );
   } catch (error) {
-    return apiErrorResponse(res, HTTP_STATUS_MESSAGE[500], error?.message ?? error, HTTP_STATUS.INTERNAL_SERVER_ERROR)
+    return apiErrorResponse(
+      res,
+      HTTP_STATUS_MESSAGE[500],
+      error?.message ?? error,
+      HTTP_STATUS.INTERNAL_SERVER_ERROR
+    );
   }
 };
 
@@ -26,9 +56,19 @@ const getAllShippings = async (req, res) => {
 const getShippingById = async (req, res) => {
   try {
     const shipping = await shippingService.getShippingById(req.params.id);
-    return apiSuccessResponse(res, HTTP_STATUS_MESSAGE[200], shipping, HTTP_STATUS.OK)
+    return apiSuccessResponse(
+      res,
+      HTTP_STATUS_MESSAGE[200],
+      shipping,
+      HTTP_STATUS.OK
+    );
   } catch (error) {
-    return apiErrorResponse(res, HTTP_STATUS_MESSAGE[500], error?.message ?? error, HTTP_STATUS.INTERNAL_SERVER_ERROR)
+    return apiErrorResponse(
+      res,
+      HTTP_STATUS_MESSAGE[500],
+      error?.message ?? error,
+      HTTP_STATUS.INTERNAL_SERVER_ERROR
+    );
   }
 };
 
@@ -39,9 +79,19 @@ const updateShipping = async (req, res) => {
       req.params.id,
       req.body
     );
-    return apiSuccessResponse(res, HTTP_STATUS_MESSAGE[200], shipping, HTTP_STATUS.OK)
+    return apiSuccessResponse(
+      res,
+      HTTP_STATUS_MESSAGE[200],
+      shipping,
+      HTTP_STATUS.OK
+    );
   } catch (error) {
-    return apiErrorResponse(res, HTTP_STATUS_MESSAGE[500], error?.message ?? error, HTTP_STATUS.INTERNAL_SERVER_ERROR)
+    return apiErrorResponse(
+      res,
+      HTTP_STATUS_MESSAGE[500],
+      error?.message ?? error,
+      HTTP_STATUS.INTERNAL_SERVER_ERROR
+    );
   }
 };
 
@@ -49,9 +99,19 @@ const updateShipping = async (req, res) => {
 const deleteShipping = async (req, res) => {
   try {
     await shippingService.deleteShipping(req.params.id);
-    return apiSuccessResponse(res, HTTP_STATUS_MESSAGE[200], { message: 'Shipping deleted successfully' }, HTTP_STATUS.OK)
+    return apiSuccessResponse(
+      res,
+      HTTP_STATUS_MESSAGE[200],
+      { message: 'Shipping deleted successfully' },
+      HTTP_STATUS.OK
+    );
   } catch (error) {
-    return apiErrorResponse(res, HTTP_STATUS_MESSAGE[500], error?.message ?? error, HTTP_STATUS.INTERNAL_SERVER_ERROR)
+    return apiErrorResponse(
+      res,
+      HTTP_STATUS_MESSAGE[500],
+      error?.message ?? error,
+      HTTP_STATUS.INTERNAL_SERVER_ERROR
+    );
   }
 };
 

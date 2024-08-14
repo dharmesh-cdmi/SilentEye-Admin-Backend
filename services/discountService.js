@@ -7,11 +7,6 @@ const createDiscount = async (data) => {
     const discount = new Discount(data);
     await discount.save();
 
-    const stripeDiscount = await paymentService.createStripeDiscount(discount);
-
-    discount.pgDiscountId = stripeDiscount.id;
-    await discount.save();
-
     return discount;
   } catch (error) {
     throw new Error('Error in creating discount: ' + error.message);
@@ -19,14 +14,58 @@ const createDiscount = async (data) => {
 };
 
 // Get all discounts
-const getAllDiscounts = async (page, limit) => {
+const getAllDiscounts = async (page, limit, search, filterValidity) => {
   try {
     const options = {
       page: parseInt(page, 10),
       limit: parseInt(limit, 10),
       sort: { createdAt: -1 },
     };
-    return await Discount.paginate({}, options);
+
+    const query = {};
+    const andConditions = [];
+
+    // Apply validity filter
+    if (filterValidity) {
+      const currentDate = new Date();
+      if (filterValidity.toLowerCase() === 'active') {
+        andConditions.push({
+          $or: [
+            { validity: 'No Limit' }, // Matches exactly 'No Limit'
+            {
+              validity: { $ne: 'No Limit' }, // Exclude 'No Limit'
+              $expr: {
+                $gt: [
+                  { $dateFromString: { dateString: '$validity' } },
+                  currentDate,
+                ],
+              }, // Active discounts with a valid date
+            },
+          ],
+        });
+      } else if (filterValidity.toLowerCase() === 'expired') {
+        andConditions.push({
+          validity: { $ne: 'No Limit' }, // Exclude 'No Limit'
+          $expr: {
+            $lte: [
+              { $dateFromString: { dateString: '$validity' } },
+              currentDate,
+            ],
+          }, // Expired discounts with a valid date
+        });
+      }
+    }
+
+    // Apply search filter
+    if (search) {
+      andConditions.push({ coupon: { $regex: search, $options: 'i' } });
+    }
+
+    // Combine all conditions
+    if (andConditions.length > 0) {
+      query.$and = andConditions;
+    }
+    return await Discount.paginate(query, options);
   } catch (error) {
     throw new Error('Error in fetching discounts: ' + error.message);
   }
@@ -48,8 +87,6 @@ const updateDiscount = async (id, data) => {
     if (!discount) {
       throw new Error('Discount not found!');
     }
-    // Update corresponding discount in Stripe
-    await paymentService.updateStripeDiscount(discount);
 
     return discount;
   } catch (error) {
@@ -61,12 +98,6 @@ const updateDiscount = async (id, data) => {
 const deleteDiscount = async (id) => {
   try {
     const discount = await Discount.findByIdAndDelete(id);
-
-    // Delete corresponding discount in Stripe
-    await paymentService.deleteStripeDiscount(
-      discount.paymentGatewayId,
-      discount?.pgDiscountId
-    );
 
     return discount;
   } catch (error) {

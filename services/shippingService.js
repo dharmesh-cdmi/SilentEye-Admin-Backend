@@ -12,14 +12,26 @@ const createShipping = async (data) => {
 };
 
 // Get all shippings
-const getAllShippings = async (page, limit) => {
+const getAllShippings = async (page, limit, search, filterStatus) => {
   try {
     const options = {
       page: parseInt(page, 10),
       limit: parseInt(limit, 10),
       sort: { createdAt: -1 },
     };
-    return await Shipping.find(options);
+
+    const query = {};
+    if (filterStatus) {
+      query.status = filterStatus;
+    }
+    if (search) {
+      query.$or = [
+        { title: { $regex: search, $options: 'i' } },
+        { daysRange: { $regex: search, $options: 'i' } },
+      ];
+    }
+
+    return await Shipping.paginate(query, options);
   } catch (error) {
     throw new Error(`Error in getting shippings: ${error.message}`);
   }

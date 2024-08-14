@@ -1,10 +1,17 @@
+const moment = require('moment');
+
 const analyticService = require('../../services/analyticService');
 const { apiSuccessResponse, apiErrorResponse, HTTP_STATUS } = require('../../utils'); // Importing helper functions
 const exportService = require('../../services/exportService');
 const fs = require('fs');
 
 const totalCountAnalytics = async (req, res) => {
-    const {plan, page, action, startDate, endDate } = req.query;
+    const {plan, page, action } = req.query;
+    let { startDate = null, endDate = null } = req.query;
+     // Validate date formats
+     startDate = startDate && moment(startDate, moment.ISO_8601, true).isValid() ? startDate : null;
+     endDate = endDate && moment(endDate, moment.ISO_8601, true).isValid() ? endDate : null;
+ 
 
     try {
         const analytic = await analyticService.analytics(plan, page, action, startDate, endDate);
@@ -16,7 +23,12 @@ const totalCountAnalytics = async (req, res) => {
 };
 
 const usersStatisticsAnalytics = async (req, res) => {
-    const { startDate, endDate, groupBy, page, limit } = req.query;
+    const { groupBy, page, limit } = req.query;
+    let { startDate = null, endDate = null } = req.query;
+     // Validate date formats
+     startDate = startDate && moment(startDate, moment.ISO_8601, true).isValid() ? startDate : null;
+     endDate = endDate && moment(endDate, moment.ISO_8601, true).isValid() ? endDate : null;
+ 
 
     try {
         const analytic = await analyticService.usersStatisticsAnalytics(startDate, endDate, groupBy, page, limit);
@@ -31,12 +43,18 @@ const usersStatisticsAnalytics = async (req, res) => {
 
 const downloadAnalytics = async (req, res) => {
     try {
-        const { format,addon, plan, page, action, startDate, endDate} = req.query; // 'pdf' or 'xlsx'
+        const { format,addon, plan, page, action} = req.query; // 'pdf' or 'xlsx'
+        let { startDate = null, endDate = null } = req.query;
+        // Validate date formats
+        startDate = startDate && moment(startDate, moment.ISO_8601, true).isValid() ? startDate : null;
+        endDate = endDate && moment(endDate, moment.ISO_8601, true).isValid() ? endDate : null;
+ 
+        
         if (!format || (format !== 'pdf' && format !== 'xlsx')) {
             return res.status(400).send('Invalid format. Must be "pdf" or "xlsx".');
         }
 
-        const data = await analyticService.analytics(addon, plan, page, action, startDate, endDate);
+        const data = await analyticService.exportAnalyticsData(plan, page, action, startDate, endDate);
         const filePath = await exportService.exportData(format, data);
 
         res.download(filePath, (err) => {

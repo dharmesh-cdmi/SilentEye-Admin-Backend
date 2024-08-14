@@ -32,7 +32,7 @@ const createPlan = async (data) => {
     };
   } catch (error) {
     return {
-      status: true,
+      status: false,
       error: true,
       message: 'Error in creating plan: ' + error,
     };
@@ -40,14 +40,24 @@ const createPlan = async (data) => {
 };
 
 // Get all plans
-const getAllPlans = async (page, limit) => {
+const getAllPlans = async (page, limit, search, filterStatus) => {
   try {
     const options = {
       page: parseInt(page, 10),
       limit: parseInt(limit, 10),
       sort: { createdAt: -1 },
     };
-    return await Plan.find(options);
+
+    const query = {};
+    if (filterStatus) query.status = filterStatus;
+    if (search) {
+      query.$or = [
+        { name: { $regex: search, $options: 'i' } },
+        { tag: { $regex: search, $options: 'i' } },
+      ];
+    }
+
+    return await Plan.paginate(query, options);
   } catch (error) {
     throw new Error(`Error fetching plans: ${error.message}`);
   }
@@ -121,7 +131,7 @@ const deletePlan = async (id) => {
     };
   } catch (error) {
     return {
-      status: true,
+      status: false,
       error: true,
       message: 'Error in deleting plan: ' + error,
     };

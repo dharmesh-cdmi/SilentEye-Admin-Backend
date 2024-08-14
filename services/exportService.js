@@ -5,12 +5,26 @@ const generateHomePageAnalyticsExcel = async (data, filePath) => {
     if (!data || typeof data !== 'object') {
         throw new Error('Invalid data. Must be a non-empty object.');
     }
+ 
 
     const workbook = new ExcelJS.Workbook();
     const sheet = workbook.addWorksheet('Sheet1');
 
     const addDataToSheet = (headers, data, startRow) => {
-        sheet.addRow(headers);
+        // sheet.addRow(headers);
+        const headerRow = sheet.addRow(headers);
+        
+          // Apply formatting to headers
+          headerRow.font = { bold: true };
+          headerRow.alignment = { vertical: 'middle', horizontal: 'center' };
+          headerRow.fill = {
+              type: 'pattern',
+              pattern: 'solid',
+              fgColor: { argb: 'FFFFE599' }, // Light yellow background
+          };
+          sheet.getRow(startRow).height = 20; // Increase row height for better readability
+
+          
         data.forEach(item => {
             const row = headers.map(header => item[header] !== undefined ? item[header].toString() : '');
             sheet.addRow(row);
@@ -19,11 +33,11 @@ const generateHomePageAnalyticsExcel = async (data, filePath) => {
     };
 
     let startRow = 1;
-
     // Process visitorDetails
-    if (data.visitorDetails && data.visitorDetails.visitorDetails.length) {
+    if (data.visitorDetails && data.visitorDetails.pageData) {
+        console.log(data.visitorDetails)
         const headers = ['page', 'action', 'totalCount'];
-        startRow = addDataToSheet(headers, data.visitorDetails.visitorDetails, startRow);
+        startRow = addDataToSheet(headers, data.visitorDetails.pageData, startRow);
     }
 
     // Process orders
@@ -93,6 +107,17 @@ const exportOrdersToExcel = async (orders) => {
         });
     });
 
+      // Add optional formatting to the header row
+      worksheet.getRow(1).font = { bold: true };
+      worksheet.getRow(1).alignment = { vertical: 'middle', horizontal: 'center' };
+      worksheet.getRow(1).fill = {
+          type: 'pattern',
+          pattern: 'solid',
+          fgColor: { argb: 'FFFFE599' }, // Light yellow background
+      };
+      worksheet.getRow(1).height = 20; // Increase row height for better readability
+
+      
     // Create buffer and return
     const buffer = await workbook.xlsx.writeBuffer();
     return buffer;
@@ -101,7 +126,7 @@ const exportOrdersToExcel = async (orders) => {
 
 
 const exportData = async (format, data) => {
-    const filePath = `./downloads/export.${format}`;
+    const filePath = `./downloads/export_analytics.${format}`;
     if (format === 'xlsx') {
         await generateHomePageAnalyticsExcel(data, filePath);
     } else {
@@ -110,7 +135,85 @@ const exportData = async (format, data) => {
     return filePath;
 };
 
+const generateUsersDataExcel = async (data, filePath) => {
+    if (!data || !Array.isArray(data) || !data.length) {
+        throw new Error('Invalid data. Must be a non-empty array.');
+    }
+
+    const workbook = new ExcelJS.Workbook();
+    const worksheet = workbook.addWorksheet('Users');
+
+    // Add header row
+    worksheet.columns = [
+        { header: 'Name', key: 'name', width: 20 },
+        { header: 'Email', key: 'email', width: 20 },
+        { header: 'Country', key: 'country', width: 20 },
+        { header: 'Phone', key: 'phone', width: 20 },
+        { header: 'Address', key: 'address', width: 20 },
+        { header: 'Status', key: 'status', width: 10 },
+        { header: 'Amount Spend', key: 'amountSpend', width: 10 },
+        { header: 'Amount Refund', key: 'amountRefund', width: 10 },
+        { header: 'Device', key: 'device', width: 10 },
+        { header: 'IP Address', key: 'ipAddress', width: 20 },
+        { header: 'Blocked', key: 'blocked', width: 10 },
+        { header: 'User Status', key: 'userStatus', width: 10 },
+        { header: 'Process', key: 'process', width: 10 },
+        { header: 'Joined', key: 'joined', width: 20 },
+        { header: 'Wallet Amount', key: 'walletAmount', width: 10 }
+    ];
+
+    // Add data rows
+    data.forEach(user => {
+        worksheet.addRow({
+            name: user.name,
+            email: user.email,
+            country: user.userDetails?.country,
+            phone: user.userDetails?.phone,
+            address: user.userDetails?.address,
+            status: user.status,
+            amountSpend: user.amountSpend,
+            amountRefund: user.amountRefund,
+            device: user.device,
+            ipAddress: user.ipAddress,
+            blocked: user.blocked,
+            userStatus: user.userStatus,
+            process: user.process,
+            joined: user.joined,
+            walletAmount: user.walletAmount
+        });
+    });
+
+    try {
+        // if file already exists, remove it and if not, create it recursively
+        if (fs.existsSync(filePath))
+            fs.unlinkSync(filePath);
+
+        if (!fs.existsSync(filePath)) {
+            let path = filePath.split('/');
+            path.pop();
+            fs.mkdirSync(path.join('/'), { recursive: true });
+        }
+
+        await workbook.xlsx.writeFile(filePath);
+    }
+    catch (error) {
+        console.log('Error generating excel file:', error);
+        throw new Error('Error generating excel file');
+    }
+}
+
+const exportUsersData = async (format, data) => {
+    const filePath = __dirname + '/downloads/users.' + format;
+    if (format === 'xlsx') {
+        await generateUsersDataExcel(data, filePath);
+    } else {
+        throw new Error('Invalid format. Must be "xlsx".');
+    }
+    return filePath;
+}
+
 module.exports = {
     exportData,
-    exportOrdersToExcel
+    exportOrdersToExcel,
+    exportUsersData
 };

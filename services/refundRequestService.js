@@ -12,14 +12,25 @@ const createRefundRequest = async (data) => {
 };
 
 // Get all refund requests
-const getAllRefundRequests = async (page, limit) => {
+const getAllRefundRequests = async (page, limit, search, filterStatus) => {
   try {
     const options = {
       page: parseInt(page, 10),
       limit: parseInt(limit, 10),
       sort: { createdAt: -1 },
+      populate: { path: 'planId', select: 'name' },
     };
-    return await RefundRequest.paginate({}, options);
+
+    const query = {};
+    if (filterStatus) query.status = filterStatus;
+    if (search) {
+      query.$or = [
+        { requestId: { $regex: search, $options: 'i' } },
+        { email: { $regex: search, $options: 'i' } },
+        { type: { $regex: search, $options: 'i' } },
+      ];
+    }
+    return await RefundRequest.paginate(query, options);
   } catch (error) {
     throw new Error(`Error in getting refund requests: ${error.message}`);
   }
@@ -28,7 +39,7 @@ const getAllRefundRequests = async (page, limit) => {
 // Get refund request by ID
 const getRefundRequestById = async (id) => {
   try {
-    return await RefundRequest.findById(id);
+    return await RefundRequest.findById(id).populate('planId', 'name');
   } catch (error) {
     throw new Error(`Error in getting refund request: ${error.message}`);
   }

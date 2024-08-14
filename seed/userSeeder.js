@@ -4,7 +4,7 @@ const User = require('../models/userModel'); // Adjust the path as necessary
 const connectDB = require('../configs/db.config');
 const { ObjectId } = mongoose.Types;
 const { faker } = require('@faker-js/faker');
-
+const { hashPasswords } = require('../utils');
 const userSeeder = async () => {
   await connectDB();
 
@@ -21,7 +21,7 @@ const userSeeder = async () => {
   const users = [];
 
   // Generate additional users
-  for (let i = 1; i <= 20; i++) { // Change '30' to the desired number of users
+  for (let i = 1; i <= 5; i++) { // Change '30' to the desired number of users
     let selectedPlan;
     const randomPlanIndex = Math.floor(Math.random() * 3); // Randomly select from 0 to 2
 
@@ -41,7 +41,7 @@ const userSeeder = async () => {
       name: faker.name.fullName(),
       email: faker.internet.email(),
       email_verified_at: faker.date.past(),
-      password: faker.internet.password(),
+      password: '123456',
       assignedBy: new ObjectId(), // Example assignedBy ID
       userDetails: {
         profile_avatar: faker.image.avatar(),
@@ -60,6 +60,7 @@ const userSeeder = async () => {
     });
   }
 
+  await hashPasswords(users);
   await User.deleteMany({});
   await User.insertMany(users);
   console.log('Users have been seeded');

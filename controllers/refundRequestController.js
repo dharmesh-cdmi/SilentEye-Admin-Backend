@@ -1,5 +1,10 @@
 const refundRequestService = require('../services/refundRequestService');
-const { apiSuccessResponse, apiErrorResponse, HTTP_STATUS_MESSAGE, HTTP_STATUS } = require('../utils/responseHelper')
+const {
+  apiSuccessResponse,
+  apiErrorResponse,
+  HTTP_STATUS_MESSAGE,
+  HTTP_STATUS,
+} = require('../utils/responseHelper');
 
 // Create a new refund request
 const createRefundRequest = async (req, res) => {
@@ -7,23 +12,45 @@ const createRefundRequest = async (req, res) => {
     const refundRequest = await refundRequestService.createRefundRequest(
       req.body
     );
-    return apiSuccessResponse(res, HTTP_STATUS_MESSAGE[201], refundRequest, HTTP_STATUS.CREATED)
+    return apiSuccessResponse(
+      res,
+      HTTP_STATUS_MESSAGE[201],
+      refundRequest,
+      HTTP_STATUS.CREATED
+    );
   } catch (error) {
-    return apiErrorResponse(res, HTTP_STATUS_MESSAGE[500], error?.message ?? error, HTTP_STATUS.INTERNAL_SERVER_ERROR)
+    return apiErrorResponse(
+      res,
+      HTTP_STATUS_MESSAGE[500],
+      error?.message ?? error,
+      HTTP_STATUS.INTERNAL_SERVER_ERROR
+    );
   }
 };
 
 // Get all refund requests
 const getAllRefundRequests = async (req, res) => {
   try {
-    const { page = 1, limit = 10 } = req.query;
+    const { page = 1, limit = 10, search, filterStatus } = req.query;
     const refundRequests = await refundRequestService.getAllRefundRequests(
       page,
-      limit
+      limit,
+      search,
+      filterStatus
     );
-    return apiSuccessResponse(res, HTTP_STATUS_MESSAGE[200], refundRequests, HTTP_STATUS.OK)
+    return apiSuccessResponse(
+      res,
+      HTTP_STATUS_MESSAGE[200],
+      refundRequests,
+      HTTP_STATUS.OK
+    );
   } catch (error) {
-    return apiErrorResponse(res, HTTP_STATUS_MESSAGE[500], error?.message ?? error, HTTP_STATUS.INTERNAL_SERVER_ERROR)
+    return apiErrorResponse(
+      res,
+      HTTP_STATUS_MESSAGE[500],
+      error?.message ?? error,
+      HTTP_STATUS.INTERNAL_SERVER_ERROR
+    );
   }
 };
 
@@ -33,9 +60,19 @@ const getRefundRequestById = async (req, res) => {
     const refundRequest = await refundRequestService.getRefundRequestById(
       req.params.id
     );
-    return apiSuccessResponse(res, HTTP_STATUS_MESSAGE[200], refundRequest, HTTP_STATUS.OK)
+    return apiSuccessResponse(
+      res,
+      HTTP_STATUS_MESSAGE[200],
+      refundRequest,
+      HTTP_STATUS.OK
+    );
   } catch (error) {
-    return apiErrorResponse(res, HTTP_STATUS_MESSAGE[500], error?.message ?? error, HTTP_STATUS.INTERNAL_SERVER_ERROR)
+    return apiErrorResponse(
+      res,
+      HTTP_STATUS_MESSAGE[500],
+      error?.message ?? error,
+      HTTP_STATUS.INTERNAL_SERVER_ERROR
+    );
   }
 };
 
@@ -46,9 +83,19 @@ const updateRefundRequest = async (req, res) => {
       req.params.id,
       req.body
     );
-    return apiSuccessResponse(res, HTTP_STATUS_MESSAGE[200], refundRequest, HTTP_STATUS.OK)
+    return apiSuccessResponse(
+      res,
+      HTTP_STATUS_MESSAGE[200],
+      refundRequest,
+      HTTP_STATUS.OK
+    );
   } catch (error) {
-    return apiErrorResponse(res, HTTP_STATUS_MESSAGE[500], error?.message ?? error, HTTP_STATUS.INTERNAL_SERVER_ERROR)
+    return apiErrorResponse(
+      res,
+      HTTP_STATUS_MESSAGE[500],
+      error?.message ?? error,
+      HTTP_STATUS.INTERNAL_SERVER_ERROR
+    );
   }
 };
 
@@ -56,9 +103,19 @@ const updateRefundRequest = async (req, res) => {
 const deleteRefundRequest = async (req, res) => {
   try {
     await refundRequestService.deleteRefundRequest(req.params.id);
-    return apiSuccessResponse(res, HTTP_STATUS_MESSAGE[200], { message: 'Request deleted successfully' }, HTTP_STATUS.OK)
+    return apiSuccessResponse(
+      res,
+      HTTP_STATUS_MESSAGE[200],
+      { message: 'Request deleted successfully' },
+      HTTP_STATUS.OK
+    );
   } catch (error) {
-    return apiErrorResponse(res, HTTP_STATUS_MESSAGE[500], error?.message ?? error, HTTP_STATUS.INTERNAL_SERVER_ERROR)
+    return apiErrorResponse(
+      res,
+      HTTP_STATUS_MESSAGE[500],
+      error?.message ?? error,
+      HTTP_STATUS.INTERNAL_SERVER_ERROR
+    );
   }
 };
 

@@ -62,6 +62,26 @@ const getRefundData = async (startDate = null, endDate = null) => {
   };
 };
 
+const getApprovedRefundsByDateRange = async (startDate, endDate) => {
+  return RefundRequest.aggregate([
+    { 
+      $match: { 
+        // status: "Approved", 
+        createdAt: { $gte: new Date(startDate), $lte: new Date(endDate) } 
+      } 
+    },
+    {
+      $group: {
+        _id: { month: { $month: "$createdAt" }, year: { $year: "$createdAt" } },
+        count: { $sum: 1 }
+      }
+    }
+  ]);
+};
+
+
+
 module.exports = {
-  getRefundData
+  getRefundData,
+  getApprovedRefundsByDateRange
 };

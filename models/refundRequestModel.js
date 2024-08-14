@@ -30,7 +30,7 @@ const RefundRequestSchema = new Schema(
     type: {
       type: String,
       required: true,
-      enum: ['Reason 1', 'Reason 2', 'Reason 3', 'Reason 4', 'Reason 5'],
+      // enum: ['Reason 1', 'Reason 2', 'Reason 3', 'Reason 4', 'Reason 5'],
     },
     checked: {
       type: Boolean,

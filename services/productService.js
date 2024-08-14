@@ -33,7 +33,7 @@ const createProduct = async (data) => {
     };
   } catch (error) {
     return {
-      status: true,
+      status: false,
       error: true,
       message: 'Error in creating product: ' + error,
     };
@@ -41,14 +41,23 @@ const createProduct = async (data) => {
 };
 
 // Get all products
-const getAllProducts = async (page, limit) => {
+const getAllProducts = async (page, limit, search, filterStatus) => {
   try {
     const options = {
       page: parseInt(page, 10),
       limit: parseInt(limit, 10),
       sort: { createdAt: -1 },
     };
-    return await Product.paginate({}, options);
+
+    const query = {};
+    if (filterStatus) {
+      query.status = filterStatus;
+    }
+    if (search) {
+      query.$or = [{ title: { $regex: search, $options: 'i' } }];
+    }
+
+    return await Product.paginate(query, options);
   } catch (error) {
     throw new Error('Error in fetching products: ' + error.message);
   }
@@ -73,7 +82,7 @@ const updateProduct = async (id, data) => {
 
     const pgData = {
       paymentGatewayId: product?.paymentGatewayId,
-      productId: product?.pgProductId,
+      itemId: product?.pgProductId,
       name: data?.title,
       productMetadata: data?.productMetadata ? data.productMetadata : undefined,
       priceId: product?.pgPriceId,
@@ -99,7 +108,7 @@ const updateProduct = async (id, data) => {
     };
   } catch (error) {
     return {
-      status: true,
+      status: false,
       error: true,
       message: 'Error in updating product: ' + error,
     };
@@ -135,7 +144,7 @@ const deleteProduct = async (id) => {
     };
   } catch (error) {
     return {
-      status: true,
+      status: false,
       error: true,
       message: 'Error in deleting product: ' + error,
     };

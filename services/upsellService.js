@@ -1,9 +1,18 @@
 const Upsell = require('../models/upsellModel');
 
 // Create a new upsell
-const createUpsell = async (data) => {
+const createUpsell = async (req) => {
   try {
-    const upsell = new Upsell(data);
+    const image = req.file ? req.file.path : '';
+    const { name, count } = req.body;
+    const upsell = new Upsell({
+      ...req.body,
+      upsell: {
+        name,
+        count,
+        image,
+      },
+    });
     await upsell.save();
     return upsell;
   } catch (error) {
@@ -12,15 +21,27 @@ const createUpsell = async (data) => {
 };
 
 // Get all upsells
-const getAllUpsells = async (page, limit) => {
+const getAllUpsells = async (page, limit, search, filterStatus) => {
   try {
     const options = {
       page: parseInt(page, 10),
       limit: parseInt(limit, 10),
       sort: { createdAt: -1 },
+      populate: { path: 'plan', select: 'name icon' },
     };
 
-    return await Upsell.find(options);
+    const query = {};
+    if (filterStatus) {
+      query.status = filterStatus;
+    }
+    if (search) {
+      query.$or = [
+        { 'upsell.name': { $regex: search, $options: 'i' } },
+        { tag: { $regex: search, $options: 'i' } },
+      ];
+    }
+
+    return await Upsell.paginate(query, options);
   } catch (error) {
     throw new Error(`Error fetching upsells: ${error.message}`);
   }
@@ -29,7 +50,7 @@ const getAllUpsells = async (page, limit) => {
 // Get upsell by ID
 const getUpsellById = async (id) => {
   try {
-    return await Upsell.findById(id);
+    return await Upsell.findById(id).populate('plan', 'name icon');
   } catch (error) {
     throw new Error(`Error fetching upsell: ${error.message}`);
   }

@@ -40,6 +40,41 @@ const usersStatisticsAnalytics = async (req, res) => {
 };
 
 
+const downloadUserStatics = async (req, res) => {
+    try {
+        const { format,addon, plan, page, action} = req.query; // 'pdf' or 'xlsx'
+        let { startDate = null, endDate = null } = req.query;
+        // Validate date formats
+        startDate = startDate && moment(startDate, moment.ISO_8601, true).isValid() ? startDate : null;
+        endDate = endDate && moment(endDate, moment.ISO_8601, true).isValid() ? endDate : null;
+ 
+        
+        // if (!format || (format !== 'pdf' && format !== 'xlsx')) {
+        //     return res.status(400).send('Invalid format. Must be "pdf" or "xlsx".');
+        // }
+
+        const data = await analyticService.exportAnalyticsData(plan, page, action, startDate, endDate);
+        const filePath = await exportService.exportData(format || 'xlsx', data);
+
+        res.download(filePath, (err) => {
+            if (err) {
+                console.error('Error downloading file:', err);
+                res.status(500).send('Error downloading file.');
+            } else {
+                // Optional: Delete the file after download
+                fs.unlink(filePath, (err) => {
+                    if (err) {
+                        console.error('Error deleting file:', err);
+                    }
+                });
+            }
+        });
+    } catch (error) {
+        console.error('Error generating analytics data:', error);
+        res.status(500).send('Internal Server Error');
+    }
+};
+
 
 const downloadAnalytics = async (req, res) => {
     try {
@@ -50,12 +85,12 @@ const downloadAnalytics = async (req, res) => {
         endDate = endDate && moment(endDate, moment.ISO_8601, true).isValid() ? endDate : null;
  
         
-        if (!format || (format !== 'pdf' && format !== 'xlsx')) {
-            return res.status(400).send('Invalid format. Must be "pdf" or "xlsx".');
-        }
+        // if (!format || (format !== 'pdf' && format !== 'xlsx')) {
+        //     return res.status(400).send('Invalid format. Must be "pdf" or "xlsx".');
+        // }
 
         const data = await analyticService.exportAnalyticsData(plan, page, action, startDate, endDate);
-        const filePath = await exportService.exportData(format, data);
+        const filePath = await exportService.exportData(format || 'xlsx', data);
 
         res.download(filePath, (err) => {
             if (err) {
@@ -80,5 +115,6 @@ const downloadAnalytics = async (req, res) => {
 module.exports = {
     totalCountAnalytics,
     usersStatisticsAnalytics,
+    downloadUserStatics,
     downloadAnalytics
 };

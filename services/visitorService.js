@@ -66,14 +66,36 @@ const getVisitorCount = async (startDate = null, endDate = null) => {
     const totalVisitorsCount = uniqueVisitor.length;
 
     // Prepare response
+    // const response = {
+    //   totalVisitorsCount,
+    //   pageData: result.map(item => ({
+    //     page: item._id.page,
+    //     action: item._id.action,
+    //     label: item._id.page+" Page " +item._id.action=='Visit'?' Visito':item._id.action,
+    //     totalCount: item.totalCount,
+    //   }))
+    // };
     const response = {
       totalVisitorsCount,
-      pageData: result.map(item => ({
-        page: item._id.page,
-        action: item._id.action,
-        totalCount: item.totalCount,
-      }))
+      pageData: result.map(item => {
+        // let label = `${item._id.page} Page ${item._id.action}`;
+        if (item._id.action === 'Visit') {
+          label = `${item._id.page} Page Visitor`;
+        } else if(item._id.action === 'Demo'){
+          label = `${item._id.action} Viewer`;
+        }
+        else{
+          label = `${item._id.page} Page`;
+        }
+        return {
+          page: item._id.page,
+          action: item._id.action,
+          label: label,
+          totalCount: item.totalCount,
+        };
+      })
     };
+    
 
     return response;
   } catch (error) {
@@ -288,10 +310,14 @@ const graphData = async (pages = [], actions = [], startDate = null, endDate = n
       { label: "Logged in Users", data: aggregatedData["Logged in Users"] },
       { label: "Total Order", data: aggregatedData["Total Order"] },
       { label: "Total Refunds", data: aggregatedData["Total Refunds"] },
-      { label: "Months",data:["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]}
     ];
 
-    return result;
+    return {
+      result,
+      "Months":["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
+
+      
+    };
   } catch (error) {
     throw error;
   }

@@ -35,7 +35,6 @@ const generateHomePageAnalyticsExcel = async (data, filePath) => {
     let startRow = 1;
     // Process visitorDetails
     if (data.visitorDetails && data.visitorDetails.pageData) {
-        console.log(data.visitorDetails)
         const headers = ['page', 'action', 'totalCount'];
         startRow = addDataToSheet(headers, data.visitorDetails.pageData, startRow);
     }

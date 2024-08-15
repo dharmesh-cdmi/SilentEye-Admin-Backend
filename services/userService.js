@@ -5,6 +5,131 @@ const adminModel = require('../models/admin/adminModel');
 const ManagerInfo = require('../models/managerInfoModel');
 const { fetchMyTickets } = require('./ticketService');
 const { Country } = require('../models/countrymodel');
+
+
+
+// const getUserStatistics = async (startDate = null, endDate = null) => {
+//     try {
+//         const matchStage = {};
+
+//         if (startDate || endDate) {
+//             matchStage.createdAt = {};
+//             if (startDate) matchStage.createdAt.$gte = new Date(startDate);
+//             if (endDate) matchStage.createdAt.$lte = new Date(endDate);
+//         }
+
+//         const pipeline = [];
+
+//         if (Object.keys(matchStage).length > 0) {
+//             pipeline.push({ $match: matchStage });
+//         }
+
+//         // Lookup stage to fetch orders and their associated plans
+//         pipeline.push(
+//             {
+//                 $lookup: {
+//                     from: "orders", // Collection name for orders
+//                     localField: "_id",
+//                     foreignField: "userId",
+//                     as: "orders"
+//                 }
+//             },
+//             {
+//                 $unwind: {
+//                     path: "$orders",
+//                     preserveNullAndEmptyArrays: true
+//                 }
+//             },
+//             {
+//                 $match: {
+//                     "orders": { $ne: [] } // Ensure there are orders
+//                 }
+//             },
+//             {
+//                 $lookup: {
+//                     from: "plans", // Collection name for plans
+//                     localField: "orders.planDetails.planId",
+//                     foreignField: "_id",
+//                     as: "plan"
+//                 }
+//             },
+//             {
+//                 $addFields: {
+//                     plan: { $arrayElemAt: ["$plan", 0] } // Extract the plan details
+//                 }
+//             },
+//             {
+//                 $group: {
+//                     _id: "$plan._id", // Group by plan ID
+//                     planName: { $first: "$plan.name" },
+//                     planIcon: { $first: "$plan.icon" },
+//                     totalSalesAmount: { $sum: "$orders.orderDetails.total" },
+//                     users: {
+//                         $push: {
+//                             userId: "$_id",
+//                             orderAmount: "$orders.orderDetails.total", // Include order amount
+//                             refunds: {
+//                                 $cond: [{ $eq: ["$orders.status", "Refunded"] }, {
+//                                     refundId: "$orders.refundDetails.refundRequestId",
+//                                     refundedAmount: "$orders.refundDetails.refundAmount"
+//                                 }, null]
+//                             }
+//                         }
+//                     },
+//                     totalUsersRefunds: {
+//                         $sum: {
+//                             $cond: [{ $eq: ["$orders.status", "Refunded"] }, 1, 0]
+//                         }
+//                     },
+//                     totalRefundedAmount: {
+//                         $sum: {
+//                             $cond: [{ $eq: ["$orders.status", "Refunded"] }, "$orders.refundDetails.refundAmount", 0]
+//                         }
+//                     },
+//                     totalCheckout: {
+//                         $sum: { $cond: [{ $eq: ["$orders.status", "Completed"] }, 1, 0] }
+//                     },
+//                     totalPaymentInitiated: {
+//                         $sum: { $cond: [{ $eq: ["$orders.status", "Pending"] }, 1, 0] }
+//                     }
+//                 }
+//             },
+//             {
+//                 $project: {
+//                     _id: 1,
+//                     planName: 1,
+//                     planIcon: 1,
+//                     sales: {
+//                         totalSalesAmount: "$totalSalesAmount",
+//                         totalUsersBought: { $size: "$users" }
+//                     },
+//                     refund: {
+//                         totalUsersRefunds: "$totalUsersRefunds",
+//                         totalRefundedAmount: "$totalRefundedAmount"
+//                     },
+
+//                     totalCheckout: 1,
+//                     totalPaymentInitiated: 1,
+//                 }
+//             }
+//         );
+
+//         const result = await User.aggregate(pipeline);
+
+//         // Filter out any documents with _id set to null
+//         const filteredResult = result.filter(item => item._id !== null);
+
+//         return {
+//             statusCode: 200,
+//             message: 'User statistics fetched successfully',
+//             data: filteredResult
+//         };
+//     } catch (error) {
+//         throw error;
+//     }
+// };
+
+
 const getUserStatistics = async (startDate = null, endDate = null) => {
     try {
         const matchStage = {};
@@ -21,74 +146,57 @@ const getUserStatistics = async (startDate = null, endDate = null) => {
             pipeline.push({ $match: matchStage });
         }
 
-        // Lookup stage to fetch orders and their associated plans
         pipeline.push(
             {
                 $lookup: {
-                    from: "orders", // Collection name for orders
+                    from: "orders",
                     localField: "_id",
                     foreignField: "userId",
                     as: "orders"
                 }
             },
+            { $unwind: { path: "$orders", preserveNullAndEmptyArrays: true } },
             {
-                $unwind: {
-                    path: "$orders",
-                    preserveNullAndEmptyArrays: true
-                }
-            },
-            {
-                $match: {
-                    "orders": { $ne: [] } // Ensure there are orders
-                }
+                $match: { "orders": { $ne: [] } }
             },
             {
                 $lookup: {
-                    from: "plans", // Collection name for plans
+                    from: "plans",
                     localField: "orders.planDetails.planId",
                     foreignField: "_id",
                     as: "plan"
                 }
             },
-            {
-                $addFields: {
-                    plan: { $arrayElemAt: ["$plan", 0] } // Extract the plan details
-                }
-            },
+            { $unwind: "$plan" },
             {
                 $group: {
-                    _id: "$plan._id", // Group by plan ID
+                    _id: "$plan._id",
                     planName: { $first: "$plan.name" },
                     planIcon: { $first: "$plan.icon" },
                     totalSalesAmount: { $sum: "$orders.orderDetails.total" },
                     users: {
                         $push: {
                             userId: "$_id",
-                            orderAmount: "$orders.orderDetails.total", // Include order amount
+                            orderAmount: "$orders.orderDetails.total",
                             refunds: {
-                                $cond: [{ $eq: ["$orders.status", "Refunded"] }, {
-                                    refundId: "$orders.refundDetails.refundRequestId",
-                                    refundedAmount: "$orders.refundDetails.refundAmount"
-                                }, null]
+                                $cond: [
+                                    { $eq: ["$orders.status", "Refunded"] },
+                                    { refundId: "$orders.refundDetails.refundRequestId", refundedAmount: "$orders.refundDetails.refundAmount" },
+                                    null
+                                ]
                             }
                         }
                     },
-                    totalUsersRefunds: {
-                        $sum: {
-                            $cond: [{ $eq: ["$orders.status", "Refunded"] }, 1, 0]
+                    addOns: {
+                        $push: {
+                            name: "$orders.addOns.name",
+                            amount: "$orders.addOns.amount"
                         }
                     },
-                    totalRefundedAmount: {
-                        $sum: {
-                            $cond: [{ $eq: ["$orders.status", "Refunded"] }, "$orders.refundDetails.refundAmount", 0]
-                        }
-                    },
-                    totalCheckout: {
-                        $sum: { $cond: [{ $eq: ["$orders.status", "Completed"] }, 1, 0] }
-                    },
-                    totalPaymentInitiated: {
-                        $sum: { $cond: [{ $eq: ["$orders.status", "Pending"] }, 1, 0] }
-                    }
+                    totalUsersRefunds: { $sum: { $cond: [{ $eq: ["$orders.status", "Refunded"] }, 1, 0] } },
+                    totalRefundedAmount: { $sum: { $cond: [{ $eq: ["$orders.status", "Refunded"] }, "$orders.refundDetails.refundAmount", 0] } },
+                    totalCheckout: { $sum: { $cond: [{ $eq: ["$orders.status", "Completed"] }, 1, 0] } },
+                    totalPaymentInitiated: { $sum: { $cond: [{ $eq: ["$orders.status", "Pending"] }, 1, 0] } }
                 }
             },
             {
@@ -104,27 +212,67 @@ const getUserStatistics = async (startDate = null, endDate = null) => {
                         totalUsersRefunds: "$totalUsersRefunds",
                         totalRefundedAmount: "$totalRefundedAmount"
                     },
-
-                    // totalSalesAmount: 1,
-                    // totalUsersBought: { $size: "$users" }, // Count unique users who bought the plan
-                    // totalUsersRefunds: 1,
-                    // totalRefundedAmount: 1,
+                    addOns: {
+                        $filter: {
+                            input: "$addOns",
+                            as: "addOn",
+                            cond: { $ne: ["$$addOn.name", null] }
+                        }
+                    },
                     totalCheckout: 1,
-                    totalPaymentInitiated: 1,
-                    // users: 1 // Include the array of user details with order amount and refunds
+                    totalPaymentInitiated: 1
                 }
             }
         );
 
         const result = await User.aggregate(pipeline);
 
-        // Filter out any documents with _id set to null
-        const filteredResult = result.filter(item => item._id !== null);
+        // Process the result to separate plans and add-ons
+        const plansData = [];
+        const addOnsData = [];
+
+        result.forEach(item => {
+            // Add plan data to plansData
+            plansData.push({
+                _id: item._id,
+                planName: item.planName,
+                planIcon: item.planIcon,
+                totalCheckout: item.totalCheckout,
+                totalPaymentInitiated: item.totalPaymentInitiated,
+                sales: item.sales,
+                refund: item.refund
+            });
+
+            // Add add-on data to addOnsData
+            item.addOns.forEach(addOn => {
+                addOnsData.push({
+                    _id: item._id,
+                    addOnName: addOn.name,
+                    addonIcon: "path/to/addon_icon.jpg",  // Adjust accordingly
+                    totalCheckout: item.totalCheckout,
+                    totalPaymentInitiated: item.totalPaymentInitiated,
+                    sales: {
+                        totalSalesAmount: addOn.amount,
+                        totalUsersBought: item.totalPaymentInitiated
+                    },
+                    refund: item.refund
+                });
+            });
+        });
+
+        // Combine both plans and add-ons
+        const finalData = [...plansData, ...addOnsData];
 
         return {
-            statusCode: 200,
-            message: 'User statistics fetched successfully',
-            data: filteredResult
+            success: true,
+            message: "Users statistics analytics retrieved successfully",
+            data: {
+                userStatistics: {
+                    statusCode: 200,
+                    message: "User statistics fetched successfully",
+                    data: finalData
+                }
+            }
         };
     } catch (error) {
         throw error;

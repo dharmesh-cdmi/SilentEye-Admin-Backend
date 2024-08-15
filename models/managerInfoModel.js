@@ -8,6 +8,7 @@ const ManagerInfoSchema = new Schema({
     skype: { type: String },
     assignedUsersCount: { type: Number, default: 0 },
     order: { type: Number, default: 0 },
+    live: { type: Boolean, default: true },
 });
 
 const ManagerInfo = mongoose.model('ManagerInfo', ManagerInfoSchema);

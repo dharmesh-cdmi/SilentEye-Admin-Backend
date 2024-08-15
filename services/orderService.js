@@ -185,7 +185,7 @@ const getTotalOrderCount = async (plan = null, startDate = null, endDate = null)
             $group: { 
                 _id: null, 
                 totalAddons: { $sum: 1 }, // Sum the count of addOns
-                totalAddonAmount: { $sum: "$addOns.price" } // Sum the price of addOns
+                totalAddonAmount: { $sum: "$addOns.amount" } // Sum the price of addOns
             } 
         }
     ];

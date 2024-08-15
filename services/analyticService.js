@@ -50,11 +50,7 @@ const usersStatisticsAnalytics = async (startDate = null, endDate = null, groupB
         throw new Error('Invalid groupBy parameter. Must be "plan" or "country".');
     }
 
-    const response = {
-        userStatistics,
-    };
-
-    return response;
+    return userStatistics;
 };
 
 

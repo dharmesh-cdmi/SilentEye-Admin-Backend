@@ -7,130 +7,7 @@ const { fetchMyTickets } = require('./ticketService');
 const { Country } = require('../models/countrymodel');
 
 
-
-// const getUserStatistics = async (startDate = null, endDate = null) => {
-//     try {
-//         const matchStage = {};
-
-//         if (startDate || endDate) {
-//             matchStage.createdAt = {};
-//             if (startDate) matchStage.createdAt.$gte = new Date(startDate);
-//             if (endDate) matchStage.createdAt.$lte = new Date(endDate);
-//         }
-
-//         const pipeline = [];
-
-//         if (Object.keys(matchStage).length > 0) {
-//             pipeline.push({ $match: matchStage });
-//         }
-
-//         // Lookup stage to fetch orders and their associated plans
-//         pipeline.push(
-//             {
-//                 $lookup: {
-//                     from: "orders", // Collection name for orders
-//                     localField: "_id",
-//                     foreignField: "userId",
-//                     as: "orders"
-//                 }
-//             },
-//             {
-//                 $unwind: {
-//                     path: "$orders",
-//                     preserveNullAndEmptyArrays: true
-//                 }
-//             },
-//             {
-//                 $match: {
-//                     "orders": { $ne: [] } // Ensure there are orders
-//                 }
-//             },
-//             {
-//                 $lookup: {
-//                     from: "plans", // Collection name for plans
-//                     localField: "orders.planDetails.planId",
-//                     foreignField: "_id",
-//                     as: "plan"
-//                 }
-//             },
-//             {
-//                 $addFields: {
-//                     plan: { $arrayElemAt: ["$plan", 0] } // Extract the plan details
-//                 }
-//             },
-//             {
-//                 $group: {
-//                     _id: "$plan._id", // Group by plan ID
-//                     planName: { $first: "$plan.name" },
-//                     planIcon: { $first: "$plan.icon" },
-//                     totalSalesAmount: { $sum: "$orders.orderDetails.total" },
-//                     users: {
-//                         $push: {
-//                             userId: "$_id",
-//                             orderAmount: "$orders.orderDetails.total", // Include order amount
-//                             refunds: {
-//                                 $cond: [{ $eq: ["$orders.status", "Refunded"] }, {
-//                                     refundId: "$orders.refundDetails.refundRequestId",
-//                                     refundedAmount: "$orders.refundDetails.refundAmount"
-//                                 }, null]
-//                             }
-//                         }
-//                     },
-//                     totalUsersRefunds: {
-//                         $sum: {
-//                             $cond: [{ $eq: ["$orders.status", "Refunded"] }, 1, 0]
-//                         }
-//                     },
-//                     totalRefundedAmount: {
-//                         $sum: {
-//                             $cond: [{ $eq: ["$orders.status", "Refunded"] }, "$orders.refundDetails.refundAmount", 0]
-//                         }
-//                     },
-//                     totalCheckout: {
-//                         $sum: { $cond: [{ $eq: ["$orders.status", "Completed"] }, 1, 0] }
-//                     },
-//                     totalPaymentInitiated: {
-//                         $sum: { $cond: [{ $eq: ["$orders.status", "Pending"] }, 1, 0] }
-//                     }
-//                 }
-//             },
-//             {
-//                 $project: {
-//                     _id: 1,
-//                     planName: 1,
-//                     planIcon: 1,
-//                     sales: {
-//                         totalSalesAmount: "$totalSalesAmount",
-//                         totalUsersBought: { $size: "$users" }
-//                     },
-//                     refund: {
-//                         totalUsersRefunds: "$totalUsersRefunds",
-//                         totalRefundedAmount: "$totalRefundedAmount"
-//                     },
-
-//                     totalCheckout: 1,
-//                     totalPaymentInitiated: 1,
-//                 }
-//             }
-//         );
-
-//         const result = await User.aggregate(pipeline);
-
-//         // Filter out any documents with _id set to null
-//         const filteredResult = result.filter(item => item._id !== null);
-
-//         return {
-//             statusCode: 200,
-//             message: 'User statistics fetched successfully',
-//             data: filteredResult
-//         };
-//     } catch (error) {
-//         throw error;
-//     }
-// };
-
-
-const getUserStatistics = async (startDate = null, endDate = null) => {
+const getUserStatistics = async (startDate = null, endDate = null,page = 1, limit = 10) => {
     try {
         const matchStage = {};
 
@@ -169,6 +46,23 @@ const getUserStatistics = async (startDate = null, endDate = null) => {
             },
             { $unwind: "$plan" },
             {
+                // Lookup to count users with status "Demo" and matching activePlanId
+                $lookup: {
+                    from: "users",
+                    let: { planId: "$plan._id" },
+                    pipeline: [
+                        { $match: { $expr: { $and: [{ $eq: ["$activePlanId", "$$planId"] }, { $eq: ["$status", "Demo"] }] } } },
+                        { $count: "totalDemoUser" }
+                    ],
+                    as: "demoUsers"
+                }
+            },
+            {
+                $addFields: {
+                    totalDemoUser: { $ifNull: [{ $arrayElemAt: ["$demoUsers.totalDemoUser", 0] }, 0] }
+                }
+            },
+            {
                 $group: {
                     _id: "$plan._id",
                     planName: { $first: "$plan.name" },
@@ -196,6 +90,7 @@ const getUserStatistics = async (startDate = null, endDate = null) => {
                     totalUsersRefunds: { $sum: { $cond: [{ $eq: ["$orders.status", "Refunded"] }, 1, 0] } },
                     totalRefundedAmount: { $sum: { $cond: [{ $eq: ["$orders.status", "Refunded"] }, "$orders.refundDetails.refundAmount", 0] } },
                     totalCheckout: { $sum: { $cond: [{ $eq: ["$orders.status", "Completed"] }, 1, 0] } },
+                    totalDemoUser: { $first: "$totalDemoUser" },  // Ensure this field is included in the $group stage
                     totalPaymentInitiated: { $sum: { $cond: [{ $eq: ["$orders.status", "Pending"] }, 1, 0] } }
                 }
             },
@@ -204,6 +99,7 @@ const getUserStatistics = async (startDate = null, endDate = null) => {
                     _id: 1,
                     planName: 1,
                     planIcon: 1,
+                    totalDemoUser: 1,  // Ensure this field is projected in the final output
                     sales: {
                         totalSalesAmount: "$totalSalesAmount",
                         totalUsersBought: { $size: "$users" }
@@ -225,6 +121,12 @@ const getUserStatistics = async (startDate = null, endDate = null) => {
             }
         );
 
+        // Add pagination stages
+        pipeline.push(
+            { $skip: (page - 1) * limit },
+            { $limit: limit }
+        );
+
         const result = await User.aggregate(pipeline);
 
         // Process the result to separate plans and add-ons
@@ -240,7 +142,8 @@ const getUserStatistics = async (startDate = null, endDate = null) => {
                 totalCheckout: item.totalCheckout,
                 totalPaymentInitiated: item.totalPaymentInitiated,
                 sales: item.sales,
-                refund: item.refund
+                refund: item.refund,
+                totalDemoUser: item.totalDemoUser
             });
 
             // Add add-on data to addOnsData
@@ -262,25 +165,28 @@ const getUserStatistics = async (startDate = null, endDate = null) => {
 
         // Combine both plans and add-ons
         const finalData = [...plansData, ...addOnsData];
+        const totalData = finalData.length;
+        
+        // return finalData;
 
-        return {
-            success: true,
-            message: "Users statistics analytics retrieved successfully",
-            data: {
-                userStatistics: {
-                    statusCode: 200,
-                    message: "User statistics fetched successfully",
-                    data: finalData
-                }
-            }
-        };
+            // Calculate total pages
+            const totalPages = Math.ceil(totalData / limit);
+
+            // Return the final data with pagination information
+            return {
+                userStatistics:finalData,
+                totalPages,
+                currentPage: page,
+                totalData
+            };
+
     } catch (error) {
         throw error;
     }
 };
 
 
-const getUserStatisticsByCountry = async (startDate = null, endDate = null) => {
+const getUserStatisticsByCountry = async (startDate = null, endDate = null,page = 1, limit = 10) => {
     try {
         const matchStage = {};
 
@@ -347,6 +253,9 @@ const getUserStatisticsByCountry = async (startDate = null, endDate = null) => {
                         $sum: { $cond: [{ $eq: ["$orders.status", "Refunded"] }, "$orders.refundDetails.refundAmount", 0] }
                     },
                     totalPlan: { $sum: 1 }, // Count the number of plans
+                    totalDemouser: {
+                        $sum: { $cond: [{ $eq: ["$userDetails.isDemo", true] }, 1, 0] } // Count demo users
+                    },
                     plans: {
                         $push: {
                             planName: "$plan.name",
@@ -369,6 +278,7 @@ const getUserStatisticsByCountry = async (startDate = null, endDate = null) => {
                     totalCheckout: 1,
                     totalPaymentInitiated: 1,
                     totalPlan: 1,
+                    totalDemouser: 1, 
                     country: "$_id",
                     plans: 1,
                     _id: 0
@@ -376,16 +286,34 @@ const getUserStatisticsByCountry = async (startDate = null, endDate = null) => {
             }
         );
 
+        // Add pagination stages
+        pipeline.push(
+            { $skip: (page - 1) * limit },
+            { $limit: limit }
+        );
+
+
         const result = await User.aggregate(pipeline);
 
         // Filter out any documents with _id set to null
         const filteredResult = result.filter(item => item.country !== null);
 
-        return {
-            statusCode: 200,
-            message: 'User statistics fetched successfully',
-            data: filteredResult
-        };
+
+        const totalData = filteredResult.length;
+        
+        // return finalData;
+
+            // Calculate total pages
+            const totalPages = Math.ceil(totalData / limit);
+
+            // Return the final data with pagination information
+            return {
+                userStatistics:filteredResult,
+                totalPages,
+                currentPage: page,
+                totalData
+            };
+
     } catch (error) {
         throw error;
     }

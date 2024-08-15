@@ -59,6 +59,19 @@ const updateRefundRequest = async (id, data) => {
   }
 };
 
+// Bulk update refund requests
+const bulkUpdateRefundRequests = async (ids, data) => {
+  try {
+    return await RefundRequest.updateMany(
+      { _id: { $in: ids } },
+      { $set: data },
+      { multi: true, new: true }
+    );
+  } catch (error) {
+    throw new Error(`Error in bulk updating refund requests: ${error.message}`);
+  }
+};
+
 // Delete refund request by ID
 const deleteRefundRequest = async (id) => {
   try {
@@ -68,10 +81,21 @@ const deleteRefundRequest = async (id) => {
   }
 };
 
+// Bulk delete refund requests
+const bulkDeleteRefundRequests = async (ids) => {
+  try {
+    return await RefundRequest.deleteMany({ _id: { $in: ids } });
+  } catch (error) {
+    throw new Error(`Error in bulk deleting refund requests: ${error.message}`);
+  }
+};
+
 module.exports = {
   createRefundRequest,
   getAllRefundRequests,
   getRefundRequestById,
   updateRefundRequest,
+  bulkUpdateRefundRequests,
   deleteRefundRequest,
+  bulkDeleteRefundRequests,
 };

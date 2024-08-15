@@ -25,7 +25,7 @@ const createOrder = async (orderData)=>{
       }
 };
 
-const getOrders = async ({ page = 1, limit = 10, status = 'Completed', paymentMethod, userId, planName, minAmount, maxAmount, startDate, endDate, country, search,orderId }) => {
+const getOrders = async ({ page = 1, limit = 10, status = 'Completed', paymentMethod, userId, planName, minAmount, maxAmount, startDate, endDate, country=[], search,orderId }) => {
     // Build the filter object
 
     let filter = {
@@ -78,10 +78,29 @@ const getOrders = async ({ page = 1, limit = 10, status = 'Completed', paymentMe
             filter['orderDetails.purchase'].$lte = new Date(endDate);
         }
 
-        // Filter by country
-        if (country) {
-            filter['orderDetails.country'] = new RegExp(country, 'i'); // Case insensitive search
+       // Filter by country
+       if (country && country.length > 0) {
+        // Ensure country is an array
+        if (typeof country === 'string') {
+            try {
+                country = JSON.parse(country.replace(/'/g, '"'));
+            } catch (error) {
+                return {
+                    statusCode: 400,
+                    message: 'Invalid country format',
+                };
+            }
         }
+        if (!Array.isArray(country)) {
+            country = [country];
+        }
+
+        // Apply the filter for multiple countries
+        filter['orderDetails.country'] = {
+            $in: country.map(c => new RegExp(c, 'i')) // Case insensitive search
+        };
+    }
+
 
         // General search across multiple fields
         if (search) {

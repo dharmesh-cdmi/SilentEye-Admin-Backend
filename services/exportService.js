@@ -134,6 +134,84 @@ const exportData = async (format, data) => {
     return filePath;
 };
 
+const exportUserStatisticData = async (format, data) => {
+    const filePath = `./downloads/export_analytics.${format}`;
+    if (format === 'xlsx') {
+        await generateUserStaticsyticsExcel(data, filePath);
+    } else {
+        throw new Error('Invalid format. Must be "xlsx".');
+    }
+    return filePath;
+};
+
+
+const generateUserStaticsyticsExcel = async (data, filePath) => {
+    if (!data || !data.userStatistics || !Array.isArray(data.userStatistics)) {
+        throw new Error('Invalid data. Must be an object with a non-empty userStatistics array.');
+    }
+
+    const workbook = new ExcelJS.Workbook();
+    const sheet = workbook.addWorksheet('User Statistics');
+
+    // Add headers to the worksheet
+    const headers = [
+        'Plan/Add-On Name',
+        'Total Checkout',
+        'Total Payment Initiated',
+        'Total Sales Amount',
+        'Total Users Bought',
+        'Total Users Refunds',
+        'Total Refunded Amount',
+        'Total Demo User'
+    ];
+    const headerRow = sheet.addRow(headers);
+
+    // Apply formatting to headers
+    headerRow.font = { bold: true };
+    headerRow.alignment = { vertical: 'middle', horizontal: 'center' };
+    headerRow.fill = {
+        type: 'pattern',
+        pattern: 'solid',
+        fgColor: { argb: 'FFFFE599' }, // Light yellow background
+    };
+    sheet.getRow(1).height = 20; // Increase row height for better readability
+
+    // Add data rows
+    data.userStatistics.forEach(stat => {
+        const isAddon = !!stat.addOnName;
+
+        const rowData = [
+            isAddon ? stat.addOnName.join(', ') : stat.planName,  // Handle both plan and add-on names
+            stat.totalCheckout || 0,
+            stat.totalPaymentInitiated || 0,
+            Array.isArray(stat.sales.totalSalesAmount) ? stat.sales.totalSalesAmount.join(', ') : stat.sales.totalSalesAmount || 0,
+            stat.sales.totalUsersBought || 0,
+            stat.refund.totalUsersRefunds || 0,
+            stat.refund.totalRefundedAmount || 0,
+            stat.totalDemoUser || 0
+        ];
+
+        sheet.addRow(rowData);
+    });
+
+    try {
+        // if file already exists, remove it and if not, create it recursively
+        if (fs.existsSync(filePath))
+            fs.unlinkSync(filePath);
+
+        if (!fs.existsSync(filePath)) {
+            let path = filePath.split('/');
+            path.pop();
+            fs.mkdirSync(path.join('/'), { recursive: true });
+        }
+
+        await workbook.xlsx.writeFile(filePath);
+    }
+    catch (error) {
+        console.log('Error generating excel file:', error);
+        throw new Error('Error generating excel file');
+    }
+}
 const generateUsersDataExcel = async (data, filePath) => {
     if (!data || !Array.isArray(data) || !data.length) {
         throw new Error('Invalid data. Must be a non-empty array.');
@@ -214,5 +292,6 @@ const exportUsersData = async (format, data) => {
 module.exports = {
     exportData,
     exportOrdersToExcel,
-    exportUsersData
+    exportUsersData,
+    exportUserStatisticData
 };

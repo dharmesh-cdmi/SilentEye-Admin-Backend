@@ -14,6 +14,7 @@ router.get('/details', adminController.getAdminDetails);
 //visitors
 router.get('/analytics', analyticsController.totalCountAnalytics);
 router.get('/users-statistics', analyticsController.usersStatisticsAnalytics);
+router.post('/download-users-statistics', analyticsController.downloadUserStatistics);
 router.get('/download-analytics', analyticsController.downloadAnalytics);
 router.get('/visitors/count', visitorController.getVisitorCount);
 

@@ -27,7 +27,10 @@ const getAllUpsells = async (page, limit, search, filterStatus) => {
       page: parseInt(page, 10),
       limit: parseInt(limit, 10),
       sort: { createdAt: -1 },
-      populate: { path: 'plan', select: 'name icon' },
+      populate: [
+        { path: 'plan', select: 'name icon' },
+        { path: 'products', select: 'title' },
+      ],
     };
 
     const query = {};
@@ -50,7 +53,9 @@ const getAllUpsells = async (page, limit, search, filterStatus) => {
 // Get upsell by ID
 const getUpsellById = async (id) => {
   try {
-    return await Upsell.findById(id).populate('plan', 'name icon');
+    return await Upsell.findById(id)
+      .populate('plan', 'name icon')
+      .populate('products', 'title');
   } catch (error) {
     throw new Error(`Error fetching upsell: ${error.message}`);
   }

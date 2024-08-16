@@ -46,6 +46,7 @@ const getAllPlans = async (page, limit, search, filterStatus) => {
       page: parseInt(page, 10),
       limit: parseInt(limit, 10),
       sort: { createdAt: -1 },
+      populate: { path: 'products', select: 'title' },
     };
 
     const query = {};
@@ -66,7 +67,7 @@ const getAllPlans = async (page, limit, search, filterStatus) => {
 // Get plan by ID
 const getPlanById = async (id) => {
   try {
-    return await Plan.findById(id);
+    return await Plan.findById(id).populate('products', 'title');
   } catch (error) {
     throw new Error(`Error fetching plan: ${error.message}`);
   }

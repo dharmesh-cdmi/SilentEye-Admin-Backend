@@ -45,6 +45,30 @@ const getRefundRequestById = async (id) => {
   }
 };
 
+// Bulk update refund requests
+const bulkUpdateRefundRequests = async (ids, data) => {
+  try {
+    // Ensure the length of ids and data arrays are the same
+    if (ids.length !== data.length) {
+      throw new Error('The length of ids and data arrays must be the same.');
+    }
+
+    const operations = ids.map((id, index) => ({
+      updateOne: {
+        filter: { _id: id },
+        update: { $set: data[index] },
+        upsert: false, // set to true if you want to create new documents if they don't exist
+      },
+    }));
+
+    return await RefundRequest.bulkWrite(operations);
+  } catch (error) {
+    throw new Error(
+      `Heelooo, Error in bulk updating refund requests: ${error.message}`
+    );
+  }
+};
+
 // Update refund request by ID
 const updateRefundRequest = async (id, data) => {
   try {
@@ -59,16 +83,12 @@ const updateRefundRequest = async (id, data) => {
   }
 };
 
-// Bulk update refund requests
-const bulkUpdateRefundRequests = async (ids, data) => {
+// Bulk delete refund requests
+const bulkDeleteRefundRequests = async (ids) => {
   try {
-    return await RefundRequest.updateMany(
-      { _id: { $in: ids } },
-      { $set: data },
-      { multi: true, new: true }
-    );
+    return await RefundRequest.deleteMany({ _id: { $in: ids } });
   } catch (error) {
-    throw new Error(`Error in bulk updating refund requests: ${error.message}`);
+    throw new Error(`Error in bulk deleting refund requests: ${error.message}`);
   }
 };
 
@@ -78,15 +98,6 @@ const deleteRefundRequest = async (id) => {
     return await RefundRequest.findByIdAndDelete(id);
   } catch (error) {
     throw new Error(`Error in deleting refund request: ${error.message}`);
-  }
-};
-
-// Bulk delete refund requests
-const bulkDeleteRefundRequests = async (ids) => {
-  try {
-    return await RefundRequest.deleteMany({ _id: { $in: ids } });
-  } catch (error) {
-    throw new Error(`Error in bulk deleting refund requests: ${error.message}`);
   }
 };
 

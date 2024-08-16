@@ -1,49 +1,50 @@
 const authService = require('../services/authService');
+const { apiSuccessResponse, apiErrorResponse, HTTP_STATUS } = require('../utils'); // Importing helper functions
 
+// Controller for user login
 const login = async (req, res) => {
   const { email, password, country, device, IP } = req.body;
 
   try {
-    // Example: Authenticate user
     const user = await authService.authenticateUser(email, password, country, device, IP);
     const tokens = await authService.generateTokens(user);
-    res.json(tokens);
+    return apiSuccessResponse(res, 'User logged in successfully', tokens);
   } catch (error) {
     console.error('User Login error:', error);
-    res.status(401).json({ message: error.message });
+    return apiErrorResponse(res, error.message, null, HTTP_STATUS.UNAUTHORIZED);
   }
 };
 
+// Controller for admin login
 const loginAdmin = async (req, res) => {
   const { emailOrUsername, password } = req.body;
 
   try {
-    // Example: Authenticate admin
     const admin = await authService.authenticateAdmin(emailOrUsername, password);
     const tokens = await authService.generateTokens(admin);
-    res.json(tokens);
+    return apiSuccessResponse(res, 'Admin logged in successfully', tokens);
   } catch (error) {
     console.error('Admin Login error:', error);
-    res.status(401).json({ message: error.message });
+    return apiErrorResponse(res, error.message, null, HTTP_STATUS.UNAUTHORIZED);
   }
-}; 
+};
 
-const refreshToken =  async (req, res) => {
+// Controller to refresh tokens
+const refreshToken = async (req, res) => {
   const { token } = req.body;
 
   if (!token) {
-    return res.status(401).json({ error: 'No token provided.' });
+    return apiErrorResponse(res, 'No token provided', null, HTTP_STATUS.UNAUTHORIZED);
   }
 
   try {
     const tokens = await authService.refreshTokens(token);
-    res.json(tokens);
+    return apiSuccessResponse(res, 'Tokens refreshed successfully', tokens);
   } catch (error) {
-    console.error('Refresh Token error:', error); // Added debug statement
-    res.status(403).json({ error: error.message });
+    console.error('Refresh Token error:', error);
+    return apiErrorResponse(res, error.message, null, HTTP_STATUS.FORBIDDEN);
   }
 };
-
 
 module.exports = {
   login,

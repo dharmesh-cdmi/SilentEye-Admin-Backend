@@ -1,43 +1,116 @@
 const Orders = require('../models/ordersModel');
-const { getVisitorCount } = require('../services/visitorService');
+const Plans  = require('../models/planModel');
 const { getRefundData } = require('../services/refundService');
+const helper = require('../utils');
 
-const getOrders = async ({ page = 1, limit = 10, status, paymentMethod, userId, planName, minAmount, maxAmount, startDate, endDate }) => {
+
+
+const createOrder = async (orderData)=>{
+    try {
+        // Check if the planId exists in the Plan collection
+        const planExists = await Plans.findById(orderData.planDetails.planId);
+        if (!planExists) {
+          throw new Error('Invalid planId: Plan does not exist');
+        }
+    
+        // Generate a new orderId
+        orderData.orderId = await helper.generateOrderId();
+    
+        // Proceed to create the new order
+        const newOrder = new Orders(orderData);
+        await newOrder.save();
+        return newOrder;
+      } catch (error) {
+        throw new Error('Error creating order: ' + error.message);
+      }
+};
+
+const getOrders = async ({ page = 1, limit = 10, status = 'Completed', paymentMethod, userId, planName, minAmount, maxAmount, startDate, endDate, country=[], search,orderId }) => {
     // Build the filter object
-    let filter = {};
 
-    if (status) {
-        filter.status = new RegExp(status, 'i'); // Case insensitive search
+    let filter = {
+        deletedAt: null // Exclude deleted orders
+    };
+   // Filter by order ID
+   if (orderId) {
+        filter._id = orderId;
+    } else {
+    
+            // Filter by status
+        if (status) {
+            filter.status = new RegExp(status, 'i'); // Case insensitive search
+        }
+
+        // Filter by payment method
+        if (paymentMethod) {
+            filter.paymentMethod = new RegExp(paymentMethod, 'i'); // Case insensitive search
+        }
+
+        // Filter by user ID
+        if (userId) {
+            filter.userId = new RegExp(userId, 'i'); // Case insensitive search
+        }
+
+        // Filter by plan name
+        if (planName) {
+            filter['planDetails.planName'] = new RegExp(planName, 'i'); // Case insensitive search
+        }
+
+        // Filter by minimum amount
+        if (minAmount) {
+            filter['planDetails.amount'] = { $gte: Number(minAmount) };
+        }
+
+        // Filter by maximum amount
+        if (maxAmount) {
+            filter['planDetails.amount'] = filter['planDetails.amount'] || {};
+            filter['planDetails.amount'].$lte = Number(maxAmount);
+        }
+
+        // Filter by start date
+        if (startDate) {
+            filter['orderDetails.purchase'] = { $gte: new Date(startDate) };
+        }
+
+        // Filter by end date
+        if (endDate) {
+            filter['orderDetails.purchase'] = filter['orderDetails.purchase'] || {};
+            filter['orderDetails.purchase'].$lte = new Date(endDate);
+        }
+
+       // Filter by country
+       if (country && country.length > 0) {
+        // Ensure country is an array
+        if (typeof country === 'string') {
+            try {
+                country = JSON.parse(country.replace(/'/g, '"'));
+            } catch (error) {
+                return {
+                    statusCode: 400,
+                    message: 'Invalid country format',
+                };
+            }
+        }
+        if (!Array.isArray(country)) {
+            country = [country];
+        }
+
+        // Apply the filter for multiple countries
+        filter['orderDetails.country'] = {
+            $in: country.map(c => new RegExp(c, 'i')) // Case insensitive search
+        };
     }
 
-    if (paymentMethod) {
-        filter.paymentMethod = new RegExp(paymentMethod, 'i'); // Case insensitive search
-    }
 
-    if (userId) {
-        filter.userId = new RegExp(userId, 'i'); // Case insensitive search
-    }
-
-    if (planName) {
-        filter['planDetails.planName'] = new RegExp(planName, 'i'); // Case insensitive search
-    }
-
-    if (minAmount) {
-        filter['planDetails.amount'] = { $gte: Number(minAmount) };
-    }
-
-    if (maxAmount) {
-        filter['planDetails.amount'] = filter['planDetails.amount'] || {};
-        filter['planDetails.amount'].$lte = Number(maxAmount);
-    }
-
-    if (startDate) {
-        filter['orderDetails.purchase'] = { $gte: new Date(startDate) };
-    }
-
-    if (endDate) {
-        filter['orderDetails.purchase'] = filter['orderDetails.purchase'] || {};
-        filter['orderDetails.purchase'].$lte = new Date(endDate);
+        // General search across multiple fields
+        if (search) {
+            const searchRegExp = new RegExp(search, 'i'); // Case insensitive search
+            filter.$or = [
+                { 'orderDetails.email': searchRegExp },
+                { 'planDetails.planName': searchRegExp },
+                { 'orderDetails.country': searchRegExp }
+            ];
+        }
     }
 
     // Fetch orders with pagination
@@ -49,19 +122,21 @@ const getOrders = async ({ page = 1, limit = 10, status, paymentMethod, userId, 
     const totalCount = await Orders.countDocuments(filter);
 
     return {
-        statusCode: 200,
-        message: 'Data Fetched successfully',
-        data: {
-            totalPages: Math.ceil(totalCount / limit),
-            currentPage: Number(page),
-            totalOrders: totalCount,
-            orders
-        }
-      };
-
-    return {
-        
+        totalPages: Math.ceil(totalCount / limit),
+        currentPage: Number(page),
+        totalOrders: totalCount,
+        orders
     };
+};
+
+const getOrderDetails = async (orderId) => {
+    const order = await Orders.findOne({ _id: orderId, deletedAt: null });
+
+    if (!order) {
+        return { error: 'Order not found' };
+    }
+
+    return { order };
 };
 
 const getTotalOrderCount = async (plan = null, startDate = null, endDate = null) => {
@@ -103,10 +178,16 @@ const getTotalOrderCount = async (plan = null, startDate = null, endDate = null)
         status: 'Refunded'
     });
 
-    // Get total addon sales count
+    // Get total add-on sales count and amount
     let pipeline = [
         { $unwind: "$addOns" }, // Unwind the addOns array
-        { $group: { _id: null, totalAddons: { $sum: 1 } } } // Sum the count of addOns
+        { 
+            $group: { 
+                _id: null, 
+                totalAddons: { $sum: 1 }, // Sum the count of addOns
+                totalAddonAmount: { $sum: "$addOns.price" } // Sum the price of addOns
+            } 
+        }
     ];
 
     // Apply date filters to the pipeline if provided
@@ -135,10 +216,12 @@ const getTotalOrderCount = async (plan = null, startDate = null, endDate = null)
 
     const result = await Orders.aggregate(pipeline);
     const totalAddonSales = result.length > 0 ? result[0].totalAddons : 0;
+    const totalAddonAmount = result.length > 0 ? result[0].totalAddonAmount : 0;
 
     const totalAmounts = await getTotalAmounts(filter);
 
     // Get total unique visitors
+    const { getVisitorCount } = require('../services/visitorService'); // please dont import this as global directly its will throw error 
     const uniqueVisitorsData = await getVisitorCount(null, null, startDate, endDate);
     const uniqueVisitorsCount = uniqueVisitorsData.totalVisitorsCount;
 
@@ -149,7 +232,7 @@ const getTotalOrderCount = async (plan = null, startDate = null, endDate = null)
     const conversionRate = uniqueVisitorsCount > 0 ? (totalOrders / uniqueVisitorsCount) * 100 : 0;
 
     return {
-        orders: {
+
             totalOrder: {
                 count: totalOrders,
                 amount: totalAmounts.totalOrderAmount
@@ -158,7 +241,7 @@ const getTotalOrderCount = async (plan = null, startDate = null, endDate = null)
                 count: pendingOrders,
                 amount: totalAmounts.paymentInitiatedAmount
             },
-            totalPurchase: {
+            totalPurchaseUsers: {
                 count: completedOrders,
                 amount: totalAmounts.totalPurchaseAmount
             },
@@ -166,12 +249,16 @@ const getTotalOrderCount = async (plan = null, startDate = null, endDate = null)
                 count: refundedOrders,
                 amount: totalAmounts.refundedAmount
             },
-            totalAddonSales,
-            conversionRate
-        },
+            totalAddonSales: {
+                count: totalAddonSales,
+                amount: totalAddonAmount
+            },
+            conversionRate,
+
         refundData
     };
 };
+
 
 const getTotalAmounts = async (filter) => {
     const totalOrderAmount = await Orders.aggregate([
@@ -222,7 +309,90 @@ const getTotalAmounts = async (filter) => {
     };
 }; 
 
+const deleteOrder = async (orderId) => {
+    // Find the order by ID
+    const order = await Orders.findById(orderId);
+
+    if (!order) {
+        return { error: 'Order not found' };
+    }
+
+    // Check if the order is already deleted
+    if (order.deletedAt) {
+        return { error: 'Order already deleted' };
+    }
+
+    // Update the deletedAt field
+    order.deletedAt = new Date();
+
+    await order.save();
+
+    return { order };
+};
+
+
+
+const initiateRefund = async (orderId, refundReason,refundRequestId) => {
+    // Find the order by ID, ensuring it's not deleted
+    const order = await Orders.findOne({ _id: orderId, deletedAt: null });
+    if (!order) {
+        return { error: 'Order not found' };
+    }
+
+    // Check if the order is already refunded
+    if (order.status === 'Refunded') {
+        return { error: 'Order already refunded' };
+    }
+
+    // Create refund details
+    const refundAmount = order.planDetails.amount; // Use the amount from the order
+
+    // Update the order with refund details
+    order.status = 'Refunded';
+    order.refundDetails = {
+        refundRequestId,
+        refundAmount,
+        refundReason,
+        refundDate: new Date()
+    };
+    await order.save();
+
+    return { success: true };
+};
+
+
+const getOrdersByDateRange = async (startDate, endDate) => {
+    try {
+      const orders = await Orders.aggregate([
+        {
+          $match: {
+            createdAt: { $gte: new Date(startDate), $lte: new Date(endDate) }
+          }
+        },
+        {
+          $group: {
+            _id: {
+              month: { $month: "$createdAt" },
+              year: { $year: "$createdAt" }
+            },
+            totalCount: { $sum: 1 }
+          }
+        }
+      ]);
+      return orders;
+    } catch (error) {
+      console.error('Error fetching orders by date range:', error);
+      throw error;
+    }
+  };
+  
+
 module.exports = {
+    createOrder,
     getOrders,
-    getTotalOrderCount
+    getTotalOrderCount,
+    deleteOrder,
+    getOrderDetails,
+    initiateRefund,
+    getOrdersByDateRange,
 };

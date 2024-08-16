@@ -10,10 +10,10 @@ router.get(
     controller.FetchAllContactsForm
 );
 
-router.post(
+router.get(
     "/search-contact-form",
     authMiddleware.verifyAdmin,
-    validationMiddleware.validateRequest(contactFormSchemas.searchContactSchema),
+    validationMiddleware.validateQuery(contactFormSchemas.searchContactSchema),
     controller.SearchContactsForm
 );
 
@@ -21,6 +21,13 @@ router.post(
     "/create-contact-form",
     validationMiddleware.validateRequest(contactFormSchemas.createContactSchema),
     controller.CreateContactForm
+);
+
+router.delete(
+    "/delete-contact-form/:contactFormId",
+    authMiddleware.verifyAdmin,
+    validationMiddleware.validateParams(contactFormSchemas.contactIdSchema),
+    controller.DeleteContactForm
 );
 
 module.exports = router;

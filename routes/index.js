@@ -16,7 +16,10 @@ const discountRoutes = require('./discountRoutes');
 const adminRoutes = require('./admin/adminRoutes');
 const authRoutes = require('./authRoutes');
 const settingRoutes = require('./refundSettingRoutes');
+const userRoutes = require('./userRoutes');
 const { verifyAdmin } = require('../middleware/authMiddleware');
+
+
 
 const router = express.Router();
 
@@ -28,6 +31,7 @@ router.use('/extension', extensionRoutes);
 router.use('/content-manage', contentManageRoutes);
 router.use('/', authRoutes);
 router.use('/admin', verifyAdmin, adminRoutes);
+
 router.use('/payment', paymentRoutes);
 router.use('/payment-gateway', paymentGatewayRoutes);
 router.use('/product', productRoutes);
@@ -36,6 +40,7 @@ router.use('/upsell', upsellRoutes);
 router.use('/plan', planRoutes);
 router.use('/tickets', require('./ticketRoutes'));
 router.use('/managers', require('./managerRoutes'));
+router.use('/users', userRoutes);
 router.use('/shipping', shippingRoutes);
 router.use('/refund-request', refundRequestRoutes);
 router.use('/discount', discountRoutes);

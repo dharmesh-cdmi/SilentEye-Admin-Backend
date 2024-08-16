@@ -11,14 +11,14 @@ async function seedVisitors() {
     // await Visitor.deleteMany();
 
     // Generate and save sample visitors
-    const visitorCount = 5; // Adjust as needed
+    const visitorCount = 50; // Adjust as needed
     const visitors = [];
 
     for (let i = 0; i < visitorCount; i++) {
       const visitor = new Visitor({
         page: faker.helpers.arrayElement(['home', 'Checkout', 'Plan']),
         visitDate: faker.date.recent(),
-        action: faker.helpers.arrayElement(['Visit', 'Checkout', 'Demo View', 'Order Placed', 'Login']),
+        action: faker.helpers.arrayElement(['Visit', 'Checkout', 'Demo', 'Order', 'Login']),
         isVisit: faker.datatype.boolean(),
         country: faker.location.country(),
         device: faker.internet.userAgent(),

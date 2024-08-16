@@ -2,11 +2,11 @@ const ContactForm = require('../models/contactFormModel');
 
 const fetchAllContactsForm = async () => {
     const contactsForm = await ContactForm.find({});
-    if (!contactsForm || contactsForm.length <= 0) {
-        const error = new Error('Contacts form not found!');
-        error.code = 404;
-        throw error;
-    }
+    // if (!contactsForm || contactsForm.length <= 0) {
+    //     const error = new Error('Contacts form not found!');
+    //     error.code = 404;
+    //     throw error;
+    // }
     return contactsForm;
 };
 
@@ -28,11 +28,11 @@ const searchContactsForm = async (pageIndex, limit, searchQuery) => {
         .skip(skip)
         .limit(limit);
 
-    if (!contactsForm || contactsForm.length <= 0) {
-        const error = new Error('Contacts form not found!');
-        error.code = 404;
-        throw error;
-    }
+    // if (!contactsForm || contactsForm.length <= 0) {
+    //     const error = new Error('Contacts form not found!');
+    //     error.code = 404;
+    //     throw error;
+    // }
 
     return {
         contactsForm,
@@ -66,10 +66,19 @@ const getTotalContactFormsCount = async (startDate, endDate) => {
     return totalCount;
 };
 
+const deleteContactForm = async (contactFormId) => {
+    const deletedConatctForm = await ContactForm.findByIdAndDelete(contactFormId);
+    if (!deletedConatctForm) {
+        const error = new Error('Contacts form not found!');
+        error.code = 404;
+        throw error;
+    }
+};
 
 module.exports = {
     fetchAllContactsForm,
     createContactForm,
     searchContactsForm,
-    getTotalContactFormsCount
+    getTotalContactFormsCount,
+    deleteContactForm
 };

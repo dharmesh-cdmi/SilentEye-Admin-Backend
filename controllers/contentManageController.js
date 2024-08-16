@@ -55,6 +55,7 @@ const AddFeature = async (req, res, next) => {
         let iconPath = (icon && icon.path) || null;
         const data = {
             ...req.body,
+            status: req.body.status === "true",
             stopHere: req.body.stopHere === "true",
             failCount: Number(req.body.failCount),
             icon: iconPath
@@ -71,6 +72,7 @@ const UpdateFeature = async (req, res, next) => {
         const { featureId } = req.params;
         const data = {
             ...req.body,
+            status: req.body.status === "true",
             stopHere: req.body.stopHere === "true",
             failCount: Number(req.body.failCount),
         };
@@ -113,6 +115,16 @@ const FetchPages = async (req, res, next) => {
         const parsedLimit = parseInt(limit, 10);
         const result = await contentManageService.fetchPages(parsedPageIndex, parsedLimit);
         res.status(200).json({ result });
+    } catch (error) {
+        next(error);
+    }
+};
+
+const FetchPageById = async (req, res, next) => {
+    try {
+        const { pageId } = req.params;
+        const page = await contentManageService.fetchPageById(pageId);
+        res.status(200).json({ page });
     } catch (error) {
         next(error);
     }
@@ -164,6 +176,7 @@ const AddFaqCategory = async (req, res, next) => {
         let imagePath = (image && image.path) || null;
         const data = {
             ...req.body,
+            status: req.body.status === "true",
             faqs: [],
             image: imagePath
         };
@@ -177,7 +190,10 @@ const AddFaqCategory = async (req, res, next) => {
 const UpdateFaqCategory = async (req, res, next) => {
     try {
         const { categoryId } = req.params;
-        const data = { ...req.body };
+        const data = {
+            ...req.body,
+            status: req.body.status === "true",
+        };
         if (req.file && req.file.mimetype.startsWith('image/')) {
             data.image = req.file.path;
         }
@@ -270,6 +286,7 @@ const AddReview = async (req, res, next) => {
         let profilePath = (profile && profile.path) || null;
         const data = {
             ...req.body,
+            status: req.body.status === "true",
             rating: Number(req.body.rating),
             profile: profilePath
         };
@@ -285,6 +302,7 @@ const UpdateReview = async (req, res, next) => {
         const { reviewId } = req.params;
         const data = {
             ...req.body,
+            status: req.body.status === "true",
             rating: Number(req.body.rating),
         };
         if (req.file && req.file.mimetype.startsWith('image/')) {
@@ -321,6 +339,7 @@ module.exports = {
     DeleteFeature,
     FetchAllPages,
     FetchPages,
+    FetchPageById,
     AddPage,
     UpdatePage,
     DeletePage,

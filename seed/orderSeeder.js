@@ -21,7 +21,7 @@ async function seedOrders() {
     const users = await User.find({});
 
     // Seed orders with refund data
-    for (let i = 0; i < 10; i++) {
+    for (let i = 0; i < 50; i++) {
       // Randomly select a user
       const randomUser = users[Math.floor(Math.random() * users.length)];
 
@@ -92,7 +92,8 @@ async function seedOrders() {
         status: orderStatus,
         refundDetails: refundDetails,
         createdAt: faker.date.past(),
-        updatedAt: faker.date.recent()
+        updatedAt: faker.date.recent(),
+        updatedAt: null
       });
 
       await order.save();

@@ -587,8 +587,21 @@ const registerUser = async (userData) => {
     newUser.activePlanId = orderCreated.planDetails.planId;
     let totalAmount = Number(orderCreated.orderDetails.total);
     newUser.amountSpend += totalAmount;
-    await newUser.save();
-    return "user created successfully";
+    newUser = await newUser.save();
+    return {
+        user: {
+            _id: newUser?._id,
+            name: newUser?.name,
+        },
+        order: {
+            orderId: orderCreated?.orderId,
+            _id: orderCreated?._id,
+            planDetails: {
+                planId: orderCreated?.planDetails?.planId,
+            }
+        },
+        totalAmount: orderCreated?.orderDetails?.total
+    }
 };
 
 const updateUser = async (id, data) => {

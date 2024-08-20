@@ -20,6 +20,10 @@ const UpsellSchema = new Schema(
       ),
       required: true,
     },
+    order: {
+      type: Number,
+      required: true,
+    },
     amount: {
       type: Number,
       required: true,
@@ -37,6 +41,10 @@ const UpsellSchema = new Schema(
       type: Number,
       required: true,
     },
+    device: {
+      type: Number,
+      required: true,
+    },
     tag: {
       type: String,
       required: true,
@@ -47,6 +55,13 @@ const UpsellSchema = new Schema(
       required: true,
       enum: ['live', 'test'],
     },
+    products: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: 'Product',
+        required: false,
+      },
+    ],
   },
   {
     timestamps: true,

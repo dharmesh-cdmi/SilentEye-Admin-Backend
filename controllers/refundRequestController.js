@@ -99,17 +99,56 @@ const updateRefundRequest = async (req, res) => {
   }
 };
 
+// Bulk update refund requests
+const bulkUpdateRefundRequests = async (req, res) => {
+  try {
+    const { ids, data } = req.body;
+    const updatedRequests = await refundRequestService.bulkUpdateRefundRequests(
+      ids,
+      data
+    );
+    return apiSuccessResponse(
+      res,
+      HTTP_STATUS_MESSAGE[200],
+      updatedRequests,
+      HTTP_STATUS.OK
+    );
+    // res.status(200).json(updatedRequests);
+  } catch (error) {
+    // res.status(500).json({ message: error.message });
+    return apiErrorResponse(
+      res,
+      HTTP_STATUS_MESSAGE[500],
+      error?.message ?? error,
+      HTTP_STATUS.INTERNAL_SERVER_ERROR
+    );
+  }
+};
+
 // Delete refund request by ID
 const deleteRefundRequest = async (req, res) => {
   try {
     await refundRequestService.deleteRefundRequest(req.params.id);
-    return apiSuccessResponse(
-      res,
-      HTTP_STATUS_MESSAGE[200],
-      { message: 'Request deleted successfully' },
-      HTTP_STATUS.OK
-    );
+    return apiSuccessResponse(res, HTTP_STATUS_MESSAGE[200], HTTP_STATUS.OK);
   } catch (error) {
+    return apiErrorResponse(
+      res,
+      HTTP_STATUS_MESSAGE[500],
+      error?.message ?? error,
+      HTTP_STATUS.INTERNAL_SERVER_ERROR
+    );
+  }
+};
+
+// Bulk delete refund requests
+const bulkDeleteRefundRequests = async (req, res) => {
+  try {
+    const { ids } = req.body;
+    await refundRequestService.bulkDeleteRefundRequests(ids);
+    return apiSuccessResponse(res, HTTP_STATUS_MESSAGE[200], HTTP_STATUS.OK);
+    // res.status(200).json({ message: 'Refund requests deleted successfully.' });
+  } catch (error) {
+    // res.status(500).json({ message: error.message });
     return apiErrorResponse(
       res,
       HTTP_STATUS_MESSAGE[500],
@@ -124,5 +163,7 @@ module.exports = {
   getAllRefundRequests,
   getRefundRequestById,
   updateRefundRequest,
+  bulkUpdateRefundRequests,
   deleteRefundRequest,
+  bulkDeleteRefundRequests,
 };

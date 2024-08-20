@@ -15,6 +15,7 @@ const refundRequestRoutes = require('./refundRequestRoutes');
 const discountRoutes = require('./discountRoutes');
 const adminRoutes = require('./admin/adminRoutes');
 const authRoutes = require('./authRoutes');
+const settingRoutes = require('./refundSettingRoutes');
 const userRoutes = require('./userRoutes');
 const { verifyAdmin } = require('../middleware/authMiddleware');
 
@@ -43,5 +44,6 @@ router.use('/users', userRoutes);
 router.use('/shipping', shippingRoutes);
 router.use('/refund-request', refundRequestRoutes);
 router.use('/discount', discountRoutes);
+router.use('/setting', settingRoutes);
 
 module.exports = router;

@@ -9,6 +9,15 @@ const PlanSchema = new Schema(
       required: true,
       trim: true,
     },
+    order: {
+      type: Number,
+      required: true,
+    },
+    key: {
+      type: String,
+      required: true,
+      trim: true,
+    },
     icon: {
       type: String,
       required: true,
@@ -28,6 +37,10 @@ const PlanSchema = new Schema(
       default: 0,
     },
     discountValue: {
+      type: Number,
+      required: true,
+    },
+    duration: {
       type: Number,
       required: true,
     },
@@ -56,6 +69,13 @@ const PlanSchema = new Schema(
       required: false,
       trim: true,
     },
+    products: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: 'Product',
+        required: false,
+      },
+    ],
   },
   {
     timestamps: true,

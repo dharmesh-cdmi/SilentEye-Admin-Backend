@@ -21,13 +21,13 @@ const searchTicketSchema = yup.object().shape({
 }).noUnknown(true, 'Unknown field in search ticket form data');
 
 const ticketStatusUpdateSchema = yup.object().shape({
-    status: yup.string().oneOf(['Active', 'Answered', 'Closed'], 'Invalid status').required('Status is required')
+    status: yup.string().oneOf(['Pending', 'Active', 'Answered', 'Closed'], 'Invalid status').required('Status is required')
 }).noUnknown(true, 'Unknown field in ticket status update data');
 
 
 const bulkUpdateStatusSchema = yup.object({
     ticketIds: yup.array().of(yup.string().required()).required(),
-    status: yup.string().oneOf(['Active', 'Answered', 'Closed']).required(),
+    status: yup.string().oneOf(['Pending', 'Active', 'Answered', 'Closed']).required(),
 });
 
 const bulkDeleteSchema = yup.object({

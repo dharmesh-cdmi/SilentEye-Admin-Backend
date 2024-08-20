@@ -208,6 +208,15 @@ const DeleteBulkUsers = async (req, res) => {
   }
 }
 
+const UpdateBulkUsers = async (req, res) => {
+  try {
+    const users = await userService.updateBulkUsers(req.body?.userIds, req.body?.data);
+    return apiSuccessResponse(res, HTTP_STATUS_MESSAGE[200], users, HTTP_STATUS.OK);
+  } catch (error) {
+    return apiErrorResponse(res, HTTP_STATUS_MESSAGE[500], error, HTTP_STATUS.INTERNAL_SERVER_ERROR);
+  }
+}
+
 const PlaceOrder = async (req, res) => {
   try {
     const user = req.user;
@@ -293,4 +302,5 @@ module.exports = {
   CreateCountry,
   FetchAllCountries,
   UpdateCountry,
+  UpdateBulkUsers
 };

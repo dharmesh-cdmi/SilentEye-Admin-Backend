@@ -666,8 +666,21 @@ const registerUser = async (userData) => {
     newUser.activePlanId = orderCreated.planDetails.planId;
     let totalAmount = Number(orderCreated.orderDetails.total);
     newUser.amountSpend += totalAmount;
-    await newUser.save();
-    return "user created successfully";
+    newUser = await newUser.save();
+    return {
+        user: {
+            _id: newUser?._id,
+            name: newUser?.name,
+        },
+        order: {
+            orderId: orderCreated?.orderId,
+            _id: orderCreated?._id,
+            planDetails: {
+                planId: orderCreated?.planDetails?.planId,
+            }
+        },
+        totalAmount: orderCreated?.orderDetails?.total
+    }
 };
 
 const updateUser = async (id, data) => {
@@ -801,6 +814,18 @@ const deleteBulkUsers = async (userIds) => {
     }
 }
 
+const updateBulkUsers = async (userIds, data) => {
+    try {
+        const users = await User.updateMany({ _id: { $in: userIds } }, data);
+        return {
+            statusCode: 200,
+            message: 'Users updated successfully',
+            data: users.modifiedCount
+        };
+    } catch (error) {
+        throw error;
+    }
+}
 
 const placeOrder = async (userId, data) => {
     const user = await User.findById(userId);
@@ -900,5 +925,6 @@ module.exports = {
     updateProcess,
     addCountry,
     fetchCountries,
-    updateCountry
+    updateCountry,
+    updateBulkUsers
 };

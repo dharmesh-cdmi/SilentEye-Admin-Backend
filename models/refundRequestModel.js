@@ -4,21 +4,54 @@ const Schema = mongoose.Schema;
 
 const RefundRequestSchema = new Schema(
   {
-    index: {
-      type: Number,
-      required: true,
-    },
-    requestId: {
-      type: String,
-      required: true,
-      trim: true,
-    },
+    // index: {
+    //   type: Number,
+    //   required: true,
+    // },
+    // requestId: {
+    //   type: String,
+    //   required: true,
+    //   trim: true,
+    // },
+    // email: {
+    //   type: String,
+    //   required: true,
+    //   trim: true,
+    // },
+    // amount: {
+    //   type: Number,
+    //   required: true,
+    // },
+    // status: {
+    //   type: String,
+    //   required: true,
+    //   enum: ['Pending', 'Approved', 'Rejected', 'Refunded', 'True Refunded'],
+    // },
+    // type: {
+    //   type: String,
+    //   required: true,
+    //   // enum: ['Reason 1', 'Reason 2', 'Reason 3', 'Reason 4', 'Reason 5'],
+    // },
+    // checked: {
+    //   type: Boolean,
+    //   required: true,
+    // },
+    // planId: {
+    //   type: Schema.Types.ObjectId,
+    //   ref: 'Plan',
+    //   required: false,
+    // },
     email: {
       type: String,
       required: true,
       trim: true,
     },
-    amount: {
+    reason: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+    targettedNumber: {
       type: Number,
       required: true,
     },
@@ -27,19 +60,9 @@ const RefundRequestSchema = new Schema(
       required: true,
       enum: ['Pending', 'Approved', 'Rejected', 'Refunded', 'True Refunded'],
     },
-    type: {
-      type: String,
-      required: true,
-      // enum: ['Reason 1', 'Reason 2', 'Reason 3', 'Reason 4', 'Reason 5'],
-    },
     checked: {
       type: Boolean,
       required: true,
-    },
-    planId: {
-      type: Schema.Types.ObjectId,
-      ref: 'Plan',
-      required: false,
     },
   },
   {

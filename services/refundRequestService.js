@@ -18,16 +18,16 @@ const getAllRefundRequests = async (page, limit, search, filterStatus) => {
       page: parseInt(page, 10),
       limit: parseInt(limit, 10),
       sort: { createdAt: -1 },
-      populate: { path: 'planId', select: 'name' },
+      // populate: { path: 'planId', select: 'name' },
     };
 
     const query = {};
     if (filterStatus) query.status = filterStatus;
     if (search) {
       query.$or = [
-        { requestId: { $regex: search, $options: 'i' } },
+        // { requestId: { $regex: search, $options: 'i' } },
         { email: { $regex: search, $options: 'i' } },
-        { type: { $regex: search, $options: 'i' } },
+        // { type: { $regex: search, $options: 'i' } },
       ];
     }
     return await RefundRequest.paginate(query, options);
@@ -39,7 +39,8 @@ const getAllRefundRequests = async (page, limit, search, filterStatus) => {
 // Get refund request by ID
 const getRefundRequestById = async (id) => {
   try {
-    return await RefundRequest.findById(id).populate('planId', 'name');
+    return await RefundRequest.findById(id);
+    // .populate('planId', 'name');
   } catch (error) {
     throw new Error(`Error in getting refund request: ${error.message}`);
   }

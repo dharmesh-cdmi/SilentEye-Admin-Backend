@@ -10,8 +10,20 @@ const errorHandlerMiddleware = require('./middleware/errorHandlerMiddleware');
 //Express Server Setup
 const app = express();
 const port = process.env.PORT || 5111;
+
+const allowedOrigins = [
+    process.env.FRONTEND_URL, 
+    'http://localhost:5173'
+];
+
 const corsOptions = {
-    origin: process.env.FRONTEND_URL || 'http://localhost:5173',
+    origin: function (origin, callback) {
+        if (allowedOrigins.includes(origin) || !origin) {
+            callback(null, true);
+        } else {
+            callback(new Error('Not allowed by CORS'));
+        }
+    },
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
     allowedHeaders: ['Content-Type', 'Authorization'],
     credentials: true

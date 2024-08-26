@@ -9,10 +9,21 @@ const ShippingSchema = new Schema(
       required: true,
       trim: true,
     },
-    daysRange: {
-      type: String,
+    order: {
+      type: Number,
       required: true,
-      trim: true,
+    },
+    daysMin: {
+      type: Number,
+      required: true,
+    },
+    daysMax: {
+      type: Number,
+      required: true,
+    },
+    mrp: {
+      type: Number,
+      required: true,
     },
     price: {
       type: Number,

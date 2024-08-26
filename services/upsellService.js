@@ -62,9 +62,42 @@ const getUpsellById = async (id) => {
 };
 
 // Update upsell by ID
-const updateUpsell = async (id, data) => {
+const updateUpsell = async (id, req) => {
   try {
-    const upsell = await Upsell.findByIdAndUpdate(id, data, { new: true });
+    const data = req.body;
+    const image = req.file ? req.file.path : undefined; // Get the new image if it was uploaded
+
+    // Find the existing upsell
+    let upsell = await Upsell.findById(id);
+    if (!upsell) {
+      throw new Error('Upsell not found!');
+    }
+
+    // Update fields
+    upsell.upsell.name = data.name || upsell.upsell.name;
+    upsell.upsell.count = data.count || upsell.upsell.count;
+
+    // Update image if a new one is provided
+    if (image) {
+      upsell.upsell.image = image;
+    }
+
+    // Update other fields
+    upsell.plan = data.plan || upsell.plan;
+    upsell.order = data.order || upsell.order;
+    upsell.key = data.key || upsell.key;
+    upsell.amount = data.amount || upsell.amount;
+    upsell.mrp = data.mrp || upsell.mrp;
+    upsell.discountPercent = data.discountPercent || upsell.discountPercent;
+    upsell.discountValue = data.discountValue || upsell.discountValue;
+    upsell.device = data.device || upsell.device;
+    upsell.tag = data.tag || upsell.tag;
+    upsell.status = data.status || upsell.status;
+    upsell.products = data.products || upsell.products;
+
+    // Save the updated upsell
+    await upsell.save();
+
     return upsell;
   } catch (error) {
     throw new Error(`Error updating upsell: ${error.message}`);

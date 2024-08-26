@@ -11,7 +11,7 @@ const createProduct = async (data) => {
       name: data?.title,
       amount: data?.mrp,
       currency: 'usd',
-      images: [data?.image],
+      images: [data?.mainImage],
     };
 
     const pgProduct = await paymentService.createStripeItem(pgData);
@@ -21,6 +21,8 @@ const createProduct = async (data) => {
       paymentGatewayId: data?.paymentGatewayId,
       pgProductId: pgProduct?.data?.product,
       pgPriceId: pgProduct?.data?.id,
+      mainImage: data?.mainImage,
+      image2: data?.image2 || null,
     };
 
     const product = new Product(data);
@@ -96,7 +98,13 @@ const updateProduct = async (id, data) => {
       throw new Error('Product not updated on stripe!');
     }
 
-    product = await Product.findByIdAndUpdate(id, data, {
+    const updatedData = {
+      ...data,
+      mainImage: data?.mainImage || product.mainImage,
+      image2: data?.image2 !== undefined ? data.image2 : product.image2,
+    };
+
+    product = await Product.findByIdAndUpdate(id, updatedData, {
       new: true,
       runValidators: true,
     });

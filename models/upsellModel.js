@@ -24,6 +24,11 @@ const UpsellSchema = new Schema(
       type: Number,
       required: true,
     },
+    key: {
+      type: String,
+      required: true,
+      trim: true,
+    },
     amount: {
       type: Number,
       required: true,

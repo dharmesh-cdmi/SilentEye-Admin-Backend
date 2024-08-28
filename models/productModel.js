@@ -9,6 +9,10 @@ const ProductSchema = new Schema(
       required: true,
       trim: true,
     },
+    order: {
+      type: Number,
+      required: true,
+    },
     mrp: {
       type: Number,
       required: true,
@@ -18,9 +22,14 @@ const ProductSchema = new Schema(
       required: true,
       enum: ['live', 'test'],
     },
-    image: {
+    mainImage: {
       type: String,
       required: true,
+      trim: true,
+    },
+    image2: {
+      type: String,
+      required: false,
       trim: true,
     },
     paymentGatewayId: {
@@ -34,6 +43,11 @@ const ProductSchema = new Schema(
       trim: true,
     },
     pgPriceId: {
+      type: String,
+      required: false,
+      trim: true,
+    },
+    description: {
       type: String,
       required: false,
       trim: true,

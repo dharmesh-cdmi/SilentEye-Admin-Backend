@@ -9,6 +9,10 @@ const AddonSchema = new Schema(
       required: true,
       trim: true,
     },
+    order: {
+      type: Number,
+      required: true,
+    },
     description: {
       type: String,
       required: true,

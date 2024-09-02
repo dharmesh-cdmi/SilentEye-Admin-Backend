@@ -4,13 +4,13 @@ const paymentService = require('./paymentService');
 // Create a new plan
 const createPlan = async (data) => {
   try {
+    console.log('data', data);
     const pgData = {
       paymentGatewayId: data?.paymentGatewayId,
       name: data?.name,
       amount: data?.mrp,
       currency: 'usd',
       description: `${data?.discountPercent}% OFF`,
-      images: [data?.icon],
     };
 
     const pgPlan = await paymentService.createStripeItem(pgData);
@@ -31,11 +31,9 @@ const createPlan = async (data) => {
       message: 'Plan created successfully',
     };
   } catch (error) {
-    return {
-      status: false,
-      error: true,
-      message: 'Error in creating plan: ' + error,
-    };
+    throw new Error(
+      'Error in creating the plan: ' + error?.message ? error?.message : error
+    );
   }
 };
 

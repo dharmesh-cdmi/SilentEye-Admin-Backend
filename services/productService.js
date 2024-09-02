@@ -11,7 +11,6 @@ const createProduct = async (data) => {
       name: data?.title,
       amount: data?.mrp,
       currency: 'usd',
-      images: [data?.mainImage],
     };
 
     const pgProduct = await paymentService.createStripeItem(pgData);
@@ -34,11 +33,11 @@ const createProduct = async (data) => {
       message: 'Product created successfully',
     };
   } catch (error) {
-    return {
-      status: false,
-      error: true,
-      message: 'Error in creating product: ' + error,
-    };
+    throw new Error(
+      'Error in creating the product: ' + error?.message
+        ? error?.message
+        : error
+    );
   }
 };
 

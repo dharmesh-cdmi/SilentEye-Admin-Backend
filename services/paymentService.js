@@ -50,7 +50,6 @@ const createStripeItem = async (data) => {
       amount,
       currency = 'usd',
       description,
-      images,
     } = data;
     const paymentGateway = await PaymentGateway.findById(paymentGatewayId);
     if (!paymentGateway) {
@@ -62,7 +61,6 @@ const createStripeItem = async (data) => {
     let item = await stripeInstance.products.create({
       name,
       description,
-      images,
     });
 
     const price = await stripeInstance.prices.create({

@@ -11,7 +11,19 @@ const {
 // Create a new product
 const createProduct = async (req, res) => {
   try {
-    const product = await productService.createProduct(req.body);
+    // Extract files from req.files
+    const files = req.files;
+    const mainImage = files?.mainImage?.[0]?.path; // Assuming you are storing the file path
+    const image2 = files?.image2?.[0]?.path || null;
+
+    // Merge the file paths into req.body
+    const productData = {
+      ...req.body,
+      mainImage, // Attach the mainImage path to the body
+      image2, // Attach the image2 path if available
+    };
+
+    const product = await productService.createProduct(productData);
     return apiSuccessResponse(
       res,
       HTTP_STATUS_MESSAGE[201],

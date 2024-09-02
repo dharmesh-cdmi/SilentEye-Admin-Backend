@@ -11,7 +11,16 @@ const {
 // Create a new plan
 const createPlan = async (req, res) => {
   try {
-    const plan = await planService.createPlan(req.body);
+    const icon = req.file ? req.file.path : null;
+    const data = {
+      ...req.body,
+      icon, // Add the icon to the data
+    };
+
+    // Call the service to create the plan
+    const plan = await planService.createPlan(data);
+
+    // const plan = await planService.createPlan(req.body);
     return apiSuccessResponse(
       res,
       HTTP_STATUS_MESSAGE[201],

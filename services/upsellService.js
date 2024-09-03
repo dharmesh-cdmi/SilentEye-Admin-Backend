@@ -7,6 +7,7 @@ const createUpsell = async (req) => {
     const { name, count } = req.body;
     const upsell = new Upsell({
       ...req.body,
+      products: JSON.parse(req?.body?.products),
       upsell: {
         name,
         count,

@@ -4,7 +4,6 @@ const paymentService = require('./paymentService');
 // Create a new plan
 const createPlan = async (data) => {
   try {
-    console.log('data', data);
     const pgData = {
       paymentGatewayId: data?.paymentGatewayId,
       name: data?.name,
@@ -20,8 +19,8 @@ const createPlan = async (data) => {
       paymentGatewayId: data?.paymentGatewayId,
       pgPlanId: pgPlan?.data?.product,
       pgPriceId: pgPlan?.data?.id,
+      products: JSON.parse(data?.products),
     };
-
     const plan = new Plan(data);
     await plan.save();
 

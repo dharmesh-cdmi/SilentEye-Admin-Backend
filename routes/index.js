@@ -16,10 +16,9 @@ const discountRoutes = require('./discountRoutes');
 const adminRoutes = require('./admin/adminRoutes');
 const authRoutes = require('./authRoutes');
 const settingRoutes = require('./refundSettingRoutes');
+const shippingTrackingRoutes = require('./shippingTrackingRoutes');
 const userRoutes = require('./userRoutes');
 const { verifyAdmin } = require('../middleware/authMiddleware');
-
-
 
 const router = express.Router();
 
@@ -45,5 +44,6 @@ router.use('/shipping', shippingRoutes);
 router.use('/refund-request', refundRequestRoutes);
 router.use('/discount', discountRoutes);
 router.use('/setting', settingRoutes);
+router.use('/shipping-tracking', shippingTrackingRoutes);
 
 module.exports = router;

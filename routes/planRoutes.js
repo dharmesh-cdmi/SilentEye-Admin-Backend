@@ -8,7 +8,7 @@ const { upload } = require('../middleware/multerMiddleware');
 router.post('/', upload.single('icon'), planController.createPlan);
 router.get('/', planController.getAllPlans);
 router.get('/:id', planController.getPlanById);
-router.put('/:id', planController.updatePlan);
+router.put('/:id', upload.single('icon'), planController.updatePlan);
 router.delete('/:id', planController.deletePlan);
 
 module.exports = router;

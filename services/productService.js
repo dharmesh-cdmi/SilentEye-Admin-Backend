@@ -136,11 +136,11 @@ const deleteProduct = async (id) => {
       itemId: product?.pgProductId,
     };
 
-    const pgProduct = await paymentService.deleteStripeItem(pgData);
+    // const pgProduct = await paymentService.deleteStripeItem(pgData);
 
-    if (!pgProduct) {
-      throw new Error('Product not deleted on stripe!');
-    }
+    // if (!pgProduct) {
+    //   throw new Error('Product not deleted on stripe!');
+    // }
 
     await Product.findByIdAndDelete(id);
 

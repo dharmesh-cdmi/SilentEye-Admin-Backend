@@ -77,7 +77,13 @@ const getUpsellById = async (req, res) => {
 // Update a upsell by ID
 const updateUpsell = async (req, res) => {
   try {
-    const upsell = await upsellService.updateUpsell(req.params.id, req.body);
+    const image = req.file ? req.file.path : null;
+    const data = {
+      ...req.body,
+      image,
+    };
+
+    const upsell = await upsellService.updateUpsell(req.params.id, data);
     return apiSuccessResponse(
       res,
       HTTP_STATUS_MESSAGE[200],

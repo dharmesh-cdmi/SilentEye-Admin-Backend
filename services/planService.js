@@ -92,9 +92,13 @@ const updatePlan = async (id, data) => {
       throw new Error('Plan not updated on stripe!');
     }
 
-    plan = await Plan.findByIdAndUpdate(id, data, {
-      new: true,
-    });
+    plan = await Plan.findByIdAndUpdate(
+      id,
+      { ...data, products: JSON.parse(data?.products) },
+      {
+        new: true,
+      }
+    );
     return plan;
   } catch (error) {
     throw new Error(`Error updating plan: ${error.message}`);
@@ -114,11 +118,11 @@ const deletePlan = async (id) => {
       itemId: plan?.pgPlanId,
     };
 
-    const pgPlan = await paymentService.deleteStripeItem(pgData);
+    // const pgPlan = await paymentService.deleteStripeItem(pgData);
 
-    if (!pgPlan) {
-      throw new Error('Plan not deleted on stripe!');
-    }
+    // if (!pgPlan) {
+    //   throw new Error('Plan not deleted on stripe!');
+    // }
 
     plan = await Plan.findByIdAndDelete(id);
 

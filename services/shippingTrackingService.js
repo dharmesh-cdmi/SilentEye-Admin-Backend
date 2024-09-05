@@ -58,7 +58,34 @@ const deleteTopic = async (topicId) => {
   }
 };
 
-// Add a new subtopic
+// // Add a new subtopic
+// const addSubTopic = async (topicId, data) => {
+//   try {
+//     const settings = await ShippingTrackingSettings.findOne({});
+
+//     // Find the topic by its ID
+//     const topic = settings.topics.id(topicId);
+
+//     if (!topic) {
+//       throw new Error('Topic not found');
+//     }
+
+//     // Add the subtopic to the subTopics array
+//     topic.subTopics.push(data?.name);
+//     await settings.save();
+
+//     return {
+//       status: true,
+//       data: settings,
+//       message: 'Subtopic added successfully',
+//     };
+//   } catch (error) {
+//     throw new Error(
+//       'Error in adding the subtopic: ' +
+//         (error?.message ? error?.message : error)
+//     );
+//   }
+// };
 const addSubTopic = async (topicId, data) => {
   try {
     const settings = await ShippingTrackingSettings.findOne({});
@@ -70,8 +97,9 @@ const addSubTopic = async (topicId, data) => {
       throw new Error('Topic not found');
     }
 
-    // Add the subtopic to the subTopics array
-    topic.subTopics.push(data?.name);
+    // Add the new subtopic with a generated _id
+    topic.subTopics.push({ name: data?.name });
+
     await settings.save();
 
     return {
@@ -87,9 +115,69 @@ const addSubTopic = async (topicId, data) => {
   }
 };
 
-const deleteSubTopic = async (topicId, subTopicName) => {
+// const deleteSubTopic = async (topicId, subTopicName) => {
+//   try {
+//     // Fetch the settings document
+//     const settings = await ShippingTrackingSettings.findOne({});
+
+//     if (!settings) {
+//       throw new Error('Settings not found');
+//     }
+
+//     // Find the topic by its ID
+//     const topic = settings.topics.id(topicId);
+
+//     if (!topic) {
+//       throw new Error('Topic not found');
+//     }
+
+//     // Log the topic object to inspect its structure
+//     console.log('Topic:', topic);
+
+//     // Ensure topic.subTopics is an array
+//     if (!Array.isArray(topic.subTopics)) {
+//       throw new Error('subTopics is not an array');
+//     }
+
+//     // Log the subTopics array for debugging
+//     console.log('SubTopics:', topic.subTopics);
+
+//     // Ensure subTopicName is a valid string
+//     if (typeof subTopicName !== 'string') {
+//       throw new Error('subTopicName is not a string');
+//     }
+
+//     // Check for exact match of the subtopic
+//     const subTopicIndex = topic.subTopics.findIndex(
+//       (subTopic) =>
+//         typeof subTopic === 'string' && subTopic.trim() === subTopicName.trim()
+//     );
+
+//     if (subTopicIndex === -1) {
+//       throw new Error('Subtopic not found');
+//     }
+
+//     // Remove the subtopic from the subTopics array
+//     topic.subTopics.splice(subTopicIndex, 1);
+
+//     // Save the changes
+//     await settings.save();
+
+//     return {
+//       status: true,
+//       data: settings,
+//       message: 'Subtopic deleted successfully',
+//     };
+//   } catch (error) {
+//     console.error('Error in deleting the subtopic:', error.message || error);
+//     throw new Error(
+//       'Error in deleting the subtopic: ' +
+//         (error?.message ? error?.message : error)
+//     );
+//   }
+// };
+const deleteSubTopic = async (topicId, subTopicId) => {
   try {
-    // Fetch the settings document
     const settings = await ShippingTrackingSettings.findOne({});
 
     if (!settings) {
@@ -103,34 +191,15 @@ const deleteSubTopic = async (topicId, subTopicName) => {
       throw new Error('Topic not found');
     }
 
-    // Log the topic object to inspect its structure
-    console.log('Topic:', topic);
+    // Find the subtopic by its ID
+    const subTopic = topic.subTopics.id(subTopicId);
 
-    // Ensure topic.subTopics is an array
-    if (!Array.isArray(topic.subTopics)) {
-      throw new Error('subTopics is not an array');
-    }
-
-    // Log the subTopics array for debugging
-    console.log('SubTopics:', topic.subTopics);
-
-    // Ensure subTopicName is a valid string
-    if (typeof subTopicName !== 'string') {
-      throw new Error('subTopicName is not a string');
-    }
-
-    // Check for exact match of the subtopic
-    const subTopicIndex = topic.subTopics.findIndex(
-      (subTopic) =>
-        typeof subTopic === 'string' && subTopic.trim() === subTopicName.trim()
-    );
-
-    if (subTopicIndex === -1) {
+    if (!subTopic) {
       throw new Error('Subtopic not found');
     }
 
-    // Remove the subtopic from the subTopics array
-    topic.subTopics.splice(subTopicIndex, 1);
+    // Remove the subtopic by its ID
+    topic.subTopics.pull({ _id: subTopicId });
 
     // Save the changes
     await settings.save();

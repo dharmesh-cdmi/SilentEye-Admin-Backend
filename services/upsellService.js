@@ -63,11 +63,8 @@ const getUpsellById = async (id) => {
 };
 
 // Update upsell by ID
-const updateUpsell = async (id, req) => {
+const updateUpsell = async (id, data) => {
   try {
-    const data = req.body;
-    const image = req.file ? req.file.path : undefined; // Get the new image if it was uploaded
-
     // Find the existing upsell
     let upsell = await Upsell.findById(id);
     if (!upsell) {
@@ -79,8 +76,8 @@ const updateUpsell = async (id, req) => {
     upsell.upsell.count = data.count || upsell.upsell.count;
 
     // Update image if a new one is provided
-    if (image) {
-      upsell.upsell.image = image;
+    if (data?.image) {
+      upsell.upsell.image = data?.image;
     }
 
     // Update other fields
@@ -94,7 +91,9 @@ const updateUpsell = async (id, req) => {
     upsell.device = data.device || upsell.device;
     upsell.tag = data.tag || upsell.tag;
     upsell.status = data.status || upsell.status;
-    upsell.products = data.products || upsell.products;
+    upsell.products = data.products
+      ? JSON.parse(data?.products)
+      : upsell.products;
 
     // Save the updated upsell
     await upsell.save();

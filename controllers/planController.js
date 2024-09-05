@@ -86,7 +86,13 @@ const getPlanById = async (req, res) => {
 // Update a plan by ID
 const updatePlan = async (req, res) => {
   try {
-    const plan = await planService.updatePlan(req.params.id, req.body);
+    const icon = req.file ? req.file.path : null;
+    const data = {
+      ...req.body,
+      icon, // Add the icon to the data
+    };
+
+    const plan = await planService.updatePlan(req.params.id, data);
     return apiSuccessResponse(
       res,
       HTTP_STATUS_MESSAGE[200],

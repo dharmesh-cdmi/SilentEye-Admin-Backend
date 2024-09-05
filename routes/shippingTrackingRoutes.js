@@ -12,7 +12,7 @@ router.post(
   shippingTrackingSettingsController.addSubTopic
 ); // Add a new subtopic
 router.delete(
-  '/topics/:topicId/subtopics',
+  '/topics/:topicId/subtopics/:subTopicId',
   shippingTrackingSettingsController.deleteSubTopic
 ); // Delete a subtopic
 router.get('/settings', shippingTrackingSettingsController.getSettings); // Get all settings

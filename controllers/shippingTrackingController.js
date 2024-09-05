@@ -74,9 +74,10 @@ const addSubTopic = async (req, res) => {
 // Delete a subtopic
 const deleteSubTopic = async (req, res) => {
   try {
+    const { topicId, subTopicId } = req.params;
     const settings = await shippingTrackingSettingsService.deleteSubTopic(
-      req.params.topicId,
-      req.body?.name
+      topicId,
+      subTopicId
     );
     return apiSuccessResponse(
       res,

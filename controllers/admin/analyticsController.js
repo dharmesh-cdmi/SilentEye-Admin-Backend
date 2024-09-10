@@ -18,6 +18,7 @@ const totalCountAnalytics = async (req, res) => {
 
         return apiSuccessResponse(res, 'Total count analytics retrieved successfully', analytic);
     } catch (error) {
+        // console.log(error);
         return apiErrorResponse(res, error.message, null, HTTP_STATUS.INTERNAL_SERVER_ERROR);
     }
 };

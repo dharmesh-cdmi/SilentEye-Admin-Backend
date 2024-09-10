@@ -112,7 +112,7 @@ const getUserStatistics = async (startDate = null, endDate = null,page = 1, limi
                         $filter: {
                             input: "$addOns",
                             as: "addOn",
-                            cond: { $ne: ["$$addOn.name", null] }
+                            cond: { $ne: ["$addOn.name", null] }
                         }
                     },
                     totalCheckout: 1,

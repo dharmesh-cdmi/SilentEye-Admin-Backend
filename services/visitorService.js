@@ -93,140 +93,6 @@ const getVisitorCount = async (startDate = null, endDate = null) => {
   }
 };
 
-
-
-// const graphData = async (pages = [], actions = [], startDate = null, endDate = null) => {
-  
-//   try {
-//     // Parse and validate pages and actions
-//     if (typeof pages === 'string') {
-//       pages = JSON.parse(pages.replace(/'/g, '"'));
-//     }
-//     pages = Array.isArray(pages) ? pages : [pages];
-    
-//     if (typeof actions === 'string') {
-//       actions = JSON.parse(actions.replace(/'/g, '"'));
-//     }
-//     actions = Array.isArray(actions) ? actions : [actions];
-
-//     // Define default date range
-//     const end = endDate ? new Date(endDate) : new Date();
-//     const start = startDate ? new Date(startDate) : new Date(new Date().setFullYear(end.getFullYear() - 1));
-
-    
-//     // Define match condition for MongoDB aggregation
-//     const matchCondition = {
-//       visitDate: { $gte: start, $lte: end }
-//     };
-
-//     // MongoDB aggregation pipeline
-//     const pipeline = [
-//       { $match: matchCondition },
-//       {
-//         $group: {
-//           _id: {
-//             month: { $month: "$visitDate" },
-//             year: { $year: "$visitDate" },
-//             page: "$page",
-//             action: "$action"
-//           },
-//           totalCount: { $sum: 1 }
-//         }
-//       },
-//       {
-//         $project: {
-//           _id: 0,
-//           month: "$_id.month",
-//           year: "$_id.year",
-//           page: "$_id.page",
-//           action: "$_id.action",
-//           totalCount: 1
-//         }
-//       }
-//     ];
-
-//     // Fetch data
-//     const visitorResult = await Visitor.aggregate(pipeline);
-
-
-
-//     const orderData = await orderService.getOrdersByDateRange(start, end);
-//     const refundData = await refundService.getApprovedRefundsByDateRange(start, end);
-//     const loginResult = await loginService.getLoginDataByDateRange(start, end);
-      
-
-//     // Initialize aggregated data
-//     const aggregatedData = {
-//       "Checkout Page Visitor": Array(12).fill(0),
-//       "Plan Page Visitor": Array(12).fill(0),
-//       "Demo Viewer": Array(12).fill(0),
-//       "Logged in Users": Array(12).fill(0),
-//       "Total Order": Array(12).fill(0),
-//       "Total Refunds": Array(12).fill(0)
-//     };
-
-//       // Process login data
-//       loginResult.forEach(item => {
-//         if (item._id.action === 'Login') {
-//           const monthIndex = item._id.month - 1; // 0-based index
-//           aggregatedData["Logged in Users"][monthIndex] += item.totalCount;
-//         }
-//       });
-
-      
-
-//     // Process visitor data
-//     visitorResult.forEach(item => {
-//       const label = item.action === 'Visit' && item.page === 'Checkout'
-//         ? "Checkout Page Visitor"
-//         : item.action === 'Visit' && item.page === 'Plan'
-//         ? "Plan Page Visitor"
-//         : item.action === 'Demo'
-//         ? "Demo Viewer"
-//         : item.action === 'Login'
-//         ? "Logged in Users"
-//         : null;
-//         // const data = item.totalCount;
-
-//       if (label) {
-//         const monthIndex = item.month - 1; // 0-based index
-//         aggregatedData[label][monthIndex] += item.totalCount;
-//       }
-//     });
-
-//     // Process order data
-//     orderData.forEach(order => {
-//       const monthIndex = order._id.month - 1; // 0-based index
-//       aggregatedData["Total Order"][monthIndex] += order.totalCount;
-//     });
-
-//     // Process refund data
-//     refundData.forEach(refund => {
-//       const monthIndex = refund._id.month - 1; // 0-based index
-//       aggregatedData["Total Refunds"][monthIndex] += refund.count;
-//     });
-
-//     // Format the result with 'label' and 'data' keys
-//     const result = [
-//       { label: "Checkout Page Visitor", data: aggregatedData["Checkout Page Visitor"] },
-//       { label: "Plan Page Visitor", data: aggregatedData["Plan Page Visitor"] },
-//       { label: "Demo Viewer", data: aggregatedData["Demo Viewer"] },
-//       { label: "Logged in Users", data: aggregatedData["Logged in Users"] },
-//       { label: "Total Order", data: aggregatedData["Total Order"] },
-//       { label: "Total Refunds", data: aggregatedData["Total Refunds"] },
-//     ];
-
-//     return {
-//       result,
-//       "Months":["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
-
-      
-//     };
-//   } catch (error) {
-//     throw error;
-//   }
-// };
-
 const moment = require('moment'); // Ensure moment.js is installed
 
 const graphData = async (pages = [], actions = [], startDate = null, endDate = null) => {
@@ -307,6 +173,7 @@ const graphData = async (pages = [], actions = [], startDate = null, endDate = n
     const visitorResult = await Visitor.aggregate(pipeline);
     const orderData = await orderService.getOrdersByDateRange(start.toDate(), end.toDate());
     const refundData = await refundService.getApprovedRefundsByDateRange(start.toDate(), end.toDate());
+    // const trueRefund = await refundService.getRefundData(start.toDate(), end.toDate());
     const loginResult = await loginService.getLoginDataByDateRange(start.toDate(), end.toDate());
 
     // Initialize aggregated data with the same length as labels
@@ -316,8 +183,19 @@ const graphData = async (pages = [], actions = [], startDate = null, endDate = n
       "Demo Viewer": Array(labels.length).fill(0),
       "Logged in Users": Array(labels.length).fill(0),
       "Total Order": Array(labels.length).fill(0),
-      "Total Refunds": Array(labels.length).fill(0)
+      "Total Refunds": Array(labels.length).fill(0),
+      "True Refunds": Array(labels.length).fill(0)
     };
+
+    //addon sales
+    //payment initiated
+    //total purchase order
+    //conversation
+    //support ticket
+    //refund request
+    //total refunded
+    //true refund
+    //contact us
 
     // Process visitor data
     visitorResult.forEach(item => {
@@ -328,7 +206,9 @@ const graphData = async (pages = [], actions = [], startDate = null, endDate = n
         : item.group.action === 'Demo'
         ? "Demo Viewer"
         : item.group.action === 'Login'
-        ? "Logged in Users"
+        ? "Logged in Users" 
+        : item.group.action === 'true_refund'
+        ? "True Refund"
         : null;
 
       if (label) {
@@ -378,7 +258,8 @@ const graphData = async (pages = [], actions = [], startDate = null, endDate = n
       { label: "Demo Viewer", data: aggregatedData["Demo Viewer"] },
       { label: "Logged in Users", data: aggregatedData["Logged in Users"] },
       { label: "Total Order", data: aggregatedData["Total Order"] },
-      { label: "Total Refunds", data: aggregatedData["Total Refunds"] }
+      { label: "Total Refunds", data: aggregatedData["Total Refunds"] },
+      { label: "True Refunds", data: aggregatedData["True Refunds"] }
     ];
 
     return { result, labels }; // Return the dynamic labels based on the selected date range

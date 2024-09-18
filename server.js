@@ -1,32 +1,33 @@
-const express = require("express");
-const path = require("path");
-const cors = require("cors");
-const cookieParser = require("cookie-parser");
+const express = require('express');
+const path = require('path');
+const cors = require('cors');
+const cookieParser = require('cookie-parser');
 require('dotenv').config();
-const connectDB = require("./configs/db.config");
+const cron = require('node-cron');
+const connectDB = require('./configs/db.config');
 const routes = require('./routes/index');
 const errorHandlerMiddleware = require('./middleware/errorHandlerMiddleware');
+const {
+  updateWithdrawalStatuses,
+} = require('./services/withdrawalRequestService');
 
 //Express Server Setup
 const app = express();
 const port = process.env.PORT || 5111;
 
-const allowedOrigins = [
-    process.env.FRONTEND_URL, 
-    'http://localhost:5173'
-];
+const allowedOrigins = [process.env.FRONTEND_URL, 'http://localhost:5173'];
 
 const corsOptions = {
-    origin: function (origin, callback) {
-        if (allowedOrigins.includes(origin) || !origin) {
-            callback(null, true);
-        } else {
-            callback(new Error('Not allowed by CORS'));
-        }
-    },
-    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
-    allowedHeaders: ['Content-Type', 'Authorization'],
-    credentials: true
+  origin: function (origin, callback) {
+    if (allowedOrigins.includes(origin) || !origin) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  credentials: true,
 };
 
 //Express Middlewares
@@ -41,13 +42,20 @@ connectDB();
 
 //Server status endpoint
 app.get('/', (req, res) => {
-    res.send('Server is Up!');
+  res.send('Server is Up!');
 });
 
 // Routes
-app.use("/api", routes);
+app.use('/api', routes);
 app.use(errorHandlerMiddleware);
 
+// Schedule the status updates to run every day at midnight
+// cron.schedule('0 0 * * *', async () => {
+cron.schedule('* * * * *', async () => {
+  console.log('Running scheduled withdrawal status update...');
+  await updateWithdrawalStatuses();
+});
+
 app.listen(port, () => {
-    console.log(`Node/Express Server is Up......\nPort: localhost:${port}`);
+  console.log(`Node/Express Server is Up......\nPort: localhost:${port}`);
 });

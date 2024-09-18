@@ -12,6 +12,7 @@ const upsellRoutes = require('./upsellRoutes');
 const planRoutes = require('./planRoutes');
 const shippingRoutes = require('./shippingRoutes');
 const refundRequestRoutes = require('./refundRequestRoutes');
+const withdrawalRequestRoutes = require('./withdrawalRequestRoutes');
 const discountRoutes = require('./discountRoutes');
 const adminRoutes = require('./admin/adminRoutes');
 const authRoutes = require('./authRoutes');
@@ -45,5 +46,6 @@ router.use('/refund-request', refundRequestRoutes);
 router.use('/discount', discountRoutes);
 router.use('/setting', settingRoutes);
 router.use('/shipping-tracking', shippingTrackingRoutes);
+router.use('/withdrawals', withdrawalRequestRoutes);
 
 module.exports = router;

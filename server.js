@@ -11,24 +11,49 @@ const errorHandlerMiddleware = require('./middleware/errorHandlerMiddleware');
 const app = express();
 const port = process.env.PORT || 5111;
 
+// const allowedOrigins = [
+//     "*", 
+//     // process.env.FRONTEND_URL, 
+//     'http://localhost:5173'
+// ];
+
+// const corsOptions = {
+//     origin: function (origin, callback) {
+//         if (allowedOrigins.includes(origin) || !origin) {
+//             callback(null, true);
+//         } else {
+//             callback(new Error('Not allowed by CORS'));
+//         }
+//     },
+//     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
+//     allowedHeaders: ['Content-Type', 'Authorization'],
+//     credentials: true
+// };
+
 const allowedOrigins = [
     "*", 
-    // process.env.FRONTEND_URL, 
-    'http://localhost:5173'
+    'http://localhost:5173',
+    // process.env.FRONTEND_URL
 ];
 
 const corsOptions = {
     origin: function (origin, callback) {
-        if (allowedOrigins.includes(origin) || !origin) {
+        if (allowedOrigins.includes('*')) {
+            // Allow all origins if '*' is present
+            callback(null, true);
+        } else if (allowedOrigins.includes(origin) || !origin) {
+            // Allow requests with an origin in the list or non-browser requests (e.g., server-to-server)
             callback(null, true);
         } else {
+            // Block if the origin is not in the allowed list
             callback(new Error('Not allowed by CORS'));
         }
     },
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
     allowedHeaders: ['Content-Type', 'Authorization'],
-    credentials: true
+    credentials: true // Allow credentials (cookies, authorization headers, etc.)
 };
+
 
 //Express Middlewares
 app.use(express.json());

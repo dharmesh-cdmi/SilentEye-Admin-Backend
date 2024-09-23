@@ -1,76 +1,21 @@
-const express = require('express');
-const path = require('path');
-const cors = require('cors');
-const cookieParser = require('cookie-parser');
+const express = require("express");
+const path = require("path");
+const cors = require("cors");
+const cookieParser = require("cookie-parser");
 require('dotenv').config();
-const cron = require('node-cron');
-const connectDB = require('./configs/db.config');
+const connectDB = require("./configs/db.config");
 const routes = require('./routes/index');
 const errorHandlerMiddleware = require('./middleware/errorHandlerMiddleware');
-const {
-  updateWithdrawalStatuses,
-} = require('./services/withdrawalRequestService');
 
 //Express Server Setup
 const app = express();
 const port = process.env.PORT || 5111;
-
-// const allowedOrigins = [
-//     "*", 
-//     // process.env.FRONTEND_URL, 
-//     'http://localhost:5173'
-// ];
-
-// const corsOptions = {
-//     origin: function (origin, callback) {
-//         if (allowedOrigins.includes(origin) || !origin) {
-//             callback(null, true);
-//         } else {
-//             callback(new Error('Not allowed by CORS'));
-//         }
-//     },
-//     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
-//     allowedHeaders: ['Content-Type', 'Authorization'],
-//     credentials: true
-// };
-
-const allowedOrigins = [
-    "*", 
-    'http://localhost:5173',
-    // process.env.FRONTEND_URL
-];
-
-// const corsOptions = {
-//   origin: function (origin, callback) {
-//     if (allowedOrigins.includes(origin) || !origin) {
-//       callback(null, true);
-//     } else {
-//       callback(new Error('Not allowed by CORS'));
-//     }
-//   },
-//   methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
-//   allowedHeaders: ['Content-Type', 'Authorization'],
-//   credentials: true,
-// };
-
-
 const corsOptions = {
-    origin: function (origin, callback) {
-      if (allowedOrigins.includes(origin) || !origin) {
-        callback(null, true);
-      } else {
-        callback(new Error('Not allowed by CORS'));
-      }
-    },
+    origin: process.env.FRONTEND_URL || 'http://localhost:5173',
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
     allowedHeaders: ['Content-Type', 'Authorization'],
-    credentials: true,
-    preflightContinue: false,  // Ensures OPTIONS preflight is handled
-    optionsSuccessStatus: 204  // Some legacy browsers may choke on 204
-  };
-  
-  app.use(cors(corsOptions)); // Apply CORS middleware
-  
+    credentials: true
+};
 
 //Express Middlewares
 app.use(express.json());
@@ -84,20 +29,13 @@ connectDB();
 
 //Server status endpoint
 app.get('/', (req, res) => {
-  res.send('Server is Up!');
+    res.send('Server is Up!');
 });
 
 // Routes
-app.use('/api', routes);
+app.use("/api", routes);
 app.use(errorHandlerMiddleware);
 
-// Schedule the status updates to run every day at midnight
-// cron.schedule('0 0 * * *', async () => {
-cron.schedule('* * * * *', async () => {
-  console.log('Running scheduled withdrawal status update...');
-  await updateWithdrawalStatuses();
-});
-
 app.listen(port, () => {
-  console.log(`Node/Express Server is Up......\nPort: localhost:${port}`);
+    console.log(`Node/Express Server is Up......\nPort: localhost:${port}`);
 });

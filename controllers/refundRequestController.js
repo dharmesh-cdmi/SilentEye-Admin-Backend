@@ -1,16 +1,17 @@
-const refundRequestService = require('../services/refundRequestService');
+const refundRequestService = require("../services/refundRequestService");
 const {
   apiSuccessResponse,
   apiErrorResponse,
   HTTP_STATUS_MESSAGE,
   HTTP_STATUS,
-} = require('../utils/responseHelper');
+} = require("../utils/responseHelper");
 
 // Create a new refund request
 const createRefundRequest = async (req, res) => {
   try {
     const refundRequest = await refundRequestService.createRefundRequest(
-      req.body
+      req.body,
+      req.user.id
     );
     return apiSuccessResponse(
       res,
@@ -57,8 +58,9 @@ const getAllRefundRequests = async (req, res) => {
 // Get refund request by ID
 const getRefundRequestById = async (req, res) => {
   try {
+    const userId = req.user.id;
     const refundRequest = await refundRequestService.getRefundRequestById(
-      req.params.id
+      userId
     );
     return apiSuccessResponse(
       res,

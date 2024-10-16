@@ -1,14 +1,17 @@
-const jwt = require('jsonwebtoken');
-const Admin = require('../models/admin/adminModel');
-const User = require('../models/userModel');
-const { accessTokenSecret, refreshTokenSecret } = require('../configs/jwt.config');
+const jwt = require("jsonwebtoken");
+const Admin = require("../models/admin/adminModel");
+const User = require("../models/userModel");
+const {
+  accessTokenSecret,
+  refreshTokenSecret,
+} = require("../configs/jwt.config");
 
 // Middleware to verify user
 const verifyUser = async (req, res, next) => {
-  const token = req.header('Authorization')?.replace('Bearer ', '');
+  const token = req.header("Authorization")?.replace("Bearer ", "");
 
   if (!token) {
-    return res.status(401).json({ error: 'Access denied. No token provided.' });
+    return res.status(401).json({ error: "Access denied. No token provided." });
   }
 
   try {
@@ -16,25 +19,25 @@ const verifyUser = async (req, res, next) => {
     const user = await User.findById(decoded.id);
 
     if (!user) {
-      return res.status(401).json({ error: 'User not found.' });
+      return res.status(401).json({ error: "User not found." });
     }
 
     req.user = user;
     next();
   } catch (error) {
-    if (error.name === 'TokenExpiredError') {
-      return res.status(401).json({ error: 'Token expired.' });
+    if (error.name === "TokenExpiredError") {
+      return res.status(401).json({ error: "Token expired." });
     }
-    res.status(400).json({ error: 'Please Login To Continue.' });
+    res.status(400).json({ error: "Please Login To Continue." });
   }
 };
 
 // Middleware to verify admin
 const verifyAdmin = async (req, res, next) => {
-  const token = req.header('Authorization')?.replace('Bearer ', '');
+  const token = req.header("Authorization")?.replace("Bearer ", "");
 
   if (!token) {
-    return res.status(401).json({ error: 'Access denied. No token provided.' });
+    return res.status(401).json({ error: "Access denied. No token provided." });
   }
 
   try {
@@ -42,16 +45,46 @@ const verifyAdmin = async (req, res, next) => {
     const admin = await Admin.findById(decoded.id);
 
     if (!admin) {
-      return res.status(401).json({ error: 'Unauthorized.' });
+      return res.status(401).json({ error: "Unauthorized." });
     }
 
     req.admin = admin;
     next();
   } catch (error) {
-    if (error.name === 'TokenExpiredError') {
-      return res.status(401).json({ error: 'Token expired.' });
+    if (error.name === "TokenExpiredError") {
+      return res.status(401).json({ error: "Token expired." });
     }
-    res.status(400).json({ error: 'Please Login To Continue.' });
+    res.status(400).json({ error: "Please Login To Continue." });
+  }
+};
+
+const verifyUserOrAdmin = async (req, res, next) => {
+  const token = req.header("Authorization")?.replace("Bearer ", "");
+
+  if (!token) {
+    return res.status(401).json({ error: "Access denied. No token provided." });
+  }
+  try {
+    const decoded = jwt.verify(token, accessTokenSecret);
+    const [user, admin] = await Promise.all([
+      User.findById(decoded.id),
+      Admin.findById(decoded.id),
+    ]);
+    if (user) {
+      req.user = user; // Attach the user to the request
+      return next();
+    }
+    if (admin) {
+      req.admin = admin; // Attach the admin to the request
+      return next();
+    }
+    return res.status(401).json({ error: "Unauthorized access." });
+  } catch (error) {
+    const message =
+      error.name === "TokenExpiredError"
+        ? "Token expired."
+        : "Please login to continue.";
+    return res.status(401).json({ error: message });
   }
 };
 
@@ -61,7 +94,9 @@ const roleValidator = (roles) => {
     const userRole = req.admin?.role;
 
     if (!roles.includes(userRole)) {
-      return res.status(403).json({ error: 'Access denied. Insufficient permissions.' });
+      return res
+        .status(403)
+        .json({ error: "Access denied. Insufficient permissions." });
     }
 
     next();
@@ -70,10 +105,10 @@ const roleValidator = (roles) => {
 
 // Middleware to check if it is user or admin and authenticate
 const authenticateUser = async (req, res, next) => {
-  const token = req.header('Authorization')?.replace('Bearer ', '');
+  const token = req.header("Authorization")?.replace("Bearer ", "");
 
   if (!token) {
-    return res.status(401).json({ error: 'Access denied. No token provided.' });
+    return res.status(401).json({ error: "Access denied. No token provided." });
   }
 
   try {
@@ -83,7 +118,7 @@ const authenticateUser = async (req, res, next) => {
     if (!user) {
       const admin = await Admin.findById(decoded.id);
       if (!admin) {
-        return res.status(401).json({ error: 'Unauthorized.' });
+        return res.status(401).json({ error: "Unauthorized." });
       }
       req.admin = admin;
       return next();
@@ -92,16 +127,17 @@ const authenticateUser = async (req, res, next) => {
     req.user = user;
     next();
   } catch (error) {
-    if (error.name === 'TokenExpiredError') {
-      return res.status(401).json({ error: 'Token expired.' });
+    if (error.name === "TokenExpiredError") {
+      return res.status(401).json({ error: "Token expired." });
     }
-    res.status(400).json({ error: 'Invalid token.' });
+    res.status(400).json({ error: "Invalid token." });
   }
 };
 
-module.exports = { 
-  verifyUser, 
-  verifyAdmin, 
+module.exports = {
+  verifyUser,
+  verifyAdmin,
+  verifyUserOrAdmin,
   roleValidator,
-  authenticateUser 
+  authenticateUser,
 };

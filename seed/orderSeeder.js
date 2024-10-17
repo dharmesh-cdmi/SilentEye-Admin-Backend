@@ -39,7 +39,7 @@ async function seedOrders() {
       // Create fake order details data
       const orderDetails = {
         email: randomUser.email,
-        country: randomUser.userDetails.country,
+        country: randomUser.userDetails?.country,
         purchase: faker.date.past(),
         total: parseFloat(faker.commerce.price())
       };

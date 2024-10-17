@@ -709,9 +709,8 @@ const getUserProfile = async (userId) => {
         user.ticket = ticket;
 
         let refundRequest = await RefundRequest.findOne({
-            email: user?.email,
-            status: 'Pending'
-        })
+            status: { $in: ['Pending'] },
+        }) 
         if (!user) {
             throw new Error('User not found');
         }

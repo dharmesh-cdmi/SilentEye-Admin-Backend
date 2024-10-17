@@ -19,6 +19,8 @@ const fetchAllTickets = async (page = 1, limit = 10, searchQuery = "", status, o
             { message: { $regex: searchQuery, $options: 'i' } },
             { status: { $regex: searchQuery, $options: 'i' } },
             { type: { $regex: searchQuery, $options: 'i' } },
+            { email: { $regex: searchQuery, $options: 'i' } },
+            { ticketId: { $regex: searchQuery, $options: 'i' } },
         ];
     }
     if (status) {

@@ -57,10 +57,25 @@ const deleteRefundRequest = async (id) => {
   }
 };
 
+// Get refund request by ID
+const getRefundRequestByUser = async (email, status = null) => {
+  try {
+    let options = {}
+    options.email = email;
+    if (status) options.status = status
+    return await RefundRequest.find({
+      email,
+      status
+    })
+  } catch (error) {
+    throw new Error(`Error in getting refund request: ${error.message}`);
+  }
+};
 module.exports = {
   createRefundRequest,
   getAllRefundRequests,
   getRefundRequestById,
   updateRefundRequest,
   deleteRefundRequest,
+  getRefundRequestByUser
 };

@@ -1,3 +1,4 @@
+const User = require('../models/userModel');
 const refundRequestService = require('../services/refundRequestService');
 const { apiSuccessResponse, apiErrorResponse, HTTP_STATUS_MESSAGE, HTTP_STATUS } = require('../utils/responseHelper')
 
@@ -62,10 +63,28 @@ const deleteRefundRequest = async (req, res) => {
   }
 };
 
+// Get refund request of a user
+const getUserRefundRequests = async (req, res) => {
+  let { status = null } = req.query;
+  let { userId } = req.params;
+
+  let user = await User.findById(userId);
+  if (!user){
+    return apiErrorResponse(res, HTTP_STATUS_MESSAGE[404], HTTP_STATUS.NOT_FOUND) 
+  }
+  try {
+    const refundRequest = await refundRequestService.getRefundRequestByUser(user.email, status);
+    
+    return apiSuccessResponse(res, HTTP_STATUS_MESSAGE[200], refundRequest, HTTP_STATUS.OK)
+  } catch (error) {
+    return apiErrorResponse(res, HTTP_STATUS_MESSAGE[500], error?.message ?? error, HTTP_STATUS.INTERNAL_SERVER_ERROR)
+  }
+}
 module.exports = {
   createRefundRequest,
   getAllRefundRequests,
   getRefundRequestById,
   updateRefundRequest,
   deleteRefundRequest,
+  getUserRefundRequests
 };

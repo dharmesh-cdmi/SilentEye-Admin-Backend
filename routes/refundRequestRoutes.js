@@ -6,6 +6,7 @@ const refundRequestController = require('../controllers/refundRequestController'
 
 router.post('/', refundRequestController.createRefundRequest);
 router.get('/', refundRequestController.getAllRefundRequests);
+router.get('/users/:userId', refundRequestController.getUserRefundRequests);
 router.get('/:id', refundRequestController.getRefundRequestById);
 router.put('/:id', refundRequestController.updateRefundRequest);
 router.delete('/:id', refundRequestController.deleteRefundRequest);

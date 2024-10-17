@@ -5,6 +5,7 @@ const adminModel = require('../models/admin/adminModel');
 const ManagerInfo = require('../models/managerInfoModel');
 const { fetchMyTickets } = require('./ticketService');
 const { Country } = require('../models/countrymodel');
+const RefundRequest = require('../models/refundRequestModel');
 const getUserStatistics = async (startDate = null, endDate = null) => {
     try {
         const matchStage = {};
@@ -706,6 +707,11 @@ const getUserProfile = async (userId) => {
 
         let ticket = await fetchMyTickets(userId);
         user.ticket = ticket;
+
+        let refundRequest = await RefundRequest.findOne({
+            email: user?.email,
+            status: 'Pending'
+        })
         if (!user) {
             throw new Error('User not found');
         }
@@ -714,7 +720,8 @@ const getUserProfile = async (userId) => {
             message: 'Data Fetched successfully',
             data: {
                 ...user._doc,
-                ticket
+                ticket,
+                refundRequest
             }
         };
     } catch (error) {

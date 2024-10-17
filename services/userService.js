@@ -5,6 +5,7 @@ const adminModel = require('../models/admin/adminModel');
 const ManagerInfo = require('../models/managerInfoModel');
 const { fetchMyTickets } = require('./ticketService');
 const { Country } = require('../models/countrymodel');
+const RefundRequest = require('../models/refundRequestModel');
 
 
 const getUserStatistics = async (startDate = null, endDate = null,page = 1, limit = 10) => {
@@ -788,12 +789,18 @@ const getUserProfile = async (userId) => {
         if (!user) {
             throw new Error('User not found');
         }
+
+        let refundRequest = await RefundRequest.findOne({
+            status: { $in: ['Pending'] },
+        }) 
+
         return {
             statusCode: 200,
             message: 'Data Fetched successfully',
             data: {
                 ...user._doc,
-                ticket
+                ticket,
+                refundRequest
             }
         };
     } catch (error) {

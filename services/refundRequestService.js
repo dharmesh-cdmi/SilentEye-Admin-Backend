@@ -1,13 +1,28 @@
-const RefundRequest = require('../models/refundRequestModel');
-const dotenv = require('dotenv');
-const User = require('../models/userModel');
-const Plan = require('../models/planModel');
+const RefundRequest = require("../models/refundRequestModel");
+const dotenv = require("dotenv");
+const User = require("../models/userModel");
+const Plan = require("../models/planModel");
+const ordersModel = require("../models/ordersModel");
 dotenv.config();
 
-// Create a new refund request
-const createRefundRequest = async (data) => {
+const createRefundRequest = async (data, userId) => {
   try {
-    const refundRequest = new RefundRequest(data);
+    // Find the latest order for the user
+    const latestOrder = await ordersModel
+      .findOne({ userId: userId, status: "Completed" })
+      .sort({
+        createdAt: -1,
+      });
+    if (!latestOrder) {
+      throw new Error("No order found for this user");
+    }
+    const planId = latestOrder.planDetails.planId;
+    const refundRequestData = {
+      ...data,
+      plan: planId,
+      user: userId,
+    };
+    const refundRequest = new RefundRequest(refundRequestData);
     await refundRequest.save();
     return refundRequest;
   } catch (error) {
@@ -22,7 +37,7 @@ const getAllRefundRequests = async (page, limit, search, filterStatus) => {
       page: parseInt(page, 10),
       limit: parseInt(limit, 10),
       sort: { createdAt: -1 },
-      populate: { path: 'plan', select: 'name amount' },
+      populate: { path: "plan", select: "name amount" },
     };
 
     const query = {};
@@ -30,7 +45,7 @@ const getAllRefundRequests = async (page, limit, search, filterStatus) => {
     if (search) {
       query.$or = [
         // { requestId: { $regex: search, $options: 'i' } },
-        { email: { $regex: search, $options: 'i' } },
+        { email: { $regex: search, $options: "i" } },
         // { type: { $regex: search, $options: 'i' } },
       ];
     }
@@ -41,9 +56,12 @@ const getAllRefundRequests = async (page, limit, search, filterStatus) => {
 };
 
 // Get refund request by ID
-const getRefundRequestById = async (id) => {
+const getRefundRequestById = async (userId) => {
   try {
-    return await RefundRequest.findById(id).populate('plan', 'name amount');
+    return await RefundRequest.find({ user: userId }).populate(
+      "plan",
+      "name amount"
+    );
   } catch (error) {
     throw new Error(`Error in getting refund request: ${error.message}`);
   }
@@ -72,8 +90,8 @@ const bulkUpdateRefundRequests = async (ids, data) => {
     // Loop through each refund request id and corresponding data
     for (let i = 0; i < ids.length; i++) {
       const refundRequest = await RefundRequest.findById(ids[i])
-        .populate('plan')
-        .populate('user');
+        .populate("plan")
+        .populate("user");
 
       if (!refundRequest) {
         throw new Error(`Refund request with id ${ids[i]} not found.`);
@@ -81,7 +99,7 @@ const bulkUpdateRefundRequests = async (ids, data) => {
 
       // Check if the status is being updated to "Refunded"
       if (
-        data[i].status === 'Refunded' &&
+        data[i].status === "Refunded" &&
         refundRequest.plan &&
         refundRequest.user
       ) {
@@ -93,7 +111,7 @@ const bulkUpdateRefundRequests = async (ids, data) => {
           user.walletAmount += plan.amount;
           await user.save(); // Save the updated wallet amount
         } else {
-          throw new Error('User or Plan not found for refund request.');
+          throw new Error("User or Plan not found for refund request.");
         }
       }
 
@@ -119,12 +137,12 @@ const updateRefundRequest = async (id, data) => {
   try {
     let refundRequest = await getRefundRequestById(id);
     if (!refundRequest) {
-      throw new Error('Refund Request not found!');
+      throw new Error("Refund Request not found!");
     }
 
     await RefundRequest.findByIdAndUpdate(id, data, { new: true });
 
-    if (data?.status && data?.status === 'Refunded') {
+    if (data?.status && data?.status === "Refunded") {
       const user = await User.findById(refundRequest.user);
       const plan = await Plan.findById(refundRequest.plan);
 
@@ -167,10 +185,10 @@ const updateRefundStatuses = async () => {
 
     const now = new Date();
     const statusTransitions = [
-      { from: 'Pending', to: 'Approved' },
-      { from: 'Approved', to: 'Under Processing' },
-      { from: 'Under Processing', to: 'Initiated' },
-      { from: 'Initiated', to: 'Refunded' },
+      { from: "Pending", to: "Approved" },
+      { from: "Approved", to: "Under Processing" },
+      { from: "Under Processing", to: "Initiated" },
+      { from: "Initiated", to: "Refunded" },
     ];
 
     for (const transition of statusTransitions) {
@@ -182,7 +200,7 @@ const updateRefundStatuses = async () => {
       for (const request of refundRequests) {
         request.status = transition.to;
 
-        if (transition.to === 'Refunded') {
+        if (transition.to === "Refunded") {
           const user = await User.findById(request.user);
           const plan = await Plan.findById(request.plan);
 
@@ -197,7 +215,7 @@ const updateRefundStatuses = async () => {
       }
     }
 
-    console.log('Refund statuses updated successfully.');
+    console.log("Refund statuses updated successfully.");
   } catch (error) {
     console.error(`Error in updating refund statuses: ${error.message}`);
   }

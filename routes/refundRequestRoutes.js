@@ -3,10 +3,11 @@
 const express = require('express');
 const router = express.Router();
 const refundRequestController = require('../controllers/refundRequestController');
+const { verifyUserOrAdmin } = require('../middleware/authMiddleware');
 
-router.post('/', refundRequestController.createRefundRequest);
+router.post('/', verifyUserOrAdmin, refundRequestController.createRefundRequest);
 router.get('/', refundRequestController.getAllRefundRequests);
-router.get('/:id', refundRequestController.getRefundRequestById);
+router.get('/userId', verifyUserOrAdmin, refundRequestController.getRefundRequestById);
 // Bulk update refund requests
 router.put('/bulk-update', refundRequestController.bulkUpdateRefundRequests);
 router.put('/:id', refundRequestController.updateRefundRequest);

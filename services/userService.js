@@ -780,7 +780,7 @@ const getUserProfile = async (userId) => {
                     select: "whatsapp skype"
                 }
             })
-            .populate('activePlanId', 'name amount')
+            .populate('activePlanId')
             .populate('userDetails', 'profile_avatar country address')
             .select('-password -refreshToken -__v -updatedAt -history -orders -amountSpend -amountRefund');
 

@@ -18,6 +18,10 @@ const RefundRequestSchema = new Schema(
       required: true,
       trim: true,
     },
+    reasonByAdmin: {
+      type: String,
+      required: false,
+    },
     // type: {
     //   type: String,
     //   required: true,

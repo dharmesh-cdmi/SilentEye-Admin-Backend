@@ -139,9 +139,7 @@ const updateRefundRequest = async (id, data) => {
     if (!refundRequest) {
       throw new Error("Refund Request not found!");
     }
-
     await RefundRequest.findByIdAndUpdate(id, data, { new: true });
-
     if (data?.status && data?.status === "Refunded") {
       const user = await User.findById(refundRequest.user);
       const plan = await Plan.findById(refundRequest.plan);
